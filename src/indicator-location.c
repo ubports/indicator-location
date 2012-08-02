@@ -12,6 +12,23 @@ GMainLoop * mainloop = NULL;
 
 /* Menu items */
 GtkMenuItem * accuracy_item = NULL;
+GtkMenuItem * details_item = NULL;
+
+gboolean has_location_details = FALSE;
+GtkMenuItem * lat_item = NULL;
+GtkMenuItem * lon_item = NULL;
+GtkMenuItem * alt_item = NULL;
+
+GtkMenuItem * detail_sep_item = NULL;
+
+gboolean has_address_details = FALSE;
+GtkMenuItem * ccode_item = NULL;
+GtkMenuItem * country_item = NULL;
+GtkMenuItem * region_item = NULL;
+GtkMenuItem * locality_item = NULL;
+GtkMenuItem * area_item = NULL;
+GtkMenuItem * postcode_item = NULL;
+GtkMenuItem * street_item = NULL;
 
 /* Geoclue trackers */
 static GeoclueMasterClient * geo_master = NULL;
@@ -30,12 +47,14 @@ update_accuracy (GeoclueAccuracyLevel level)
 	const char * icon = NULL;
 	const char * icon_desc = NULL;
 	const char * item_text = NULL;
+	gboolean details_sensitive = TRUE;
 	
 	switch (level) {
 	case GEOCLUE_ACCURACY_LEVEL_NONE:
 		icon = "indicator-location-unknown";
 		icon_desc = _("Location accuracy unknown");
 		item_text = _("Accuracy: Unknown");
+		details_sensitive = FALSE;
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_COUNTRY:
 	case GEOCLUE_ACCURACY_LEVEL_REGION:
@@ -43,17 +62,20 @@ update_accuracy (GeoclueAccuracyLevel level)
 		icon = "indicator-location-region";
 		icon_desc = _("Location regional accuracy");
 		item_text = _("Accuracy: Regional");
+		details_sensitive = TRUE;
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_POSTALCODE:
 	case GEOCLUE_ACCURACY_LEVEL_STREET:
 		icon = "indicator-location-neighborhood";
 		icon_desc = _("Location neighborhood accuracy");
 		item_text = _("Accuracy: Neighborhood");
+		details_sensitive = TRUE;
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_DETAILED:
 		icon = "indicator-location-specific";
 		icon_desc = _("Location specific accuracy");
 		item_text = _("Accuracy: Detailed");
+		details_sensitive = TRUE;
 		break;
 	default:
 		g_assert_not_reached();
@@ -65,6 +87,54 @@ update_accuracy (GeoclueAccuracyLevel level)
 
 	if (accuracy_item != NULL) {
 		gtk_menu_item_set_label(accuracy_item, item_text);
+	}
+
+	if (details_item != NULL) {
+		gtk_widget_set_sensitive(GTK_WIDGET(details_item), details_sensitive);
+	}
+
+	return;
+}
+
+struct {
+	const gchar * hash_value;
+	const gchar * item_label;
+	GtkMenuItem ** item;
+} address_detail_table[] = {
+	{GEOCLUE_ADDRESS_KEY_COUNTRYCODE,  N_("Country Code: %s"),  &ccode_item},
+	{GEOCLUE_ADDRESS_KEY_COUNTRY,      N_("Country: %s"),       &country_item},
+	{GEOCLUE_ADDRESS_KEY_REGION,       N_("Region: %s"),        &region_item},
+	{GEOCLUE_ADDRESS_KEY_LOCALITY,     N_("Locality: %s"),      &locality_item},
+	{GEOCLUE_ADDRESS_KEY_AREA,         N_("Area: %s"),          &area_item},
+	{GEOCLUE_ADDRESS_KEY_POSTALCODE,   N_("Zip Code: %s"),      &postcode_item},
+	{GEOCLUE_ADDRESS_KEY_STREET,       N_("Street: %s"),        &street_item},
+	{NULL, NULL, NULL}
+};
+
+void
+update_address_details (GHashTable * details)
+{
+	int i;
+	has_address_details = FALSE;
+
+	for (i = 0; address_detail_table[i].hash_value != NULL; i++) {
+		if (g_hash_table_contains(details, address_detail_table[i].hash_value)) {
+			gchar * string = g_strdup_printf(_(address_detail_table[i].item_label), g_hash_table_lookup(details, address_detail_table[i].hash_value));
+			gtk_menu_item_set_label(*address_detail_table[i].item, string);
+			g_free(string);
+
+			gtk_widget_show(GTK_WIDGET(*address_detail_table[i].item));
+
+			has_address_details = TRUE;
+		} else {
+			gtk_widget_hide(GTK_WIDGET(*address_detail_table[i].item));
+		}
+	}
+
+	if (has_location_details && has_address_details) {
+		gtk_widget_show(GTK_WIDGET(detail_sep_item));
+	} else {
+		gtk_widget_hide(GTK_WIDGET(detail_sep_item));
 	}
 
 	return;
@@ -83,6 +153,8 @@ geo_address_cb (GeoclueAddress * address, int timestamp, GHashTable * addy_data,
 	GeoclueAccuracyLevel level = GEOCLUE_ACCURACY_LEVEL_NONE;
 	geoclue_accuracy_get_details(accuracy, &level, NULL, NULL);
 	update_accuracy(level);
+
+	update_address_details(addy_data);
 
 	return;
 }
@@ -246,6 +318,75 @@ open_maps (void)
 }
 
 void
+open_debuglocation (void)
+{
+	g_spawn_command_line_async("geoclue-test-gui", NULL);
+	return;
+}
+
+GtkWidget *
+build_details_items (void)
+{
+	GtkWidget * menu = gtk_menu_new();
+
+	lat_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(lat_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(lat_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(lat_item));
+
+	lon_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(lon_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(lon_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(lon_item));
+
+	alt_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(alt_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(alt_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(alt_item));
+
+	detail_sep_item = GTK_MENU_ITEM(gtk_separator_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(alt_item));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(alt_item));
+
+	ccode_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(ccode_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(ccode_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(ccode_item));
+
+	country_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(country_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(country_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(country_item));
+
+	region_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(region_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(region_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(region_item));
+
+	locality_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(locality_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(locality_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(locality_item));
+
+	area_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(area_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(area_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(area_item));
+
+	postcode_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(postcode_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(postcode_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(postcode_item));
+
+	street_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(street_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(street_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(street_item));
+
+	return menu;
+}
+
+void
 build_indicator (void)
 {
 	indicator = app_indicator_new_with_path("indicator-location", "indicator-location-unknown", APP_INDICATOR_CATEGORY_SYSTEM_SERVICES, ICON_DIR);
@@ -257,6 +398,14 @@ build_indicator (void)
 	accuracy_item = GTK_MENU_ITEM(gtk_menu_item_new());
 	gtk_widget_show(GTK_WIDGET(accuracy_item));
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(accuracy_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(accuracy_item), FALSE);
+
+	details_item = GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Details")));
+	gtk_widget_show(GTK_WIDGET(details_item));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(details_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(details_item), FALSE);
+
+	gtk_menu_item_set_submenu(details_item, build_details_items());
 
 	gchar * maps_in_path = g_find_program_in_path("emerillon");
 	if (maps_in_path != NULL) {
@@ -271,6 +420,21 @@ build_indicator (void)
 		gtk_widget_show(maps);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(maps));
 		g_signal_connect(G_OBJECT(maps), "activate", G_CALLBACK(open_maps), NULL);
+	}
+
+	gchar * geoclue_in_path = g_find_program_in_path("geoclue-test-gui");
+	if (geoclue_in_path != NULL) {
+		g_free(geoclue_in_path);
+		geoclue_in_path = NULL;
+
+		GtkWidget * sep = gtk_separator_menu_item_new();
+		gtk_widget_show(sep);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(sep));
+
+		GtkWidget * debugloc = gtk_menu_item_new_with_label(_("Debug Location"));
+		gtk_widget_show(debugloc);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(debugloc));
+		g_signal_connect(G_OBJECT(debugloc), "activate", G_CALLBACK(open_debuglocation), NULL);
 	}
 
 	gtk_widget_show(GTK_WIDGET(menu));
