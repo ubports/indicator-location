@@ -14,12 +14,14 @@ GMainLoop * mainloop = NULL;
 GtkMenuItem * accuracy_item = NULL;
 GtkMenuItem * details_item = NULL;
 
+gboolean has_location_details = FALSE;
 GtkMenuItem * lat_item = NULL;
 GtkMenuItem * lon_item = NULL;
 GtkMenuItem * alt_item = NULL;
 
 GtkMenuItem * detail_sep_item = NULL;
 
+gboolean has_address_details = FALSE;
 GtkMenuItem * ccode_item = NULL;
 GtkMenuItem * country_item = NULL;
 GtkMenuItem * region_item = NULL;
@@ -94,6 +96,50 @@ update_accuracy (GeoclueAccuracyLevel level)
 	return;
 }
 
+struct {
+	const gchar * hash_value;
+	const gchar * item_label;
+	GtkMenuItem ** item;
+} address_detail_table[] = {
+	{GEOCLUE_ADDRESS_KEY_COUNTRYCODE,  N_("Country Code: %s"),  &ccode_item},
+	{GEOCLUE_ADDRESS_KEY_COUNTRY,      N_("Country: %s"),       &country_item},
+	{GEOCLUE_ADDRESS_KEY_REGION,       N_("Region: %s"),        &region_item},
+	{GEOCLUE_ADDRESS_KEY_LOCALITY,     N_("Locality: %s"),      &locality_item},
+	{GEOCLUE_ADDRESS_KEY_AREA,         N_("Area: %s"),          &area_item},
+	{GEOCLUE_ADDRESS_KEY_POSTALCODE,   N_("Zip Code: %s"),      &postcode_item},
+	{GEOCLUE_ADDRESS_KEY_STREET,       N_("Street: %s"),        &street_item},
+	{NULL, NULL, NULL}
+};
+
+void
+update_address_details (GHashTable * details)
+{
+	int i;
+	has_address_details = FALSE;
+
+	for (i = 0; address_detail_table[i].hash_value != NULL; i++) {
+		if (g_hash_table_contains(details, address_detail_table[i].hash_value)) {
+			gchar * string = g_strdup_printf(_(address_detail_table[i].item_label), g_hash_table_lookup(details, address_detail_table[i].hash_value));
+			gtk_menu_item_set_label(*address_detail_table[i].item, string);
+			g_free(string);
+
+			gtk_widget_show(GTK_WIDGET(*address_detail_table[i].item));
+
+			has_address_details = TRUE;
+		} else {
+			gtk_widget_hide(GTK_WIDGET(*address_detail_table[i].item));
+		}
+	}
+
+	if (has_location_details && has_address_details) {
+		gtk_widget_show(GTK_WIDGET(detail_sep_item));
+	} else {
+		gtk_widget_hide(GTK_WIDGET(detail_sep_item));
+	}
+
+	return;
+}
+
 /* Callback from getting the address */
 static void
 geo_address_cb (GeoclueAddress * address, int timestamp, GHashTable * addy_data, GeoclueAccuracy * accuracy, GError * error, gpointer user_data)
@@ -107,6 +153,8 @@ geo_address_cb (GeoclueAddress * address, int timestamp, GHashTable * addy_data,
 	GeoclueAccuracyLevel level = GEOCLUE_ACCURACY_LEVEL_NONE;
 	geoclue_accuracy_get_details(accuracy, &level, NULL, NULL);
 	update_accuracy(level);
+
+	update_address_details(addy_data);
 
 	return;
 }
@@ -352,7 +400,7 @@ build_indicator (void)
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(accuracy_item));
 	gtk_widget_set_sensitive(GTK_WIDGET(accuracy_item), FALSE);
 
-	details_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	details_item = GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Details")));
 	gtk_widget_show(GTK_WIDGET(details_item));
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(details_item));
 	gtk_widget_set_sensitive(GTK_WIDGET(details_item), FALSE);
