@@ -416,7 +416,7 @@ build_indicator (void)
 		gtk_widget_show(sep);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(sep));
 
-		GtkWidget * maps = gtk_menu_item_new_with_label(_("Open Map"));
+		GtkWidget * maps = gtk_menu_item_new_with_label(_("Open Map…"));
 		gtk_widget_show(maps);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(maps));
 		g_signal_connect(G_OBJECT(maps), "activate", G_CALLBACK(open_maps), NULL);
@@ -431,7 +431,7 @@ build_indicator (void)
 		gtk_widget_show(sep);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(sep));
 
-		GtkWidget * debugloc = gtk_menu_item_new_with_label(_("Debug Location"));
+		GtkWidget * debugloc = gtk_menu_item_new_with_label(_("Debug Location…"));
 		gtk_widget_show(debugloc);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(debugloc));
 		g_signal_connect(G_OBJECT(debugloc), "activate", G_CALLBACK(open_debuglocation), NULL);
