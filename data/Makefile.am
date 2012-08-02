@@ -6,3 +6,5 @@ icons_DATA = \
 	indicator-location-specific.svg \
 	indicator-location-unknown.svg
 
+EXTRA_DIST = \
+	$(icons_DATA)
