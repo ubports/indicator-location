@@ -18,6 +18,16 @@ GtkMenuItem * lat_item = NULL;
 GtkMenuItem * lon_item = NULL;
 GtkMenuItem * alt_item = NULL;
 
+GtkMenuItem * detail_sep_item = NULL;
+
+GtkMenuItem * ccode_item = NULL;
+GtkMenuItem * country_item = NULL;
+GtkMenuItem * region_item = NULL;
+GtkMenuItem * locality_item = NULL;
+GtkMenuItem * area_item = NULL;
+GtkMenuItem * postcode_item = NULL;
+GtkMenuItem * street_item = NULL;
+
 /* Geoclue trackers */
 static GeoclueMasterClient * geo_master = NULL;
 static GeoclueAddress * geo_address = NULL;
@@ -285,6 +295,45 @@ build_details_items (void)
 	gtk_widget_show(GTK_WIDGET(alt_item));
 	gtk_widget_set_sensitive(GTK_WIDGET(alt_item), FALSE);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(alt_item));
+
+	detail_sep_item = GTK_MENU_ITEM(gtk_separator_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(alt_item));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(alt_item));
+
+	ccode_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(ccode_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(ccode_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(ccode_item));
+
+	country_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(country_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(country_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(country_item));
+
+	region_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(region_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(region_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(region_item));
+
+	locality_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(locality_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(locality_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(locality_item));
+
+	area_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(area_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(area_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(area_item));
+
+	postcode_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(postcode_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(postcode_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(postcode_item));
+
+	street_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(street_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(street_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(street_item));
 
 	return menu;
 }
