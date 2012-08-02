@@ -1,5 +1,5 @@
 
-iconsdir = $(datadir)/icons/ubuntu-mono-dark/stock/scalable
+iconsdir = $(pkgdatadir)/icons/
 icons_DATA = \
 	indicator-location-neighborhood.svg \
 	indicator-location-region.svg \

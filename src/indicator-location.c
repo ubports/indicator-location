@@ -241,7 +241,7 @@ geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar *
 void
 build_indicator (void)
 {
-	indicator = app_indicator_new("indicator-location", "indicator-location-unknown", APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
+	indicator = app_indicator_new_with_path("indicator-location", "indicator-location-unknown", APP_INDICATOR_CATEGORY_SYSTEM_SERVICES, ICON_DIR);
 	app_indicator_set_title(indicator, _("Location"));
 	app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
 
