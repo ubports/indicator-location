@@ -1,10 +1,10 @@
-indicator-location (0.0.2-0ubuntu1~ppa1) UNRELEASED; urgency=low
+indicator-location (0.0.2-0ubuntu1~ppa1) quantal; urgency=low
 
   * New upstream release.
     * Move icons into own directory
     * Add an autostart file
 
- -- Ted Gould <ted@ubuntu.com>  Thu, 02 Aug 2012 14:45:49 +0100
+ -- Ted Gould <ted@ubuntu.com>  Thu, 02 Aug 2012 14:46:55 +0100
 
 indicator-location (0.0.1-0ubuntu1~ppa1) quantal; urgency=low
 
