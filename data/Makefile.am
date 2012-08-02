@@ -1,1 +1,8 @@
-# Nothing to see here
+
+iconsdir = $(datadir)/icons/ubuntu-mono-dark/stock/scalable
+icons_DATA = \
+	indicator-location-neighborhood.svg \
+	indicator-location-region.svg \
+	indicator-location-specific.svg \
+	indicator-location-unknown.svg
+
