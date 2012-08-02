@@ -257,6 +257,7 @@ build_indicator (void)
 	accuracy_item = GTK_MENU_ITEM(gtk_menu_item_new());
 	gtk_widget_show(GTK_WIDGET(accuracy_item));
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(accuracy_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(accuracy_item), FALSE);
 
 	gchar * maps_in_path = g_find_program_in_path("emerillon");
 	if (maps_in_path != NULL) {
