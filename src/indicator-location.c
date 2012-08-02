@@ -239,6 +239,13 @@ geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar *
 }
 
 void
+open_maps (void)
+{
+	g_spawn_command_line_async("emerillon", NULL);
+	return;
+}
+
+void
 build_indicator (void)
 {
 	indicator = app_indicator_new_with_path("indicator-location", "indicator-location-unknown", APP_INDICATOR_CATEGORY_SYSTEM_SERVICES, ICON_DIR);
@@ -250,6 +257,21 @@ build_indicator (void)
 	accuracy_item = GTK_MENU_ITEM(gtk_menu_item_new());
 	gtk_widget_show(GTK_WIDGET(accuracy_item));
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(accuracy_item));
+
+	gchar * maps_in_path = g_find_program_in_path("emerillon");
+	if (maps_in_path != NULL) {
+		g_free(maps_in_path);
+		maps_in_path = NULL;
+
+		GtkWidget * sep = gtk_separator_menu_item_new();
+		gtk_widget_show(sep);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(sep));
+
+		GtkWidget * maps = gtk_menu_item_new_with_label(_("Open Map"));
+		gtk_widget_show(maps);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(maps));
+		g_signal_connect(G_OBJECT(maps), "activate", G_CALLBACK(open_maps), NULL);
+	}
 
 	gtk_widget_show(GTK_WIDGET(menu));
 
