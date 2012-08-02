@@ -14,6 +14,10 @@ GMainLoop * mainloop = NULL;
 GtkMenuItem * accuracy_item = NULL;
 GtkMenuItem * details_item = NULL;
 
+GtkMenuItem * lat_item = NULL;
+GtkMenuItem * lon_item = NULL;
+GtkMenuItem * alt_item = NULL;
+
 /* Geoclue trackers */
 static GeoclueMasterClient * geo_master = NULL;
 static GeoclueAddress * geo_address = NULL;
@@ -265,8 +269,24 @@ open_debuglocation (void)
 GtkWidget *
 build_details_items (void)
 {
+	GtkWidget * menu = gtk_menu_new();
 
-	return NULL;
+	lat_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(lat_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(lat_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(lat_item));
+
+	lon_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(lon_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(lon_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(lon_item));
+
+	alt_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(alt_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(alt_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(alt_item));
+
+	return menu;
 }
 
 void
