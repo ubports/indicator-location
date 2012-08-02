@@ -28,26 +28,31 @@ static void
 update_accuracy (GeoclueAccuracyLevel level)
 {
 	const char * icon = NULL;
+	const char * icon_desc = NULL;
 	const char * item_text = NULL;
 	
 	switch (level) {
 	case GEOCLUE_ACCURACY_LEVEL_NONE:
 		icon = "indicator-location-unknown";
+		icon_desc = _("Location accuracy unknown");
 		item_text = _("Accuracy: Unknown");
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_COUNTRY:
 	case GEOCLUE_ACCURACY_LEVEL_REGION:
 	case GEOCLUE_ACCURACY_LEVEL_LOCALITY:
 		icon = "indicator-location-region";
+		icon_desc = _("Location regional accuracy");
 		item_text = _("Accuracy: Regional");
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_POSTALCODE:
 	case GEOCLUE_ACCURACY_LEVEL_STREET:
 		icon = "indicator-location-neighborhood";
+		icon_desc = _("Location neighborhood accuracy");
 		item_text = _("Accuracy: Neighborhood");
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_DETAILED:
 		icon = "indicator-location-specific";
+		icon_desc = _("Location specific accuracy");
 		item_text = _("Accuracy: Detailed");
 		break;
 	default:
@@ -55,7 +60,7 @@ update_accuracy (GeoclueAccuracyLevel level)
 	}
 
 	if (indicator != NULL) {
-		app_indicator_set_icon(indicator, icon);
+		app_indicator_set_icon_full(indicator, icon, icon_desc);
 	}
 
 	if (accuracy_item != NULL) {
@@ -233,14 +238,38 @@ geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar *
 	return;
 }
 
+void
+build_indicator (void)
+{
+	indicator = app_indicator_new("indicator-location", "indicator-location-unknown", APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
+	app_indicator_set_title(indicator, _("Location"));
+	app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
+
+	GtkMenu * menu = GTK_MENU(gtk_menu_new());
+
+	accuracy_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(accuracy_item));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(accuracy_item));
+
+	gtk_widget_show(GTK_WIDGET(menu));
+
+	app_indicator_set_menu(indicator, menu);
+
+	update_accuracy(GEOCLUE_ACCURACY_LEVEL_NONE);
+
+	return;
+}
+
 int
 main (int argc, char * argv[])
 {
-	g_type_init();
+	gtk_init(&argc, &argv);
 
 	/* Setup geoclue */
 	GeoclueMaster * master = geoclue_master_get_default();
 	geoclue_master_create_client_async(master, geo_create_client, NULL);
+
+	build_indicator();
 
 	/* Mainloop */
 	mainloop = g_main_loop_new(NULL, FALSE);
