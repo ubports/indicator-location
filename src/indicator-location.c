@@ -246,6 +246,13 @@ open_maps (void)
 }
 
 void
+open_debuglocation (void)
+{
+	g_spawn_command_line_async("geoclue-test-gui", NULL);
+	return;
+}
+
+void
 build_indicator (void)
 {
 	indicator = app_indicator_new_with_path("indicator-location", "indicator-location-unknown", APP_INDICATOR_CATEGORY_SYSTEM_SERVICES, ICON_DIR);
@@ -272,6 +279,21 @@ build_indicator (void)
 		gtk_widget_show(maps);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(maps));
 		g_signal_connect(G_OBJECT(maps), "activate", G_CALLBACK(open_maps), NULL);
+	}
+
+	gchar * geoclue_in_path = g_find_program_in_path("geoclue-test-gui");
+	if (geoclue_in_path != NULL) {
+		g_free(geoclue_in_path);
+		geoclue_in_path = NULL;
+
+		GtkWidget * sep = gtk_separator_menu_item_new();
+		gtk_widget_show(sep);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(sep));
+
+		GtkWidget * debugloc = gtk_menu_item_new_with_label(_("Debug Location"));
+		gtk_widget_show(debugloc);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(debugloc));
+		g_signal_connect(G_OBJECT(debugloc), "activate", G_CALLBACK(open_debuglocation), NULL);
 	}
 
 	gtk_widget_show(GTK_WIDGET(menu));
