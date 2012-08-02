@@ -10,6 +10,9 @@
 AppIndicator * indicator = NULL;
 GMainLoop * mainloop = NULL;
 
+/* Menu items */
+GtkMenuItem * accuracy_item = NULL;
+
 /* Geoclue trackers */
 static GeoclueMasterClient * geo_master = NULL;
 static GeoclueAddress * geo_address = NULL;
@@ -24,7 +27,40 @@ static void geo_create_client (GeoclueMaster * master, GeoclueMasterClient * cli
 static void
 update_accuracy (GeoclueAccuracyLevel level)
 {
+	const char * icon = NULL;
+	const char * item_text = NULL;
+	
+	switch (level) {
+	case GEOCLUE_ACCURACY_LEVEL_NONE:
+		icon = "indicator-location-unknown";
+		item_text = _("Accuracy: Unknown");
+		break;
+	case GEOCLUE_ACCURACY_LEVEL_COUNTRY:
+	case GEOCLUE_ACCURACY_LEVEL_REGION:
+	case GEOCLUE_ACCURACY_LEVEL_LOCALITY:
+		icon = "indicator-location-region";
+		item_text = _("Accuracy: Regional");
+		break;
+	case GEOCLUE_ACCURACY_LEVEL_POSTALCODE:
+	case GEOCLUE_ACCURACY_LEVEL_STREET:
+		icon = "indicator-location-neighborhood";
+		item_text = _("Accuracy: Neighborhood");
+		break;
+	case GEOCLUE_ACCURACY_LEVEL_DETAILED:
+		icon = "indicator-location-specific";
+		item_text = _("Accuracy: Detailed");
+		break;
+	default:
+		g_assert_not_reached();
+	}
 
+	if (indicator != NULL) {
+		app_indicator_set_icon(indicator, icon);
+	}
+
+	if (accuracy_item != NULL) {
+		gtk_menu_item_set_label(accuracy_item, item_text);
+	}
 
 	return;
 }
