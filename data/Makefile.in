@@ -102,8 +102,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(iconsdir)"
-DATA = $(icons_DATA)
+am__installdirs = "$(DESTDIR)$(autostartdir)" "$(DESTDIR)$(iconsdir)"
+DATA = $(autostart_DATA) $(icons_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALL_LINGUAS = @ALL_LINGUAS@
@@ -260,14 +260,17 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-iconsdir = $(datadir)/icons/ubuntu-mono-dark/stock/scalable
+iconsdir = $(pkgdatadir)/icons/
 icons_DATA = \
 	indicator-location-neighborhood.svg \
 	indicator-location-region.svg \
 	indicator-location-specific.svg \
 	indicator-location-unknown.svg
 
+autostartdir = $(sysconfdir)/xdg/autostart
+autostart_DATA = indicator-location.desktop
 EXTRA_DIST = \
+	$(autostart_DATA) \
 	$(icons_DATA)
 
 all: all-am
@@ -309,6 +312,27 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-autostartDATA: $(autostart_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(autostart_DATA)'; test -n "$(autostartdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(autostartdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(autostartdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(autostartdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(autostartdir)" || exit $$?; \
+	done
+
+uninstall-autostartDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(autostart_DATA)'; test -n "$(autostartdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(autostartdir)'; $(am__uninstall_files_from_dir)
 install-iconsDATA: $(icons_DATA)
 	@$(NORMAL_INSTALL)
 	@list='$(icons_DATA)'; test -n "$(iconsdir)" || list=; \
@@ -371,7 +395,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(iconsdir)"; do \
+	for dir in "$(DESTDIR)$(autostartdir)" "$(DESTDIR)$(iconsdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -424,7 +448,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-iconsDATA
+install-data-am: install-autostartDATA install-iconsDATA
 
 install-dvi: install-dvi-am
 
@@ -468,21 +492,22 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-iconsDATA
+uninstall-am: uninstall-autostartDATA uninstall-iconsDATA
 
 .MAKE: install-am install-strip
 
 .PHONY: all all-am check check-am clean clean-generic clean-libtool \
 	distclean distclean-generic distclean-libtool distdir dvi \
 	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-iconsDATA install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	uninstall uninstall-am uninstall-iconsDATA
+	install-autostartDATA install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-iconsDATA install-info install-info-am \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
+	ps ps-am uninstall uninstall-am uninstall-autostartDATA \
+	uninstall-iconsDATA
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
