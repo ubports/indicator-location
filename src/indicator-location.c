@@ -20,6 +20,15 @@ static void geo_address_change (GeoclueMasterClient * client, gchar * a, gchar *
 static void geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar * path, GError * error, gpointer user_data);
 
 
+/* Update accuracy */
+static void
+update_accuracy (GeoclueAccuracyLevel level)
+{
+
+
+	return;
+}
+
 /* Callback from getting the address */
 static void
 geo_address_cb (GeoclueAddress * address, int timestamp, GHashTable * addy_data, GeoclueAccuracy * accuracy, GError * error, gpointer user_data)
@@ -30,7 +39,9 @@ geo_address_cb (GeoclueAddress * address, int timestamp, GHashTable * addy_data,
 		return;
 	}
 
-	/* TODO: Use the data */
+	GeoclueAccuracyLevel level = GEOCLUE_ACCURACY_LEVEL_NONE;
+	geoclue_accuracy_get_details(accuracy, &level, NULL, NULL);
+	update_accuracy(level);
 
 	return;
 }
@@ -124,7 +135,7 @@ geo_client_invalid (GeoclueMasterClient * client, gpointer user_data)
 	GeoclueMaster * master = geoclue_master_get_default();
 	geoclue_master_create_client_async(master, geo_create_client, NULL);
 
-	/* TODO: Clear data */
+	update_accuracy(GEOCLUE_ACCURACY_LEVEL_NONE);
 
 	return;
 }
@@ -141,7 +152,7 @@ geo_address_change (GeoclueMasterClient * client, gchar * a, gchar * b, gchar * 
 
 	geoclue_master_client_create_address_async(geo_master, geo_create_address, NULL);
 
-	/* TODO: Clear data */
+	update_accuracy(GEOCLUE_ACCURACY_LEVEL_NONE);
 
 	return;
 }
