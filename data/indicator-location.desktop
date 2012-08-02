@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Indicator Location
+Comment=Show the accuracy of your location in the menubar
+Icon=indicator-location-neighborhood
+Exec=indicator-location
+Terminal=false
+Type=Application
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
