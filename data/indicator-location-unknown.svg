@@ -24,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="56.0625"
+     inkscape:zoom="32"
      inkscape:cx="6.0949687"
-     inkscape:cy="7.2200739"
+     inkscape:cy="6.8368806"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -52,7 +52,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -69,7 +69,7 @@
        sodipodi:cy="7"
        sodipodi:rx="5"
        sodipodi:ry="5"
-       d="M 13,7 A 5,5 0 1 1 3,7 5,5 0 1 1 13,7 z"
+       d="M 13,7 C 13,9.7614237 10.761424,12 8,12 5.2385763,12 3,9.7614237 3,7 3,4.2385763 5.2385763,2 8,2 c 2.761424,0 5,2.2385763 5,5 z"
        transform="matrix(1.0909091,0,0,1.0909091,-0.72727275,1036.7257)" />
     <path
        style="fill:none;stroke:#dfdbd3;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;color:#000000;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
@@ -94,15 +94,15 @@
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-size:10.88486958000000016px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#dfdbd3;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
-       x="6"
-       y="1048.3622"
+       style="font-size:8.69258404px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#dfdbd3;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
+       x="6.4519057"
+       y="1047.3174"
        id="text3849"
        sodipodi:linespacing="100%"><tspan
          sodipodi:role="line"
          id="tspan3851"
-         x="6"
-         y="1048.3622">?</tspan></text>
+         x="6.4519057"
+         y="1047.3174">?</tspan></text>
     <path
        style="fill:none;stroke:#dfdbd3;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m 8,1049.3622 c 0,2 0,2 0,2"
