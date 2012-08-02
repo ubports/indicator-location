@@ -1,5 +1,5 @@
-indicator-location (0.0.1-0ubuntu1~ppa1) UNRELEASED; urgency=low
+indicator-location (0.0.1-0ubuntu1~ppa1) quantal; urgency=low
 
   * New upstream release.
 
- -- Ted Gould <ted@ubuntu.com>  Thu, 02 Aug 2012 14:10:15 +0100
+ -- Ted Gould <ted@ubuntu.com>  Thu, 02 Aug 2012 14:45:38 +0100
