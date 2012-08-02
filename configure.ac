@@ -26,6 +26,7 @@ AC_CONFIG_FILES([
 ])
 
 PKG_CHECK_MODULES(INDICATOR, glib-2.0
+                  geoclue
                   appindicator3-0.1)
 
 ###########################
