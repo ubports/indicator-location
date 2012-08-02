@@ -1,11 +1,11 @@
-indicator-location (0.0.3-0ubuntu1~ppa1) UNRELEASED; urgency=low
+indicator-location (0.0.3-0ubuntu1~ppa1) quantal; urgency=low
 
   * New upstream release.
     * Better question mark
     * Open Maps menu item
   * debian/control: Recommending Maps and Ubuntu GeoIP
 
- -- Ted Gould <ted@ubuntu.com>  Thu, 02 Aug 2012 15:12:02 +0100
+ -- Ted Gould <ted@ubuntu.com>  Thu, 02 Aug 2012 15:14:42 +0100
 
 indicator-location (0.0.2-0ubuntu1~ppa1) quantal; urgency=low
 
