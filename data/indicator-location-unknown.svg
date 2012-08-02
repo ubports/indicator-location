@@ -24,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="56.0625"
+     inkscape:zoom="32"
      inkscape:cx="6.0949687"
-     inkscape:cy="7.2200739"
+     inkscape:cy="6.8368806"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -52,7 +52,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -69,7 +69,7 @@
        sodipodi:cy="7"
        sodipodi:rx="5"
        sodipodi:ry="5"
-       d="M 13,7 A 5,5 0 1 1 3,7 5,5 0 1 1 13,7 z"
+       d="M 13,7 C 13,9.7614237 10.761424,12 8,12 5.2385763,12 3,9.7614237 3,7 3,4.2385763 5.2385763,2 8,2 c 2.761424,0 5,2.2385763 5,5 z"
        transform="matrix(1.0909091,0,0,1.0909091,-0.72727275,1036.7257)" />
     <path
        style="fill:none;stroke:#dfdbd3;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;color:#000000;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
@@ -92,17 +92,11 @@
        d="m 8,1049.3622 c 0,2 0,2 0,2"
        id="path3763-7-0"
        inkscape:connector-curvature="0" />
-    <text
-       xml:space="preserve"
-       style="font-size:10.88486958000000016px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#dfdbd3;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
-       x="6"
-       y="1048.3622"
-       id="text3849"
-       sodipodi:linespacing="100%"><tspan
-         sodipodi:role="line"
-         id="tspan3851"
-         x="6"
-         y="1048.3622">?</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       id="path2992"
+       style="font-size:8.69258404px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#dfdbd3;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
+       d="m 7.9644153,1041.8324 c -0.3824748,0 -0.7562555,0.099 -1.1213433,0.2955 l -0.2260072,-0.6259 c 0.1970316,-0.1043 0.4172435,-0.1883 0.6606364,-0.252 0.2491863,-0.064 0.5128611,-0.096 0.7910252,-0.096 0.3303162,0 0.599786,0.046 0.8084103,0.1391 0.2144144,0.087 0.3853684,0.2 0.5128624,0.339 0.1274882,0.1391 0.214414,0.2956 0.2607776,0.4694 0.052152,0.1681 0.07823,0.3304 0.078233,0.4868 -3.3e-6,0.1971 -0.037671,0.3738 -0.1130036,0.5303 -0.075339,0.1506 -0.1680596,0.2926 -0.2781627,0.4259 -0.1101088,0.1333 -0.2318049,0.2608 -0.3650885,0.3825 -0.1332887,0.1217 -0.2549847,0.2492 -0.3650885,0.3824 -0.1101081,0.1275 -0.2028289,0.2695 -0.2781627,0.426 -0.075338,0.1507 -0.1130054,0.3216 -0.1130036,0.5128 -1.8e-6,0.029 -1.8e-6,0.061 0,0.096 -1.8e-6,0.035 0.0029,0.067 0.00869,0.096 l -0.6780216,0 c -0.023181,-0.1159 -0.034771,-0.2376 -0.03477,-0.3651 -1.1e-6,-0.1854 0.031872,-0.3535 0.095618,-0.5042 0.06954,-0.1506 0.1564652,-0.2897 0.2607775,-0.4172 0.1043095,-0.1333 0.2144155,-0.255 0.3303182,-0.3651 0.1158993,-0.1159 0.2260052,-0.2318 0.3303182,-0.3477 0.1043088,-0.1159 0.1883371,-0.2376 0.2520849,-0.3651 0.069538,-0.1275 0.1043086,-0.2666 0.1043111,-0.4172 -2.5e-6,-0.2434 -0.078236,-0.4405 -0.2346998,-0.5911 -0.1564686,-0.1565 -0.3853731,-0.2347 -0.6867142,-0.2347 m 0.5476328,5.0156 c -2e-6,0.1565 -0.052157,0.2926 -0.1564665,0.4085 -0.1043128,0.1159 -0.2462915,0.1739 -0.4259366,0.1739 -0.179648,0 -0.3216268,-0.058 -0.4259366,-0.1739 -0.104312,-0.1159 -0.1564674,-0.252 -0.1564665,-0.4085 -9e-7,-0.1565 0.052154,-0.2927 0.1564665,-0.4086 0.1043098,-0.1159 0.2462886,-0.1738 0.4259366,-0.1738 0.1796451,0 0.3216238,0.058 0.4259366,0.1738 0.104309,0.1159 0.1564645,0.2521 0.1564665,0.4086" />
     <path
        style="fill:none;stroke:#dfdbd3;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m 8,1049.3622 c 0,2 0,2 0,2"
