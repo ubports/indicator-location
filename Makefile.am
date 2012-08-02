@@ -1,5 +1,6 @@
 
 SUBDIRS = \
+	src \
 	data \
 	po
 

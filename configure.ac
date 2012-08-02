@@ -21,10 +21,11 @@ AC_CONFIG_HEADER(config.h)
 AC_CONFIG_FILES([
     Makefile
 	data/Makefile
+	src/Makefile
     po/Makefile.in
 ])
 
-PKG_CHECK_MODULES(SERVICE, glib-2.0
+PKG_CHECK_MODULES(INDICATOR, glib-2.0
                   appindicator3-0.1)
 
 ###########################
