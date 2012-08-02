@@ -1,5 +1,5 @@
 
-AC_INIT(indicator-location, 0.0.1)
+AC_INIT(indicator-location, 0.0.2)
 
 AC_PREREQ(2.53)
 AM_INIT_AUTOMAKE([])
