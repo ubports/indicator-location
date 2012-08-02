@@ -12,6 +12,7 @@ GMainLoop * mainloop = NULL;
 
 /* Menu items */
 GtkMenuItem * accuracy_item = NULL;
+GtkMenuItem * details_item = NULL;
 
 /* Geoclue trackers */
 static GeoclueMasterClient * geo_master = NULL;
@@ -30,12 +31,14 @@ update_accuracy (GeoclueAccuracyLevel level)
 	const char * icon = NULL;
 	const char * icon_desc = NULL;
 	const char * item_text = NULL;
+	gboolean details_sensitive = TRUE;
 	
 	switch (level) {
 	case GEOCLUE_ACCURACY_LEVEL_NONE:
 		icon = "indicator-location-unknown";
 		icon_desc = _("Location accuracy unknown");
 		item_text = _("Accuracy: Unknown");
+		details_sensitive = FALSE;
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_COUNTRY:
 	case GEOCLUE_ACCURACY_LEVEL_REGION:
@@ -43,17 +46,20 @@ update_accuracy (GeoclueAccuracyLevel level)
 		icon = "indicator-location-region";
 		icon_desc = _("Location regional accuracy");
 		item_text = _("Accuracy: Regional");
+		details_sensitive = TRUE;
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_POSTALCODE:
 	case GEOCLUE_ACCURACY_LEVEL_STREET:
 		icon = "indicator-location-neighborhood";
 		icon_desc = _("Location neighborhood accuracy");
 		item_text = _("Accuracy: Neighborhood");
+		details_sensitive = TRUE;
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_DETAILED:
 		icon = "indicator-location-specific";
 		icon_desc = _("Location specific accuracy");
 		item_text = _("Accuracy: Detailed");
+		details_sensitive = TRUE;
 		break;
 	default:
 		g_assert_not_reached();
@@ -65,6 +71,10 @@ update_accuracy (GeoclueAccuracyLevel level)
 
 	if (accuracy_item != NULL) {
 		gtk_menu_item_set_label(accuracy_item, item_text);
+	}
+
+	if (details_item != NULL) {
+		gtk_widget_set_sensitive(GTK_WIDGET(details_item), details_sensitive);
 	}
 
 	return;
@@ -252,6 +262,13 @@ open_debuglocation (void)
 	return;
 }
 
+GtkWidget *
+build_details_items (void)
+{
+
+	return NULL;
+}
+
 void
 build_indicator (void)
 {
@@ -265,6 +282,13 @@ build_indicator (void)
 	gtk_widget_show(GTK_WIDGET(accuracy_item));
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(accuracy_item));
 	gtk_widget_set_sensitive(GTK_WIDGET(accuracy_item), FALSE);
+
+	details_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_show(GTK_WIDGET(details_item));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(details_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(details_item), FALSE);
+
+	gtk_menu_item_set_submenu(details_item, build_details_items());
 
 	gchar * maps_in_path = g_find_program_in_path("emerillon");
 	if (maps_in_path != NULL) {
