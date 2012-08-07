@@ -29,6 +29,7 @@ GtkMenuItem * locality_item = NULL;
 GtkMenuItem * area_item = NULL;
 GtkMenuItem * postcode_item = NULL;
 GtkMenuItem * street_item = NULL;
+GtkMenuItem * timezone_item = NULL;
 
 /* Geoclue trackers */
 static GeoclueMasterClient * geo_master = NULL;
@@ -108,6 +109,7 @@ struct {
 	{GEOCLUE_ADDRESS_KEY_AREA,         N_("Area: %s"),          &area_item},
 	{GEOCLUE_ADDRESS_KEY_POSTALCODE,   N_("Zip Code: %s"),      &postcode_item},
 	{GEOCLUE_ADDRESS_KEY_STREET,       N_("Street: %s"),        &street_item},
+	{"timezone",                       N_("Timezone: %s"),      &timezone_item},
 	{NULL, NULL, NULL}
 };
 
@@ -382,6 +384,11 @@ build_details_items (void)
 	gtk_widget_hide(GTK_WIDGET(street_item));
 	gtk_widget_set_sensitive(GTK_WIDGET(street_item), FALSE);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(street_item));
+
+	timezone_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(timezone_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(timezone_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(timezone_item));
 
 	return menu;
 }
