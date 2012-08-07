@@ -1,3 +1,11 @@
+indicator-location (0.0.3-0ubuntu1~ppa3) UNRELEASED; urgency=low
+
+  * Merge upstream
+    * Text fixes
+    * Remove messed up separators
+
+ -- Ted Gould <ted@ubuntu.com>  Tue, 07 Aug 2012 16:57:35 -0500
+
 indicator-location (0.0.3-0ubuntu1~ppa2) quantal; urgency=low
 
   * Merge upstream
