@@ -1,9 +1,9 @@
-indicator-location (0.0.3-0ubuntu1~ppa4) UNRELEASED; urgency=low
+indicator-location (0.0.3-0ubuntu1~ppa4) quantal; urgency=low
 
   * Merge upstream
     * Don't care about provider changing
 
- -- Ted Gould <ted@ubuntu.com>  Wed, 12 Sep 2012 16:54:37 -0500
+ -- Ted Gould <ted@ubuntu.com>  Wed, 12 Sep 2012 16:55:32 -0500
 
 indicator-location (0.0.3-0ubuntu1~ppa3) quantal; urgency=low
 
