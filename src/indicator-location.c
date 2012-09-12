@@ -37,7 +37,6 @@ static GeoclueAddress * geo_address = NULL;
 
 /* Prototypes */
 static void geo_client_invalid (GeoclueMasterClient * client, gpointer user_data);
-static void geo_address_change (GeoclueMasterClient * client, gchar * a, gchar * b, gchar * c, gchar * d, gpointer user_data);
 static void geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar * path, GError * error, gpointer user_data);
 
 
@@ -188,7 +187,6 @@ geo_client_clean (void)
 	}
 
 	g_signal_handlers_disconnect_by_func(G_OBJECT(geo_master), geo_client_invalid, NULL);
-	g_signal_handlers_disconnect_by_func(G_OBJECT(geo_master), geo_address_change, NULL);
 	g_object_unref(G_OBJECT(geo_master));
 
 	geo_master = NULL;
@@ -255,23 +253,6 @@ geo_client_invalid (GeoclueMasterClient * client, gpointer user_data)
 	return;
 }
 
-/* Address provider changed, we need to get that one */
-static void
-geo_address_change (GeoclueMasterClient * client, gchar * a, gchar * b, gchar * c, gchar * d, gpointer user_data)
-{
-	g_warning("Address provider changed.  Let's change");
-
-	/* If the address is supposed to have changed we need to drop the old
-	   address before starting to get the new one. */
-	geo_address_clean();
-
-	geoclue_master_client_create_address_async(geo_master, geo_create_address, NULL);
-
-	update_accuracy(GEOCLUE_ACCURACY_LEVEL_NONE);
-
-	return;
-}
-
 /* Callback from creating the client */
 static void
 geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar * path, GError * error, gpointer user_data)
@@ -307,7 +288,6 @@ geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar *
 	geoclue_master_client_create_address_async(geo_master, geo_create_address, NULL);
 
 	g_signal_connect(G_OBJECT(client), "invalidated", G_CALLBACK(geo_client_invalid), NULL);
-	g_signal_connect(G_OBJECT(client), "address-provider-changed", G_CALLBACK(geo_address_change), NULL);
 
 	return;
 }
