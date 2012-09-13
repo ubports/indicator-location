@@ -34,6 +34,7 @@ GtkMenuItem * timezone_item = NULL;
 /* Geoclue trackers */
 static GeoclueMasterClient * geo_master = NULL;
 static GeoclueAddress * geo_address = NULL;
+static GeocluePosition * geo_position = NULL;
 
 /* Prototypes */
 static void geo_client_invalid (GeoclueMasterClient * client, gpointer user_data);
@@ -160,6 +161,60 @@ geo_address_cb (GeoclueAddress * address, int timestamp, GHashTable * addy_data,
 	return;
 }
 
+/* Callback from getting the position */
+static void
+geo_position_cb (GeocluePosition * position, GeocluePositionFields field, int timestamp, double lat, double lon, double alt, GeoclueAccuracy * accuracy, GError * error, gpointer user_data)
+{
+	if (error != NULL) {
+		g_warning("Unable to get Geoclue position: %s", error->message);
+		g_clear_error (&error);
+		return;
+	}
+
+	has_location_details = FALSE;
+
+	if (field & GEOCLUE_POSITION_FIELDS_LATITUDE) {
+		gchar * label = g_strdup_printf(_("Latitude:\xE2\x80\x82%f"), lat);
+		gtk_menu_item_set_label(lat_item, label);
+		g_free(label);
+
+		gtk_widget_show(GTK_WIDGET(lat_item));
+		has_location_details = TRUE;
+	} else {
+		gtk_widget_hide(GTK_WIDGET(lat_item));
+	}
+
+	if (field & GEOCLUE_POSITION_FIELDS_LONGITUDE) {
+		gchar * label = g_strdup_printf(_("Longitude:\xE2\x80\x82%f"), lon);
+		gtk_menu_item_set_label(lon_item, label);
+		g_free(label);
+
+		gtk_widget_show(GTK_WIDGET(lon_item));
+		has_location_details = TRUE;
+	} else {
+		gtk_widget_hide(GTK_WIDGET(lon_item));
+	}
+
+	if (field & GEOCLUE_POSITION_FIELDS_ALTITUDE) {
+		gchar * label = g_strdup_printf(_("Altitude:\xE2\x80\x82%f"), alt);
+		gtk_menu_item_set_label(alt_item, label);
+		g_free(label);
+
+		gtk_widget_show(GTK_WIDGET(alt_item));
+		has_location_details = TRUE;
+	} else {
+		gtk_widget_hide(GTK_WIDGET(alt_item));
+	}
+
+	if (has_location_details && has_address_details) {
+		gtk_widget_show(GTK_WIDGET(detail_sep_item));
+	} else {
+		gtk_widget_hide(GTK_WIDGET(detail_sep_item));
+	}
+
+	return;
+}
+
 /* Clean up the reference we kept to the address and make sure to
    drop the signals incase someone else has one. */
 static void
@@ -177,6 +232,22 @@ geo_address_clean (void)
 	return;
 }
 
+/* Clean up the reference we kept to the position and make sure to
+   drop the signals incase someone else has one. */
+static void
+geo_position_clean (void)
+{
+	if (geo_position == NULL) {
+		return;
+	}
+
+	g_signal_handlers_disconnect_by_func(G_OBJECT(geo_position), geo_position_cb, NULL);
+	g_clear_object(&geo_position);
+
+	return;
+}
+
+
 /* Clean up and remove all signal handlers from the client as we
    unreference it as well. */
 static void
@@ -190,6 +261,33 @@ geo_client_clean (void)
 	g_object_unref(G_OBJECT(geo_master));
 
 	geo_master = NULL;
+
+	return;
+}
+
+/* Callback from async creation of a position */
+static void
+geo_create_position (GeoclueMasterClient * master, GeocluePosition * position, GError * error, gpointer user_data)
+{
+	if (error != NULL) {
+		g_warning("Unable to create GeoClue position: %s", error->message);
+		g_clear_error (&error);
+		return;
+	}
+
+	/* We shouldn't have created a new position if we already had one
+	   so this is a warning.  But, it really is only a mem-leak so we
+	   don't need to error out. */
+	g_warn_if_fail(geo_position == NULL);
+	geo_position_clean();
+
+	g_debug("Created Geoclue Position");
+	geo_position = position;
+	g_object_ref(G_OBJECT(geo_position));
+
+	geoclue_position_get_position_async(geo_position, geo_position_cb, NULL);
+
+	g_signal_connect(G_OBJECT(position), "position-changed", G_CALLBACK(geo_position_cb), NULL);
 
 	return;
 }
@@ -241,6 +339,7 @@ geo_client_invalid (GeoclueMasterClient * client, gpointer user_data)
 	/* Client changes we can assume the address is now invalid so we
 	   need to unreference the one we had. */
 	geo_address_clean();
+	geo_position_clean();
 
 	/* And our master client is invalid */
 	geo_client_clean();
@@ -276,6 +375,7 @@ geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar *
 
 	/* New client, make sure we don't have an address hanging on */
 	geo_address_clean();
+	geo_position_clean();
 
 	geoclue_master_client_set_requirements_async(geo_master,
 	                                             GEOCLUE_ACCURACY_LEVEL_REGION,
@@ -286,6 +386,7 @@ geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar *
 	                                             NULL);
 
 	geoclue_master_client_create_address_async(geo_master, geo_create_address, NULL);
+	geoclue_master_client_create_position_async(geo_master, geo_create_position, NULL);
 
 	g_signal_connect(G_OBJECT(client), "invalidated", G_CALLBACK(geo_client_invalid), NULL);
 
@@ -327,8 +428,8 @@ build_details_items (void)
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(alt_item));
 
 	detail_sep_item = GTK_MENU_ITEM(gtk_separator_menu_item_new());
-	gtk_widget_hide(GTK_WIDGET(alt_item));
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(alt_item));
+	gtk_widget_hide(GTK_WIDGET(detail_sep_item));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(detail_sep_item));
 
 	ccode_item = GTK_MENU_ITEM(gtk_menu_item_new());
 	gtk_widget_hide(GTK_WIDGET(ccode_item));
@@ -453,6 +554,7 @@ main (int argc, char * argv[])
 	mainloop = NULL;
 
 	geo_address_clean();
+	geo_position_clean();
 	geo_client_clean();
 
 	return 0;
