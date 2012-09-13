@@ -1,9 +1,9 @@
-indicator-location (0.0.3-0ubuntu1~ppa5) UNRELEASED; urgency=low
+indicator-location (0.0.3-0ubuntu1~ppa5) quantal; urgency=low
 
   * Merge upstream
     * Adding in a position listener as well
 
- -- Ted Gould <ted@ubuntu.com>  Wed, 12 Sep 2012 22:38:51 -0500
+ -- Ted Gould <ted@ubuntu.com>  Wed, 12 Sep 2012 22:39:51 -0500
 
 indicator-location (0.0.3-0ubuntu1~ppa4) quantal; urgency=low
 
