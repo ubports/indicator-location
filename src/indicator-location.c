@@ -120,8 +120,17 @@ update_address_details (GHashTable * details)
 	has_address_details = FALSE;
 
 	for (i = 0; address_detail_table[i].hash_value != NULL; i++) {
+		const gchar * hashval = NULL;
 		if (g_hash_table_contains(details, address_detail_table[i].hash_value)) {
-			gchar * string = g_strdup_printf(_(address_detail_table[i].item_label), g_hash_table_lookup(details, address_detail_table[i].hash_value));
+			hashval = g_hash_table_lookup(details, address_detail_table[i].hash_value);
+			
+			if (hashval[0] == '\0') {
+				hashval = NULL;
+			}
+		}
+
+		if (hashval != NULL) {
+			gchar * string = g_strdup_printf(_(address_detail_table[i].item_label), hashval);
 			gtk_menu_item_set_label(*address_detail_table[i].item, string);
 			g_free(string);
 
