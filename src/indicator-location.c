@@ -182,7 +182,7 @@ geo_position_cb (GeocluePosition * position, GeocluePositionFields field, int ti
 
 	has_location_details = FALSE;
 
-	if (field & GEOCLUE_POSITION_FIELDS_LATITUDE) {
+	if (field & GEOCLUE_POSITION_FIELDS_LATITUDE && lat != 0.0) {
 		gchar * label = g_strdup_printf(_("Latitude:\xE2\x80\x82%f"), lat);
 		gtk_menu_item_set_label(lat_item, label);
 		g_free(label);
@@ -193,7 +193,7 @@ geo_position_cb (GeocluePosition * position, GeocluePositionFields field, int ti
 		gtk_widget_hide(GTK_WIDGET(lat_item));
 	}
 
-	if (field & GEOCLUE_POSITION_FIELDS_LONGITUDE) {
+	if (field & GEOCLUE_POSITION_FIELDS_LONGITUDE && lon != 0.0) {
 		gchar * label = g_strdup_printf(_("Longitude:\xE2\x80\x82%f"), lon);
 		gtk_menu_item_set_label(lon_item, label);
 		g_free(label);
@@ -204,7 +204,7 @@ geo_position_cb (GeocluePosition * position, GeocluePositionFields field, int ti
 		gtk_widget_hide(GTK_WIDGET(lon_item));
 	}
 
-	if (field & GEOCLUE_POSITION_FIELDS_ALTITUDE) {
+	if (field & GEOCLUE_POSITION_FIELDS_ALTITUDE && alt != 0.0) {
 		gchar * label = g_strdup_printf(_("Altitude:\xE2\x80\x82%f"), alt);
 		gtk_menu_item_set_label(alt_item, label);
 		g_free(label);
