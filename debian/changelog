@@ -1,9 +1,9 @@
-indicator-location (0.0.4-0ubuntu1~ppa4) UNRELEASED; urgency=low
+indicator-location (0.0.4-0ubuntu1~ppa4) quantal; urgency=low
 
   * debian/control: libappindicator doesn't properly dep on GTK3
     so we need to.
 
- -- Ted Gould <ted@ubuntu.com>  Thu, 11 Oct 2012 16:41:03 -0500
+ -- Ted Gould <ted@ubuntu.com>  Thu, 11 Oct 2012 16:42:24 -0500
 
 indicator-location (0.0.4-0ubuntu1~ppa3) quantal; urgency=low
 
