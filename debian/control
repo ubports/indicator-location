@@ -3,6 +3,7 @@ Section: misc
 Priority: optional
 Maintainer: Ted Gould <ted@ubuntu.com>
 Build-Depends: debhelper (>= 8.0.0),
+               dh-autoreconf,
                cdbs,
                intltool (>= 0.35.0), 
                libglib2.0-dev (>= 2.29.19),
