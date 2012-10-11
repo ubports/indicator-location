@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 8.0.0),
                cdbs,
                intltool (>= 0.35.0), 
                libglib2.0-dev (>= 2.29.19),
-               libappindicator-dev,
+               libappindicator3-dev,
                libgeoclue-dev
 Standards-Version: 3.9.3
 Homepage: http://launchpad.net/indicator-location/
