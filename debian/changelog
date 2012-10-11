@@ -1,3 +1,10 @@
+indicator-location (0.0.4-0ubuntu1~ppa1) UNRELEASED; urgency=low
+
+  * New upstream release.
+    * Finally pushing somewhere
+
+ -- Ted Gould <ted@ubuntu.com>  Thu, 11 Oct 2012 13:03:46 -0500
+
 indicator-location (0.0.3-0ubuntu1~ppa6) quantal; urgency=low
 
   * Merge upstream
