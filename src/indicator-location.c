@@ -12,14 +12,32 @@ GMainLoop * mainloop = NULL;
 
 /* Menu items */
 GtkMenuItem * accuracy_item = NULL;
+GtkMenuItem * details_item = NULL;
+
+gboolean has_location_details = FALSE;
+GtkMenuItem * lat_item = NULL;
+GtkMenuItem * lon_item = NULL;
+GtkMenuItem * alt_item = NULL;
+
+GtkMenuItem * detail_sep_item = NULL;
+
+gboolean has_address_details = FALSE;
+GtkMenuItem * ccode_item = NULL;
+GtkMenuItem * country_item = NULL;
+GtkMenuItem * region_item = NULL;
+GtkMenuItem * locality_item = NULL;
+GtkMenuItem * area_item = NULL;
+GtkMenuItem * postcode_item = NULL;
+GtkMenuItem * street_item = NULL;
+GtkMenuItem * timezone_item = NULL;
 
 /* Geoclue trackers */
 static GeoclueMasterClient * geo_master = NULL;
 static GeoclueAddress * geo_address = NULL;
+static GeocluePosition * geo_position = NULL;
 
 /* Prototypes */
 static void geo_client_invalid (GeoclueMasterClient * client, gpointer user_data);
-static void geo_address_change (GeoclueMasterClient * client, gchar * a, gchar * b, gchar * c, gchar * d, gpointer user_data);
 static void geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar * path, GError * error, gpointer user_data);
 
 
@@ -30,30 +48,35 @@ update_accuracy (GeoclueAccuracyLevel level)
 	const char * icon = NULL;
 	const char * icon_desc = NULL;
 	const char * item_text = NULL;
+	gboolean details_sensitive = TRUE;
 	
 	switch (level) {
 	case GEOCLUE_ACCURACY_LEVEL_NONE:
 		icon = "indicator-location-unknown";
 		icon_desc = _("Location accuracy unknown");
-		item_text = _("Accuracy: Unknown");
+		item_text = _("Accuracy:\xE2\x80\x82Unknown");
+		details_sensitive = FALSE;
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_COUNTRY:
 	case GEOCLUE_ACCURACY_LEVEL_REGION:
 	case GEOCLUE_ACCURACY_LEVEL_LOCALITY:
 		icon = "indicator-location-region";
 		icon_desc = _("Location regional accuracy");
-		item_text = _("Accuracy: Regional");
+		item_text = _("Accuracy:\xE2\x80\x82Regional");
+		details_sensitive = TRUE;
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_POSTALCODE:
 	case GEOCLUE_ACCURACY_LEVEL_STREET:
 		icon = "indicator-location-neighborhood";
 		icon_desc = _("Location neighborhood accuracy");
-		item_text = _("Accuracy: Neighborhood");
+		item_text = _("Accuracy:\xE2\x80\x82Neighborhood");
+		details_sensitive = TRUE;
 		break;
 	case GEOCLUE_ACCURACY_LEVEL_DETAILED:
 		icon = "indicator-location-specific";
 		icon_desc = _("Location specific accuracy");
-		item_text = _("Accuracy: Detailed");
+		item_text = _("Accuracy:\xE2\x80\x82" "Detailed");
+		details_sensitive = TRUE;
 		break;
 	default:
 		g_assert_not_reached();
@@ -65,6 +88,64 @@ update_accuracy (GeoclueAccuracyLevel level)
 
 	if (accuracy_item != NULL) {
 		gtk_menu_item_set_label(accuracy_item, item_text);
+	}
+
+	if (details_item != NULL) {
+		gtk_widget_set_sensitive(GTK_WIDGET(details_item), details_sensitive);
+	}
+
+	return;
+}
+
+struct {
+	const gchar * hash_value;
+	const gchar * item_label;
+	GtkMenuItem ** item;
+} address_detail_table[] = {
+	{GEOCLUE_ADDRESS_KEY_COUNTRYCODE,  N_("Country Code:\xE2\x80\x82%s"),  &ccode_item},
+	{GEOCLUE_ADDRESS_KEY_COUNTRY,      N_("Country:\xE2\x80\x82%s"),       &country_item},
+	{GEOCLUE_ADDRESS_KEY_REGION,       N_("Region:\xE2\x80\x82%s"),        &region_item},
+	{GEOCLUE_ADDRESS_KEY_LOCALITY,     N_("Locality:\xE2\x80\x82%s"),      &locality_item},
+	{GEOCLUE_ADDRESS_KEY_AREA,         N_("Area:\xE2\x80\x82%s"),          &area_item},
+	{GEOCLUE_ADDRESS_KEY_POSTALCODE,   N_("Zip Code:\xE2\x80\x82%s"),      &postcode_item},
+	{GEOCLUE_ADDRESS_KEY_STREET,       N_("Street:\xE2\x80\x82%s"),        &street_item},
+	{"timezone",                       N_("Timezone:\xE2\x80\x82%s"),      &timezone_item},
+	{NULL, NULL, NULL}
+};
+
+void
+update_address_details (GHashTable * details)
+{
+	int i;
+	has_address_details = FALSE;
+
+	for (i = 0; address_detail_table[i].hash_value != NULL; i++) {
+		const gchar * hashval = NULL;
+		if (g_hash_table_contains(details, address_detail_table[i].hash_value)) {
+			hashval = g_hash_table_lookup(details, address_detail_table[i].hash_value);
+			
+			if (hashval[0] == '\0') {
+				hashval = NULL;
+			}
+		}
+
+		if (hashval != NULL) {
+			gchar * string = g_strdup_printf(_(address_detail_table[i].item_label), hashval);
+			gtk_menu_item_set_label(*address_detail_table[i].item, string);
+			g_free(string);
+
+			gtk_widget_show(GTK_WIDGET(*address_detail_table[i].item));
+
+			has_address_details = TRUE;
+		} else {
+			gtk_widget_hide(GTK_WIDGET(*address_detail_table[i].item));
+		}
+	}
+
+	if (has_location_details && has_address_details) {
+		gtk_widget_show(GTK_WIDGET(detail_sep_item));
+	} else {
+		gtk_widget_hide(GTK_WIDGET(detail_sep_item));
 	}
 
 	return;
@@ -83,6 +164,62 @@ geo_address_cb (GeoclueAddress * address, int timestamp, GHashTable * addy_data,
 	GeoclueAccuracyLevel level = GEOCLUE_ACCURACY_LEVEL_NONE;
 	geoclue_accuracy_get_details(accuracy, &level, NULL, NULL);
 	update_accuracy(level);
+
+	update_address_details(addy_data);
+
+	return;
+}
+
+/* Callback from getting the position */
+static void
+geo_position_cb (GeocluePosition * position, GeocluePositionFields field, int timestamp, double lat, double lon, double alt, GeoclueAccuracy * accuracy, GError * error, gpointer user_data)
+{
+	if (error != NULL) {
+		g_warning("Unable to get Geoclue position: %s", error->message);
+		g_clear_error (&error);
+		return;
+	}
+
+	has_location_details = FALSE;
+
+	if (field & GEOCLUE_POSITION_FIELDS_LATITUDE && lat != 0.0) {
+		gchar * label = g_strdup_printf(_("Latitude:\xE2\x80\x82%f"), lat);
+		gtk_menu_item_set_label(lat_item, label);
+		g_free(label);
+
+		gtk_widget_show(GTK_WIDGET(lat_item));
+		has_location_details = TRUE;
+	} else {
+		gtk_widget_hide(GTK_WIDGET(lat_item));
+	}
+
+	if (field & GEOCLUE_POSITION_FIELDS_LONGITUDE && lon != 0.0) {
+		gchar * label = g_strdup_printf(_("Longitude:\xE2\x80\x82%f"), lon);
+		gtk_menu_item_set_label(lon_item, label);
+		g_free(label);
+
+		gtk_widget_show(GTK_WIDGET(lon_item));
+		has_location_details = TRUE;
+	} else {
+		gtk_widget_hide(GTK_WIDGET(lon_item));
+	}
+
+	if (field & GEOCLUE_POSITION_FIELDS_ALTITUDE && alt != 0.0) {
+		gchar * label = g_strdup_printf(_("Altitude:\xE2\x80\x82%f"), alt);
+		gtk_menu_item_set_label(alt_item, label);
+		g_free(label);
+
+		gtk_widget_show(GTK_WIDGET(alt_item));
+		has_location_details = TRUE;
+	} else {
+		gtk_widget_hide(GTK_WIDGET(alt_item));
+	}
+
+	if (has_location_details && has_address_details) {
+		gtk_widget_show(GTK_WIDGET(detail_sep_item));
+	} else {
+		gtk_widget_hide(GTK_WIDGET(detail_sep_item));
+	}
 
 	return;
 }
@@ -104,6 +241,22 @@ geo_address_clean (void)
 	return;
 }
 
+/* Clean up the reference we kept to the position and make sure to
+   drop the signals incase someone else has one. */
+static void
+geo_position_clean (void)
+{
+	if (geo_position == NULL) {
+		return;
+	}
+
+	g_signal_handlers_disconnect_by_func(G_OBJECT(geo_position), geo_position_cb, NULL);
+	g_clear_object(&geo_position);
+
+	return;
+}
+
+
 /* Clean up and remove all signal handlers from the client as we
    unreference it as well. */
 static void
@@ -114,10 +267,36 @@ geo_client_clean (void)
 	}
 
 	g_signal_handlers_disconnect_by_func(G_OBJECT(geo_master), geo_client_invalid, NULL);
-	g_signal_handlers_disconnect_by_func(G_OBJECT(geo_master), geo_address_change, NULL);
 	g_object_unref(G_OBJECT(geo_master));
 
 	geo_master = NULL;
+
+	return;
+}
+
+/* Callback from async creation of a position */
+static void
+geo_create_position (GeoclueMasterClient * master, GeocluePosition * position, GError * error, gpointer user_data)
+{
+	if (error != NULL) {
+		g_warning("Unable to create GeoClue position: %s", error->message);
+		g_clear_error (&error);
+		return;
+	}
+
+	/* We shouldn't have created a new position if we already had one
+	   so this is a warning.  But, it really is only a mem-leak so we
+	   don't need to error out. */
+	g_warn_if_fail(geo_position == NULL);
+	geo_position_clean();
+
+	g_debug("Created Geoclue Position");
+	geo_position = position;
+	g_object_ref(G_OBJECT(geo_position));
+
+	geoclue_position_get_position_async(geo_position, geo_position_cb, NULL);
+
+	g_signal_connect(G_OBJECT(position), "position-changed", G_CALLBACK(geo_position_cb), NULL);
 
 	return;
 }
@@ -169,29 +348,13 @@ geo_client_invalid (GeoclueMasterClient * client, gpointer user_data)
 	/* Client changes we can assume the address is now invalid so we
 	   need to unreference the one we had. */
 	geo_address_clean();
+	geo_position_clean();
 
 	/* And our master client is invalid */
 	geo_client_clean();
 
 	GeoclueMaster * master = geoclue_master_get_default();
 	geoclue_master_create_client_async(master, geo_create_client, NULL);
-
-	update_accuracy(GEOCLUE_ACCURACY_LEVEL_NONE);
-
-	return;
-}
-
-/* Address provider changed, we need to get that one */
-static void
-geo_address_change (GeoclueMasterClient * client, gchar * a, gchar * b, gchar * c, gchar * d, gpointer user_data)
-{
-	g_warning("Address provider changed.  Let's change");
-
-	/* If the address is supposed to have changed we need to drop the old
-	   address before starting to get the new one. */
-	geo_address_clean();
-
-	geoclue_master_client_create_address_async(geo_master, geo_create_address, NULL);
 
 	update_accuracy(GEOCLUE_ACCURACY_LEVEL_NONE);
 
@@ -221,6 +384,7 @@ geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar *
 
 	/* New client, make sure we don't have an address hanging on */
 	geo_address_clean();
+	geo_position_clean();
 
 	geoclue_master_client_set_requirements_async(geo_master,
 	                                             GEOCLUE_ACCURACY_LEVEL_REGION,
@@ -231,9 +395,9 @@ geo_create_client (GeoclueMaster * master, GeoclueMasterClient * client, gchar *
 	                                             NULL);
 
 	geoclue_master_client_create_address_async(geo_master, geo_create_address, NULL);
+	geoclue_master_client_create_position_async(geo_master, geo_create_position, NULL);
 
 	g_signal_connect(G_OBJECT(client), "invalidated", G_CALLBACK(geo_client_invalid), NULL);
-	g_signal_connect(G_OBJECT(client), "address-provider-changed", G_CALLBACK(geo_address_change), NULL);
 
 	return;
 }
@@ -243,6 +407,80 @@ open_maps (void)
 {
 	g_spawn_command_line_async("emerillon", NULL);
 	return;
+}
+
+void
+open_debuglocation (void)
+{
+	g_spawn_command_line_async("geoclue-test-gui", NULL);
+	return;
+}
+
+GtkWidget *
+build_details_items (void)
+{
+	GtkWidget * menu = gtk_menu_new();
+
+	lat_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(lat_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(lat_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(lat_item));
+
+	lon_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(lon_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(lon_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(lon_item));
+
+	alt_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(alt_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(alt_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(alt_item));
+
+	detail_sep_item = GTK_MENU_ITEM(gtk_separator_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(detail_sep_item));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(detail_sep_item));
+
+	ccode_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(ccode_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(ccode_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(ccode_item));
+
+	country_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(country_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(country_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(country_item));
+
+	region_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(region_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(region_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(region_item));
+
+	locality_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(locality_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(locality_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(locality_item));
+
+	area_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(area_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(area_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(area_item));
+
+	postcode_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(postcode_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(postcode_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(postcode_item));
+
+	street_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(street_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(street_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(street_item));
+
+	timezone_item = GTK_MENU_ITEM(gtk_menu_item_new());
+	gtk_widget_hide(GTK_WIDGET(timezone_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(timezone_item), FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(timezone_item));
+
+	return menu;
 }
 
 void
@@ -257,6 +495,14 @@ build_indicator (void)
 	accuracy_item = GTK_MENU_ITEM(gtk_menu_item_new());
 	gtk_widget_show(GTK_WIDGET(accuracy_item));
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(accuracy_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(accuracy_item), FALSE);
+
+	details_item = GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Details")));
+	gtk_widget_show(GTK_WIDGET(details_item));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(details_item));
+	gtk_widget_set_sensitive(GTK_WIDGET(details_item), FALSE);
+
+	gtk_menu_item_set_submenu(details_item, build_details_items());
 
 	gchar * maps_in_path = g_find_program_in_path("emerillon");
 	if (maps_in_path != NULL) {
@@ -267,10 +513,25 @@ build_indicator (void)
 		gtk_widget_show(sep);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(sep));
 
-		GtkWidget * maps = gtk_menu_item_new_with_label(_("Open Map"));
+		GtkWidget * maps = gtk_menu_item_new_with_label(_("Open Map…"));
 		gtk_widget_show(maps);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(maps));
 		g_signal_connect(G_OBJECT(maps), "activate", G_CALLBACK(open_maps), NULL);
+	}
+
+	gchar * geoclue_in_path = g_find_program_in_path("geoclue-test-gui");
+	if (geoclue_in_path != NULL) {
+		g_free(geoclue_in_path);
+		geoclue_in_path = NULL;
+
+		GtkWidget * sep = gtk_separator_menu_item_new();
+		gtk_widget_show(sep);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(sep));
+
+		GtkWidget * debugloc = gtk_menu_item_new_with_label(_("Debug Location…"));
+		gtk_widget_show(debugloc);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(debugloc));
+		g_signal_connect(G_OBJECT(debugloc), "activate", G_CALLBACK(open_debuglocation), NULL);
 	}
 
 	gtk_widget_show(GTK_WIDGET(menu));
@@ -302,6 +563,7 @@ main (int argc, char * argv[])
 	mainloop = NULL;
 
 	geo_address_clean();
+	geo_position_clean();
 	geo_client_clean();
 
 	return 0;
