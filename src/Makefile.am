@@ -7,7 +7,11 @@ indicator_location_SOURCES = \
 
 indicator_location_CFLAGS = \
 	$(INDICATOR_CFLAGS) \
+	$(COVERAGE_CFLAGS) \
 	-DICON_DIR="\"$(pkgdatadir)/icons/\""
+
+indicator_location_LDFLAGS = \
+	$(COVERAGE_LDFLAGS)
 
 indicator_location_LDADD = \
 	$(INDICATOR_LIBS)
