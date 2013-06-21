@@ -1,0 +1,22 @@
+Source: indicator-location
+Section: misc
+Priority: optional
+Maintainer: Ted Gould <ted@ubuntu.com>
+Build-Depends: debhelper (>= 9),
+               intltool (>= 0.35.0), 
+               libglib2.0-dev (>= 2.29.19),
+               libappindicator3-dev,
+               libgtk-3-dev,
+               libgeoclue-dev,
+Standards-Version: 3.9.3
+Homepage: http://launchpad.net/indicator-location/
+
+Package: indicator-location
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Recommends: emerillon,
+            geoclue-ubuntu-geoip,
+Description: Indicator to show the state of GeoClue
+ An indicator that gives you data about your location
+ and if the computer knows it.
