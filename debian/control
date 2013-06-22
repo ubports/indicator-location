@@ -3,6 +3,7 @@ Section: misc
 Priority: optional
 Maintainer: Ted Gould <ted@ubuntu.com>
 Build-Depends: debhelper (>= 9),
+               dh-autoreconf,
                intltool (>= 0.35.0), 
                libglib2.0-dev (>= 2.29.19),
                libappindicator3-dev,
