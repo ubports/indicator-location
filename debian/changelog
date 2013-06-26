@@ -1,3 +1,9 @@
+indicator-location (0.0.4-0ubuntu1) UNRELEASED; urgency=low
+
+  * Packaging prep for daily release 
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Wed, 26 Jun 2013 14:34:56 -0400
+
 indicator-location (0.0.4-0ubuntu1~ppa4) quantal; urgency=low
 
   * debian/control: libappindicator doesn't properly dep on GTK3
