@@ -1,8 +1,62 @@
-indicator-location (0.0.4-0ubuntu1) UNRELEASED; urgency=low
+indicator-location (0.0.4+13.10.20130719-0ubuntu1) saucy; urgency=low
 
+  [ Ken VanDine ]
   * Packaging prep for daily release 
 
- -- Ken VanDine <ken.vandine@canonical.com>  Wed, 26 Jun 2013 14:34:56 -0400
+  [ Ted Gould ]
+  * Some icons for the indicator
+  * Basic build system
+  * Adding a basic build... software stuff
+  * Installing our icons
+  * Adding in GeoClue handling
+  * Adding the indicator to translations
+  * Distributing the icons
+  * Setting up a function to handle the change in accuracy
+  * Fleshing out the status changes
+  * Build us an indicator
+  * 0.0.1
+  * Putting the icons into a directory for this project
+  * Adding an autostart directory, if you have it installed, you get it
+    on your menubar
+  * 0.0.2
+  * Making the question mark slightly smaller
+  * Add a menu item to launch a map
+  * Switching to a path
+  * 0.0.3
+  * Make the informational item insensitive
+  * Adding an item to debug GeoClue
+  * Adding in the details item
+  * Adding the various detail items
+  * Adding some items for the address
+  * Adding in address details
+  * Adding ellipsis
+  * Hide entries by default
+  * Adding a timezone
+  * Switch to nicer UTF8 spaces
+  * We don't really care if the provider changes, just if the address
+    does
+  * Adding in a position listener
+  * Catch NULL strings and count them as NULL values
+  * Check to see if the values are perfectly zero. Chances are, if they
+    are, something is screwed up.
+  * 0.0.4
+  * Inline packaging
+  * Fixing Packaging for Jenkins.
+
+  [ Didier Roche ]
+  * small simplification of debian/rules.
+
+  [ Allan LeSage ]
+  * Small correction to our coverage reporting. I tested to verify that
+    we produce .gcno files, as described here:
+    http://qualityhour.wordpress.com/2012/01/29/test-coverage-tutorial-
+    for-cc-autotools-projects/ . Now we just have to add a lotta tests
+    :) .
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 38
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 19 Jul 2013 13:10:54 +0000
 
 indicator-location (0.0.4-0ubuntu1~ppa4) quantal; urgency=low
 
