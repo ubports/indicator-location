@@ -1,14 +1,14 @@
 Source: indicator-location
 Section: misc
 Priority: optional
-Maintainer: Ted Gould <ted@ubuntu.com>
-Build-Depends: debhelper (>= 9),
-               dh-autoreconf,
+Maintainer: Charles Kerr <charles.kerr@canonical.com>
+Build-Depends: cmake,
+               dbus,
+               debhelper (>= 9),
                intltool (>= 0.35.0), 
-               libappindicator3-dev,
-               libgeoclue-dev,
-               libglib2.0-dev (>= 2.29.19),
-               libgtk-3-dev,
+               libglib2.0-dev (>= 2.36),
+               libqt5core5 (>= 5.0.0),
+               libqt5location5 (>= 5.0.0),
 Standards-Version: 3.9.4
 Homepage: http://launchpad.net/indicator-location/
 # If you aren't a member of ~indicator-applet-developers but need to upload 
@@ -22,6 +22,6 @@ Depends: ${shlibs:Depends},
          ${misc:Depends},
 Recommends: emerillon,
             geoclue-ubuntu-geoip,
-Description: Indicator to show the state of GeoClue
+Description: Indicator to show the system's physical location
  An indicator that gives you data about your location
  and if the computer knows it.
