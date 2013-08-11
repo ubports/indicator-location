@@ -28,10 +28,10 @@ find_package (Qt5Core REQUIRED)
 
 include (FindPkgConfig)
 pkg_check_modules (SERVICE REQUIRED
-                   glib-2.0 >= 2.36
-                   gio-unix-2.0 >= 2.36
-                   Qt5Core >= 5.0.2
-                   Qt5Location >= 5.0.2)
+                   Qt5Location>=5.0.2
+                   Qt5Core>=5.0.2
+                   gio-unix-2.0>=2.36
+                   glib-2.0>=2.36)
 
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
