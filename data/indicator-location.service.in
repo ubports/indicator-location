@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=com.canonical.indicator.location
+Exec=@pkglibexecdir@/indicator-location-service
