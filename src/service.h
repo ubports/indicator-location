@@ -17,41 +17,33 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <locale.h>
+#ifndef SERVICE_H
+#define SERVICE_H
 
-#include <QtGlobal>
-
-#include <glib/gi18n.h>
 #include <glib.h>
+#include <gio/gio.h>
 
-#include "app.h"
+#include <QObject>
 
-/***
-****
-***/
-
-static gboolean
-on_idle (gpointer unused)
+class Service: QObject
 {
-  Q_UNUSED (unused);
+    Q_OBJECT
 
-  GMainContext * context = g_main_context_default ();
+  public:
 
-  g_message ("hello world %p", context);
-  return G_SOURCE_CONTINUE;
+    Service ();
+    virtual ~Service ();
+
+  private:
+
+    void on_bus_acquired (GDBusConnection *, const char *);
+    static void on_bus_acquired (GDBusConnection *, const char *, gpointer);
+
+    void on_name_lost (GDBusConnection *, const char *);
+    static void on_name_lost (GDBusConnection *, const char *, gpointer);
+
+    GDBusConnection * connection;
+    guint own_id;
 };
 
-int
-main (int argc, char ** argv)
-{
-  /* boilerplate i18n */
-  setlocale (LC_ALL, "");
-  bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
-  textdomain (GETTEXT_PACKAGE);
-
-  g_timeout_add_seconds (2, on_idle, NULL);
-
-  MyApp app (argc, argv);
-  app.exec ();
-  return 0;
-}
+#endif

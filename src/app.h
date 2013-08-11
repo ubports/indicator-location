@@ -17,41 +17,23 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <locale.h>
+#ifndef APP_H
+#define APP_H
 
-#include <QtGlobal>
+#include <QCoreApplication>
 
-#include <glib/gi18n.h>
-#include <glib.h>
+#include "service.h"
 
-#include "app.h"
-
-/***
-****
-***/
-
-static gboolean
-on_idle (gpointer unused)
+class MyApp: public QCoreApplication
 {
-  Q_UNUSED (unused);
+    Q_OBJECT
 
-  GMainContext * context = g_main_context_default ();
+  public:
+    MyApp (int& argc, char ** argv);
+    virtual ~MyApp ();
 
-  g_message ("hello world %p", context);
-  return G_SOURCE_CONTINUE;
+  private:
+    Service service;
 };
 
-int
-main (int argc, char ** argv)
-{
-  /* boilerplate i18n */
-  setlocale (LC_ALL, "");
-  bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
-  textdomain (GETTEXT_PACKAGE);
-
-  g_timeout_add_seconds (2, on_idle, NULL);
-
-  MyApp app (argc, argv);
-  app.exec ();
-  return 0;
-}
+#endif
