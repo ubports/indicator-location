@@ -19,7 +19,6 @@ endif ()
 set (CMAKE_INSTALL_PKGLIBEXECDIR "${CMAKE_INSTALL_LIBEXECDIR}/${CMAKE_PROJECT_NAME}")
 set (CMAKE_INSTALL_FULL_PKGLIBEXECDIR "${CMAKE_INSTALL_FULL_LIBEXECDIR}/${CMAKE_PROJECT_NAME}")
 
-
 ##
 ##  Check for prerequisites
 ##
@@ -34,6 +33,12 @@ pkg_check_modules (SERVICE REQUIRED
 set (CMAKE_AUTOMOC ON)
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 add_definitions (-DQT_NO_KEYWORDS)
+
+##
+##
+##
+
+set (CC_WARNING_ARGS " -Wall -Wextra -Wno-missing-field-initializers")
 
 add_subdirectory (src)
 add_subdirectory (data)
