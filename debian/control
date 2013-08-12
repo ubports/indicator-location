@@ -21,6 +21,7 @@ Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
 Recommends: emerillon,
+            geoclue-gypsy,
             geoclue-ubuntu-geoip,
 Description: Indicator to show the system's physical location
  An indicator that gives you data about your location

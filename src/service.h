@@ -24,6 +24,7 @@
 #include <gio/gio.h>
 
 #include <QObject>
+#include <QtLocation>
 
 class Service: QObject
 {
@@ -34,16 +35,27 @@ class Service: QObject
     Service ();
     virtual ~Service ();
 
+    void setPosition (const QGeoPositionInfo& info);
+
   private:
 
+    // GDBus callbacks
+    void on_name_lost (GDBusConnection *, const char *);
     void on_bus_acquired (GDBusConnection *, const char *);
+    static void on_name_lost (GDBusConnection *, const char *, gpointer);
     static void on_bus_acquired (GDBusConnection *, const char *, gpointer);
 
-    void on_name_lost (GDBusConnection *, const char *);
-    static void on_name_lost (GDBusConnection *, const char *, gpointer);
+  private:
 
-    GDBusConnection * connection;
-    guint own_id;
+    GDBusConnection * _connection;
+    guint _own_id;
+    QGeoPositionInfoSource * _source;
+    QGeoPositionInfo _position;
+    QGeoServiceProvider * _service_provider;
+    QGeocodeReply * _reply;
+
+    Q_SLOT void onReplyFinished ();
+    Q_SLOT void positionUpdated (const QGeoPositionInfo& info);
 };
 
 #endif
