@@ -17,45 +17,55 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SERVICE_H
-#define SERVICE_H
+#ifndef __INDICATOR_LOCATION_SERVICE_H__
+#define __INDICATOR_LOCATION_SERVICE_H__
 
 #include <glib.h>
-#include <gio/gio.h>
+#include <glib-object.h>
 
-#include <QObject>
-#include <QtLocation>
+G_BEGIN_DECLS
 
-class Service: QObject
+/* standard GObject macros */
+#define INDICATOR_TYPE_LOCATION_SERVICE          (indicator_location_service_get_type())
+#define INDICATOR_LOCATION_SERVICE(o)            (G_TYPE_CHECK_INSTANCE_CAST ((o), INDICATOR_TYPE_LOCATION_SERVICE, IndicatorLocationService))
+#define INDICATOR_LOCATION_SERVICE_GET_CLASS(o)  (G_TYPE_INSTANCE_GET_CLASS ((o), INDICATOR_TYPE_LOCATION_SERVICE, IndicatorLocationServiceClass))
+#define INDICATOR_LOCATION_SERVICE_CLASS(k)      (G_TYPE_CHECK_CLASS_CAST ((k), INDICATOR_TYPE_LOCATION_SERVICE, IndicatorLocationServiceClass))
+#define INDICATOR_IS_LOCATION_SERVICE(o)         (G_TYPE_CHECK_INSTANCE_TYPE ((o), INDICATOR_TYPE_LOCATION_SERVICE))
+
+typedef struct _IndicatorLocationService         IndicatorLocationService;
+typedef struct _IndicatorLocationServiceClass    IndicatorLocationServiceClass;
+typedef struct _IndicatorLocationServicePrivate  IndicatorLocationServicePrivate;
+
+/* signal keys */
+#define INDICATOR_LOCATION_SERVICE_SIGNAL_NAME_LOST   "name-lost"
+
+/**
+ * The Indicator Location Service.
+ */
+struct _IndicatorLocationService
 {
-    Q_OBJECT
-
-  public:
-
-    Service ();
-    virtual ~Service ();
-
-    void setPosition (const QGeoPositionInfo& info);
-
-  private:
-
-    // GDBus callbacks
-    void on_name_lost (GDBusConnection *, const char *);
-    void on_bus_acquired (GDBusConnection *, const char *);
-    static void on_name_lost (GDBusConnection *, const char *, gpointer);
-    static void on_bus_acquired (GDBusConnection *, const char *, gpointer);
-
-  private:
-
-    GDBusConnection * _connection;
-    guint _own_id;
-    QGeoPositionInfoSource * _source;
-    QGeoPositionInfo _position;
-    QGeoServiceProvider * _service_provider;
-    QGeocodeReply * _reply;
-
-    Q_SLOT void onReplyFinished ();
-    Q_SLOT void positionUpdated (const QGeoPositionInfo& info);
+  /*< private >*/
+  GObject parent;
+  IndicatorLocationServicePrivate * priv;
 };
 
-#endif
+struct _IndicatorLocationServiceClass
+{
+  GObjectClass parent_class;
+
+  /* signals */
+  void (* name_lost)(IndicatorLocationService * self);
+};
+
+/***
+****
+***/
+
+GType indicator_location_service_get_type (void);
+
+IndicatorLocationService * indicator_location_service_new (void);
+
+G_END_DECLS
+
+#endif /* __INDICATOR_LOCATION_SERVICE_H__ */
+

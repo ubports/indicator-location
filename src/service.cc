@@ -17,186 +17,133 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
+#include <glib/gi18n.h>
+#include <gio/gio.h>
 
-#include <QMap>
-#include <QString>
-#include <QVariant>
+#include "service.h"
 
-#include <QtLocation>
+#define BUS_NAME "com.canonical.indicator.location"
+#define BUS_PATH "/com/canonical/indicator/location"
 
-#include <service.h>
+G_DEFINE_TYPE (IndicatorLocationService,
+               indicator_location_service,
+               G_TYPE_OBJECT)
+
+/* signals enum */
+enum
+{
+  NAME_LOST,
+  LAST_SIGNAL
+};
+
+static guint signals[LAST_SIGNAL] = { 0 };
+
+struct _IndicatorLocationServicePrivate
+{
+  guint own_id;
+  GDBusConnection * connection;
+  GCancellable * cancellable;
+};
+
+typedef IndicatorLocationServicePrivate priv_t;
+
 
 /***
-****
+****  GDBus
 ***/
 
-void
-Service :: on_name_lost (GDBusConnection * connection,
-                         const char * name,
-                         gpointer user_data)
+static void
+on_name_lost (GDBusConnection * connection   G_GNUC_UNUSED,
+              const char      * name,
+              gpointer          gself)
 {
-  static_cast<Service*>(user_data)->on_name_lost (connection, name);
+  g_debug ("%s::%s: %s", G_STRLOC, G_STRFUNC, name);
+
+  g_signal_emit (gself, signals[NAME_LOST], 0, NULL);
 }
 
-void
-Service :: on_name_lost (GDBusConnection * connection,
-                         const char * name)
+static void
+on_bus_acquired (GDBusConnection * connection,
+                 const char      * name,
+                 gpointer          gself)
 {
-  Q_UNUSED (connection);
+  IndicatorLocationService * self;
 
-  g_message ("on name lost: %s", name);
+  g_debug ("%s::%s: %s", G_STRLOC, G_STRFUNC, name);
+
+  self = INDICATOR_LOCATION_SERVICE (gself);
+  self->priv->connection = G_DBUS_CONNECTION (g_object_ref (connection));
 }
+
 
 /***
-****
+****  GObject plumbing: life cycle
 ***/
 
-void
-Service :: on_bus_acquired (GDBusConnection * connection,
-                            const char * name,
-                            gpointer user_data)
+static void
+indicator_location_service_init (IndicatorLocationService * self)
 {
-  static_cast<Service*>(user_data)->on_bus_acquired (connection, name);
+  /* init our priv pointer */
+  priv_t * p = G_TYPE_INSTANCE_GET_PRIVATE (self,
+                                            INDICATOR_TYPE_LOCATION_SERVICE,
+                                            IndicatorLocationServicePrivate);
+  self->priv = p;
+
+  p->cancellable = g_cancellable_new ();
+
+  p->own_id = g_bus_own_name (G_BUS_TYPE_SESSION,
+                              BUS_NAME,
+                              G_BUS_NAME_OWNER_FLAGS_NONE,
+                              on_bus_acquired,
+                              NULL,
+                              on_name_lost,
+                              self,
+                              NULL);
 }
 
-void
-Service :: on_bus_acquired (GDBusConnection * connection,
-                            const char * name)
+static void
+indicator_location_service_dispose (GObject * o)
 {
-  g_assert (_connection == 0);
-  g_message ("on name acquired: %s", name);
-  _connection = connection;
+  IndicatorLocationService * self = INDICATOR_LOCATION_SERVICE(o);
+  priv_t * p = self->priv;
 
-  // FIXME: export the actions/menus
+  if (p->own_id)
+    {
+      g_bus_unown_name (p->own_id);
+      p->own_id = 0;
+    }
+
+  if (p->cancellable != NULL)
+    {
+      g_cancellable_cancel (p->cancellable);
+      g_clear_object (&p->cancellable);
+    }
+
+  g_clear_object (&p->connection);
+
+  G_OBJECT_CLASS (indicator_location_service_parent_class)->dispose (o);
 }
 
-/***
-****
-***/
-
-Service :: Service ():
-  _connection (0),
-  _own_id (0),
-  _source (QGeoPositionInfoSource::createDefaultSource (this)),
-  _service_provider (0)
+static void
+indicator_location_service_class_init (IndicatorLocationServiceClass * klass)
 {
-  g_message ("%s %s", G_STRLOC, G_STRFUNC);
+  GObjectClass * object_class = G_OBJECT_CLASS (klass);
 
+  object_class->dispose = indicator_location_service_dispose;
 
-  QStringList providerNames = QGeoServiceProvider::availableServiceProviders ();
+  g_type_class_add_private (klass, sizeof (IndicatorLocationServicePrivate));
 
-  for (auto str: providerNames)
-    std::cerr << qPrintable(str) << std::endl;
-
-  if (providerNames.contains("nokia"))
-    {
-      QMap<QString, QVariant> parameters;
-      parameters["app_id"] = "hello";
-      parameters["token"] = "world";
-      _service_provider = new QGeoServiceProvider ("nokia", parameters);
-    }
-
-  if (_service_provider == 0)
-    g_warning ("No QGeoServiceProvider available!");
-
-  if (_source != 0)
-    {
-      std::cerr << "_source.sourceName() is " << qPrintable(_source->sourceName()) << std::endl;
-
-      connect (_source, SIGNAL(positionUpdated(QGeoPositionInfo)),
-               this, SLOT(positionUpdated(QGeoPositionInfo)));
-      _source->requestUpdate (1000);
-      _source->startUpdates ();
-    }
-
-  _own_id = g_bus_own_name (G_BUS_TYPE_SESSION,
-                            "com.canonical.indicator.location",
-                            G_BUS_NAME_OWNER_FLAGS_NONE,
-                            on_bus_acquired,
-                            NULL,
-                            on_name_lost,
-                            this,
-                            NULL);
+  signals[NAME_LOST] = g_signal_new (INDICATOR_LOCATION_SERVICE_SIGNAL_NAME_LOST,
+                                     G_TYPE_FROM_CLASS(klass),
+                                     G_SIGNAL_RUN_LAST,
+                                     G_STRUCT_OFFSET (IndicatorLocationServiceClass, name_lost),
+                                     NULL, NULL,
+                                     g_cclosure_marshal_VOID__VOID,
+                                     G_TYPE_NONE, 0);
 }
 
-Service :: ~Service ()
+IndicatorLocationService *
+indicator_location_service_new (void)
 {
-  if (_source)
-    {
-      _source->stopUpdates ();
-      delete _source;
-    }
-
-  g_message ("%s %s", G_STRLOC, G_STRFUNC);
-  g_bus_unown_name (_own_id);
-}
-
-/***
-****
-***/
-
-void
-Service :: onReplyFinished ()
-{
-  std::cerr << "_reply->isFinished " << _reply->isFinished() << std::endl;
-  std::cerr << "_reply->errorString " << qPrintable(_reply->errorString()) << std::endl;
-  std::cerr << "_reply->limit " << _reply->limit() << std::endl;
-  std::cerr << "_reply->offset " << _reply->offset() << std::endl;
-
-  //std::cerr << "_reply->viewport " << _reply->viewport() << std::endl;
-
-  for (auto loc: _reply->locations())
-    {
-      const QGeoAddress address = loc.address();
-      std::cerr << "text " << qPrintable(address.text()) << std::endl;
-      std::cerr << "country " << qPrintable(address.country()) << std::endl;
-      std::cerr << "countryCode " << qPrintable(address.countryCode()) << std::endl;
-      std::cerr << "state " << qPrintable(address.state()) << std::endl;
-      std::cerr << "county " << qPrintable(address.county()) << std::endl;
-      std::cerr << "city " << qPrintable(address.city()) << std::endl;
-      std::cerr << "district " << qPrintable(address.district()) << std::endl;
-      std::cerr << "postalCode " << qPrintable(address.postalCode()) << std::endl;
-      std::cerr << "street " << qPrintable(address.street()) << std::endl;
-      std::cerr << "isEmpty " << address.isEmpty() << std::endl;
-    }
-}
-
-void
-Service :: setPosition (const QGeoPositionInfo& info)
-{
-  g_return_if_fail (info.isValid());
-
-  _position = info;
-
-  std::cerr << "new position: " << qPrintable(info.coordinate().toString()) << std::endl;
-
-  QGeocodingManager * geocodingManager = _service_provider->geocodingManager ();
-
-  g_message ("geocodingManager is %p", geocodingManager);
-  std::cerr << "error string is " << qPrintable(_service_provider->errorString()) << std::endl;
-  if (geocodingManager != 0)
-    {
-      _reply = geocodingManager->reverseGeocode (info.coordinate());
-      connect (_reply, SIGNAL(finished()),
-               this, SLOT(onReplyFinished()));
-    }
-
-  for (int i=0; i<=5; i++)
-    {
-      QGeoPositionInfo::Attribute attribute ((QGeoPositionInfo::Attribute)i);
-
-      if (info.hasAttribute (attribute))
-        {
-          std::cerr << "has attribute " << attribute << ": " << info.attribute(attribute) << std::endl;
-        }
-    }
-}
-
-void
-Service :: positionUpdated (const QGeoPositionInfo& info)
-
-{
-  if (info.isValid())
-    setPosition (info);
+  return INDICATOR_LOCATION_SERVICE (g_object_new (INDICATOR_TYPE_LOCATION_SERVICE, NULL));
 }

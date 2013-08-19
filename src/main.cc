@@ -19,39 +19,46 @@
 
 #include <locale.h>
 
-#include <QtGlobal>
-
 #include <glib/gi18n.h>
 #include <glib.h>
 
-#include "app.h"
+#include "service.h"
 
 /***
 ****
 ***/
 
 static gboolean
-on_idle (gpointer unused)
+on_idle (gpointer unused G_GNUC_UNUSED)
 {
-  Q_UNUSED (unused);
-
   GMainContext * context = g_main_context_default ();
-
   g_message ("hello world %p", context);
   return G_SOURCE_CONTINUE;
 };
 
 int
-main (int argc, char ** argv)
+main (int argc G_GNUC_UNUSED, char ** argv G_GNUC_UNUSED)
 {
+  GMainLoop * loop;
+  IndicatorLocationService * service;
+
   /* boilerplate i18n */
   setlocale (LC_ALL, "");
   bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
   textdomain (GETTEXT_PACKAGE);
+ 
+  /* set up the service */ 
+  loop = g_main_loop_new (NULL, false);
+  service = indicator_location_service_new ();
+  g_signal_connect_swapped (service, INDICATOR_LOCATION_SERVICE_SIGNAL_NAME_LOST,
+                            G_CALLBACK(g_main_loop_quit), loop);
 
+  /* run */
   g_timeout_add_seconds (2, on_idle, NULL);
+  g_main_loop_run (loop);
 
-  MyApp app (argc, argv);
-  app.exec ();
+  /* cleanup */
+  g_object_unref (service);
+  g_main_loop_unref (loop);
   return 0;
 }

@@ -24,23 +24,17 @@ set (CMAKE_INSTALL_FULL_PKGLIBEXECDIR "${CMAKE_INSTALL_FULL_LIBEXECDIR}/${CMAKE_
 ##
 
 find_package (PkgConfig REQUIRED)
-find_package (Qt5Core REQUIRED)
 
 include (FindPkgConfig)
 pkg_check_modules (SERVICE REQUIRED
-                   Qt5Location>=5.0.2
-                   Qt5Core>=5.0.2
                    gio-unix-2.0>=2.36
                    glib-2.0>=2.36)
 
-set (CMAKE_AUTOMOC ON)
+##
+##
+##
+
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
-add_definitions (-DQT_NO_KEYWORDS)
-
-##
-##
-##
-
 set (CC_WARNING_ARGS " -Wall -Wextra -Wno-missing-field-initializers")
 
 add_subdirectory (src)

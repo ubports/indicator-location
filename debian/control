@@ -7,8 +7,6 @@ Build-Depends: cmake,
                debhelper (>= 9),
                intltool (>= 0.35.0), 
                libglib2.0-dev (>= 2.36),
-               libqt5core5 (>= 5.0.0),
-               libqt5location5 (>= 5.0.0),
 Standards-Version: 3.9.4
 Homepage: http://launchpad.net/indicator-location/
 # If you aren't a member of ~indicator-applet-developers but need to upload 
@@ -20,9 +18,6 @@ Package: indicator-location
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-Recommends: emerillon,
-            geoclue-gypsy,
-            geoclue-ubuntu-geoip,
-Description: Indicator to show the system's physical location
- An indicator that gives you data about your location
- and if the computer knows it.
+Description: Indicator to show when the system is using your
+ physical location data and allow the user to toggle
+ permissions on its use.
