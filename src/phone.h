@@ -22,6 +22,9 @@
 
 #include <gio/gio.h>
 
+#include <ubuntu/application/location/controller.h>
+
+
 class Phone
 {
   public:
@@ -32,6 +35,11 @@ class Phone
   private:
     GMenu * menu;
     GActionMap * action_map;
+
+  private:
+    UALocationServiceController * location_service_controller;
+    static void on_location_service_controller_status_changed (UALocationServiceStatusFlags, void*);
+    UALocationServiceController * create_location_service_controller ();
 
   private:
     GMenu * create_menu ();

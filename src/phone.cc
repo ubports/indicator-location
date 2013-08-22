@@ -21,14 +21,17 @@
 
 #include <glib/gi18n.h>
 
+#include <ubuntu/application/location/controller.h>
+#include <ubuntu/application/location/service.h>
+
 #include "phone.h"
 
 #define PROFILE_NAME "phone"
 
-
 Phone :: Phone (GActionMap * action_map_):
   menu (create_menu ()),
-  action_map (G_ACTION_MAP (g_object_ref (action_map_)))
+  action_map (G_ACTION_MAP (g_object_ref (action_map_))),
+  location_service_controller (create_location_service_controller ())
 {
   g_debug ("%s %s: %s", G_STRLOC, G_STRFUNC, PROFILE_NAME);
 
@@ -46,6 +49,7 @@ Phone :: Phone (GActionMap * action_map_):
 
 Phone :: ~Phone ()
 {
+  g_clear_pointer (&location_service_controller, ua_location_service_controller_unref);
   g_clear_object (&action_map);
 }
 
@@ -103,7 +107,10 @@ Phone :: create_root_action ()
 GVariant *
 Phone :: action_state_for_location_detection ()
 {
-  bool enabled = true; // FIXME
+  UALocationServiceStatusFlags flags = 0;
+  bool enabled = (location_service_controller != 0)
+              && (ua_location_service_controller_query_status (location_service_controller, &flags) == U_STATUS_SUCCESS)
+              && (flags & UA_LOCATION_SERVICE_ENABLED);
   return g_variant_new_boolean (enabled);
 }
 
@@ -123,8 +130,15 @@ Phone :: on_detection_location_activated (GSimpleAction * action    G_GNUC_UNUSE
   g_assert (G_ACTION(action) == g_action_map_lookup_action (self->action_map, LOCATION_ACTION_KEY));
 
   GVariant * state = g_action_get_state (G_ACTION (action));
-  const bool enabled = g_variant_get_boolean (state);
-  g_message ("FIXME: %s toggle detection location to %d", G_STRLOC, (int)!enabled);
+  const bool old_enabled = g_variant_get_boolean (state);
+  const bool new_enabled = !old_enabled;
+
+  UStatus status = new_enabled
+                 ? ua_location_service_controller_enable_service (self->location_service_controller)
+                 : ua_location_service_controller_disable_service (self->location_service_controller);
+  if (status != U_STATUS_SUCCESS)
+    g_warning ("Unable to %s the location service", new_enabled ? "enable" : "disable");
+  
   g_variant_unref (state);
 }
 
@@ -136,6 +150,8 @@ Phone :: create_detection_enabled_action ()
   action = g_simple_action_new_stateful (LOCATION_ACTION_KEY,
                                          NULL,
                                          action_state_for_location_detection());
+
+  g_simple_action_set_enabled (action, location_service_controller != 0);
 
   g_signal_connect (action, "activate",
                     G_CALLBACK(on_detection_location_activated), this);
@@ -152,7 +168,10 @@ Phone :: create_detection_enabled_action ()
 GVariant *
 Phone :: action_state_for_gps_detection ()
 {
-  bool enabled = false; // FIXME
+  UALocationServiceStatusFlags flags = 0;
+  bool enabled = (location_service_controller != 0)
+              && (ua_location_service_controller_query_status (location_service_controller, &flags) == U_STATUS_SUCCESS)
+              && (flags & UA_LOCATION_SERVICE_GPS_ENABLED);
   return g_variant_new_boolean (enabled);
 }
 
@@ -170,10 +189,19 @@ Phone :: on_detection_gps_activated (GSimpleAction * action,
 {
   Phone * self = static_cast<Phone*>(gself);
   g_assert (G_ACTION(action) == g_action_map_lookup_action (self->action_map, GPS_ACTION_KEY));
+  g_return_if_fail (self->location_service_controller != 0);
 
   GVariant * state = g_action_get_state (G_ACTION (action));
-  const bool enabled = g_variant_get_boolean (state);
-  g_message ("FIXME: %s toggle detection gps to %d", G_STRLOC, (int)!enabled);
+  const bool old_enabled = g_variant_get_boolean (state);
+  const bool new_enabled = !old_enabled;
+
+  UStatus status = new_enabled
+                 ? ua_location_service_controller_enable_gps (self->location_service_controller)
+                 : ua_location_service_controller_disable_gps (self->location_service_controller);
+  if (status != U_STATUS_SUCCESS)
+    g_warning ("Unable to %s GPS", new_enabled ? "enable" : "disable");
+  
+  
   g_variant_unref (state);
 }
 
@@ -186,10 +214,50 @@ Phone :: create_gps_enabled_action ()
                                          NULL,
                                          action_state_for_gps_detection());
 
+  g_simple_action_set_enabled (action, location_service_controller != 0);
+
   g_signal_connect (action, "activate",
                     G_CALLBACK(on_detection_gps_activated), this);
 
   return action;
+}
+
+/***
+****
+***/
+
+void
+Phone :: on_location_service_controller_status_changed (UALocationServiceStatusFlags flags,
+                                                        void * vself)
+{
+  Phone * self = static_cast<Phone*>(vself);
+
+  if (flags & (UA_LOCATION_SERVICE_ENABLED | UA_LOCATION_SERVICE_DISABLED))
+    self->update_location_detection_state ();
+
+  if (flags & (UA_LOCATION_SERVICE_GPS_ENABLED | UA_LOCATION_SERVICE_GPS_DISABLED))
+    self->update_gps_detection_state ();
+}
+
+UALocationServiceController *
+Phone :: create_location_service_controller ()
+{
+  UALocationServiceController * c = ua_location_service_create_controller ();
+
+  if (c == 0)
+    {
+      g_warning ("Unable to load a location_service_controller.");
+    }
+  else
+    {
+      UStatus status = ua_location_service_controller_set_status_changed_handler (location_service_controller,
+                                                                                  on_location_service_controller_status_changed,
+                                                                                  this);
+      if (status != U_STATUS_SUCCESS)
+        g_warning ("Unable to monitor location service's status.");
+    }
+
+  return c;
 }
 
 /***

@@ -8,7 +8,7 @@ set_property (TARGET ${SERVICE_EXEC}
 
 set_property (TARGET ${SERVICE_EXEC}
               APPEND PROPERTY LINK_LIBRARIES
-              ${SERVICE_LIBRARIES} ${GCOV_LIBS})
+              ${SERVICE_LDFLAGS} ${GCOV_LIBS})
 
 set_property (TARGET ${SERVICE_EXEC}
               APPEND_STRING PROPERTY COMPILE_FLAGS
