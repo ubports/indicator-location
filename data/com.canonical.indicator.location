@@ -6,6 +6,3 @@ Position=90
 [phone]
 ObjectPath=/com/canonical/indicator/location/phone
 
-[desktop]
-ObjectPath=/com/canonical/indicator/location/desktop
-

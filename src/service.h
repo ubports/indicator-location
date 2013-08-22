@@ -20,52 +20,43 @@
 #ifndef __INDICATOR_LOCATION_SERVICE_H__
 #define __INDICATOR_LOCATION_SERVICE_H__
 
-#include <glib.h>
-#include <glib-object.h>
+#include <set>
 
-G_BEGIN_DECLS
+#include "phone.h"
 
-/* standard GObject macros */
-#define INDICATOR_TYPE_LOCATION_SERVICE          (indicator_location_service_get_type())
-#define INDICATOR_LOCATION_SERVICE(o)            (G_TYPE_CHECK_INSTANCE_CAST ((o), INDICATOR_TYPE_LOCATION_SERVICE, IndicatorLocationService))
-#define INDICATOR_LOCATION_SERVICE_GET_CLASS(o)  (G_TYPE_INSTANCE_GET_CLASS ((o), INDICATOR_TYPE_LOCATION_SERVICE, IndicatorLocationServiceClass))
-#define INDICATOR_LOCATION_SERVICE_CLASS(k)      (G_TYPE_CHECK_CLASS_CAST ((k), INDICATOR_TYPE_LOCATION_SERVICE, IndicatorLocationServiceClass))
-#define INDICATOR_IS_LOCATION_SERVICE(o)         (G_TYPE_CHECK_INSTANCE_TYPE ((o), INDICATOR_TYPE_LOCATION_SERVICE))
-
-typedef struct _IndicatorLocationService         IndicatorLocationService;
-typedef struct _IndicatorLocationServiceClass    IndicatorLocationServiceClass;
-typedef struct _IndicatorLocationServicePrivate  IndicatorLocationServicePrivate;
-
-/* signal keys */
-#define INDICATOR_LOCATION_SERVICE_SIGNAL_NAME_LOST   "name-lost"
-
-/**
- * The Indicator Location Service.
- */
-struct _IndicatorLocationService
+class Service
 {
-  /*< private >*/
-  GObject parent;
-  IndicatorLocationServicePrivate * priv;
+  public:
+    Service ();
+    virtual ~Service ();
+
+  private:
+    GSimpleActionGroup * action_group;
+    GDBusConnection * connection;
+    Phone phone_profile;
+
+
+  public:
+    typedef void (*name_lost_callback_func)(Service*, void* user_data);
+    void set_name_lost_callback (name_lost_callback_func callback, void* user_data);
+  private:
+    name_lost_callback_func name_lost_callback;
+    void * name_lost_user_data;
+
+
+  private:
+    unsigned int action_group_export_id;
+    std::set<unsigned int> exported_menus;
+    void unexport ();
+
+
+  private: // DBus callbacks
+    unsigned int bus_own_id;
+    void on_name_lost (GDBusConnection*, const char*);
+    void on_bus_acquired (GDBusConnection*, const char*);
+    static void on_name_lost (GDBusConnection*, const char*, gpointer);
+    static void on_bus_acquired (GDBusConnection*, const char*, gpointer);
 };
-
-struct _IndicatorLocationServiceClass
-{
-  GObjectClass parent_class;
-
-  /* signals */
-  void (* name_lost)(IndicatorLocationService * self);
-};
-
-/***
-****
-***/
-
-GType indicator_location_service_get_type (void);
-
-IndicatorLocationService * indicator_location_service_new (void);
-
-G_END_DECLS
 
 #endif /* __INDICATOR_LOCATION_SERVICE_H__ */
 

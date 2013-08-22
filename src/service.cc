@@ -25,125 +25,148 @@
 #define BUS_NAME "com.canonical.indicator.location"
 #define BUS_PATH "/com/canonical/indicator/location"
 
-G_DEFINE_TYPE (IndicatorLocationService,
-               indicator_location_service,
-               G_TYPE_OBJECT)
+/**
+***
+**/
 
-/* signals enum */
-enum
+Service :: Service ():
+  action_group (g_simple_action_group_new ()),
+  connection (0),
+  phone_profile (G_ACTION_MAP (action_group)),
+  name_lost_callback (0),
+  name_lost_user_data (0),
+  action_group_export_id (0),
+  bus_own_id (0)
 {
-  NAME_LOST,
-  LAST_SIGNAL
-};
+  bus_own_id = g_bus_own_name (G_BUS_TYPE_SESSION,
+                               BUS_NAME,
+                               G_BUS_NAME_OWNER_FLAGS_NONE,
+                               on_bus_acquired,
+                               NULL,
+                               on_name_lost,
+                               this,
+                               NULL);
+}
 
-static guint signals[LAST_SIGNAL] = { 0 };
-
-struct _IndicatorLocationServicePrivate
+Service :: ~Service ()
 {
-  guint own_id;
-  GDBusConnection * connection;
-  GCancellable * cancellable;
-};
+  if (connection != 0)
+    {
+      unexport ();
+      g_object_unref (connection);
+    }
 
-typedef IndicatorLocationServicePrivate priv_t;
+  if (bus_own_id != 0)
+    g_bus_unown_name (bus_own_id);
 
+  g_object_unref (action_group);
+}
+
+void
+Service :: set_name_lost_callback (name_lost_callback_func callback, void* user_data)
+{
+  name_lost_callback = callback;
+  name_lost_user_data = user_data;
+}
+
+void
+Service :: unexport ()
+{
+  g_return_if_fail (connection != 0);
+
+  // unexport the menu(s)
+  for (auto& id : exported_menus)
+    g_dbus_connection_unexport_menu_model (connection, id);
+  exported_menus.clear ();
+
+  // unexport the action group
+  if (action_group_export_id != 0)
+    {
+      g_dbus_connection_unexport_action_group (connection, action_group_export_id);
+      action_group_export_id = 0;
+    }
+}
 
 /***
 ****  GDBus
 ***/
 
-static void
-on_name_lost (GDBusConnection * connection   G_GNUC_UNUSED,
-              const char      * name,
-              gpointer          gself)
+void
+Service :: on_name_lost (GDBusConnection * connection,
+                         const char      * name,
+                         gpointer          gself)
 {
-  g_debug ("%s::%s: %s", G_STRLOC, G_STRFUNC, name);
+  static_cast<Service*>(gself)->on_name_lost (connection, name);
+}
+void
+Service :: on_name_lost (GDBusConnection * connection,
+                         const char      * name)
+{
+  g_debug ("%s::%s: %s %p", G_STRLOC, G_STRFUNC, name, connection);
 
-  g_signal_emit (gself, signals[NAME_LOST], 0, NULL);
+  if (name_lost_callback != 0)
+    (name_lost_callback)(this, name_lost_user_data);
 }
 
-static void
-on_bus_acquired (GDBusConnection * connection,
-                 const char      * name,
-                 gpointer          gself)
+void
+Service :: on_bus_acquired (GDBusConnection * connection,
+                            const char      * name,
+                            gpointer          gself)
 {
-  IndicatorLocationService * self;
-
-  g_debug ("%s::%s: %s", G_STRLOC, G_STRFUNC, name);
-
-  self = INDICATOR_LOCATION_SERVICE (gself);
-  self->priv->connection = G_DBUS_CONNECTION (g_object_ref (connection));
+  static_cast<Service*>(gself)->on_bus_acquired (connection, name);
 }
-
-
-/***
-****  GObject plumbing: life cycle
-***/
-
-static void
-indicator_location_service_init (IndicatorLocationService * self)
+void
+Service :: on_bus_acquired (GDBusConnection * connection,
+                            const char * name)
 {
-  /* init our priv pointer */
-  priv_t * p = G_TYPE_INSTANCE_GET_PRIVATE (self,
-                                            INDICATOR_TYPE_LOCATION_SERVICE,
-                                            IndicatorLocationServicePrivate);
-  self->priv = p;
+  g_debug ("%s::%s: %s %p", G_STRLOC, G_STRFUNC, name, connection);
 
-  p->cancellable = g_cancellable_new ();
+  connection = G_DBUS_CONNECTION (g_object_ref (connection));
 
-  p->own_id = g_bus_own_name (G_BUS_TYPE_SESSION,
-                              BUS_NAME,
-                              G_BUS_NAME_OWNER_FLAGS_NONE,
-                              on_bus_acquired,
-                              NULL,
-                              on_name_lost,
-                              self,
-                              NULL);
-}
+  GError * error = 0;
 
-static void
-indicator_location_service_dispose (GObject * o)
-{
-  IndicatorLocationService * self = INDICATOR_LOCATION_SERVICE(o);
-  priv_t * p = self->priv;
+  /* export the action group */
 
-  if (p->own_id)
+  unsigned int export_id = g_dbus_connection_export_action_group (connection,
+                                                                  BUS_PATH,
+                                                                  G_ACTION_GROUP (action_group),
+                                                                  &error);
+  if (error != 0)
     {
-      g_bus_unown_name (p->own_id);
-      p->own_id = 0;
+      g_warning ("Unable to export action group: %s", error->message);
+      g_clear_error (&error);
+    }
+  else
+    {
+      action_group_export_id = export_id;
     }
 
-  if (p->cancellable != NULL)
-    {
-      g_cancellable_cancel (p->cancellable);
-      g_clear_object (&p->cancellable);
+  /* export the menu(s) */
+
+  struct {
+    GMenu * menu;
+    const char * path;
+  } menus[] = {
+    { phone_profile.get_menu(), BUS_PATH "/phone" }
+  };
+
+  for (unsigned int i=0, n=G_N_ELEMENTS(menus); i<n; i++)
+    { 
+      export_id = g_dbus_connection_export_menu_model (connection,
+                                                       menus[i].path,
+                                                       G_MENU_MODEL (menus[i].menu),
+                                                       &error);
+      if (error != 0)
+        {
+          g_warning ("Unable to export phone menu: %s", error->message);
+          g_clear_error (&error);
+        }
+      else
+        {
+          exported_menus.insert (export_id);
+        }
+
+      g_object_unref (menus[i].menu);
     }
-
-  g_clear_object (&p->connection);
-
-  G_OBJECT_CLASS (indicator_location_service_parent_class)->dispose (o);
 }
 
-static void
-indicator_location_service_class_init (IndicatorLocationServiceClass * klass)
-{
-  GObjectClass * object_class = G_OBJECT_CLASS (klass);
-
-  object_class->dispose = indicator_location_service_dispose;
-
-  g_type_class_add_private (klass, sizeof (IndicatorLocationServicePrivate));
-
-  signals[NAME_LOST] = g_signal_new (INDICATOR_LOCATION_SERVICE_SIGNAL_NAME_LOST,
-                                     G_TYPE_FROM_CLASS(klass),
-                                     G_SIGNAL_RUN_LAST,
-                                     G_STRUCT_OFFSET (IndicatorLocationServiceClass, name_lost),
-                                     NULL, NULL,
-                                     g_cclosure_marshal_VOID__VOID,
-                                     G_TYPE_NONE, 0);
-}
-
-IndicatorLocationService *
-indicator_location_service_new (void)
-{
-  return INDICATOR_LOCATION_SERVICE (g_object_new (INDICATOR_TYPE_LOCATION_SERVICE, NULL));
-}

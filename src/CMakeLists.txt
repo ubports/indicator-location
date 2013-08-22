@@ -1,6 +1,6 @@
 set (SERVICE_EXEC "indicator-location-service")
 
-add_executable (${SERVICE_EXEC} main.cc service.cc)
+add_executable (${SERVICE_EXEC} main.cc service.cc phone.cc)
 
 set_property (TARGET ${SERVICE_EXEC}
               APPEND PROPERTY INCLUDE_DIRECTORIES

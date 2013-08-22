@@ -18,29 +18,20 @@
  */
 
 #include <locale.h>
-
 #include <glib/gi18n.h>
 #include <glib.h>
-
 #include "service.h"
 
-/***
-****
-***/
-
-static gboolean
-on_idle (gpointer unused G_GNUC_UNUSED)
+static void
+on_name_lost (Service * service G_GNUC_UNUSED, gpointer loop)
 {
-  GMainContext * context = g_main_context_default ();
-  g_message ("hello world %p", context);
-  return G_SOURCE_CONTINUE;
-};
+  g_main_loop_quit (static_cast<GMainLoop*>(loop));
+}
 
 int
 main (int argc G_GNUC_UNUSED, char ** argv G_GNUC_UNUSED)
 {
   GMainLoop * loop;
-  IndicatorLocationService * service;
 
   /* boilerplate i18n */
   setlocale (LC_ALL, "");
@@ -49,16 +40,11 @@ main (int argc G_GNUC_UNUSED, char ** argv G_GNUC_UNUSED)
  
   /* set up the service */ 
   loop = g_main_loop_new (NULL, false);
-  service = indicator_location_service_new ();
-  g_signal_connect_swapped (service, INDICATOR_LOCATION_SERVICE_SIGNAL_NAME_LOST,
-                            G_CALLBACK(g_main_loop_quit), loop);
-
-  /* run */
-  g_timeout_add_seconds (2, on_idle, NULL);
+  Service service;
+  service.set_name_lost_callback (on_name_lost, loop);
   g_main_loop_run (loop);
 
   /* cleanup */
-  g_object_unref (service);
   g_main_loop_unref (loop);
   return 0;
 }
