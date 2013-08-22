@@ -27,9 +27,9 @@ find_package (PkgConfig REQUIRED)
 
 include (FindPkgConfig)
 pkg_check_modules (SERVICE REQUIRED
-                   ubuntu-platform-api>=1.0.0
                    gio-unix-2.0>=2.36
                    glib-2.0>=2.36)
+                   #ubuntu-platform-api>=1.0.0
 
 ##
 ##

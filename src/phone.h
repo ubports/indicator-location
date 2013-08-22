@@ -20,29 +20,29 @@
 #ifndef __INDICATOR_LOCATION_PHONE_H__
 #define __INDICATOR_LOCATION_PHONE_H__
 
+#include <memory>
 #include <gio/gio.h>
-
-#include <ubuntu/application/location/controller.h>
+//#include <ubuntu/application/location/controller.h>
 
 
 class Phone
 {
   public:
-    Phone (GActionMap * action_map);
+    Phone (std::shared_ptr<GSimpleActionGroup> action_group);
     virtual ~Phone ();
-    GMenu * get_menu () { return G_MENU (g_object_ref (menu)); }
+    std::shared_ptr<GMenu> get_menu () { return menu; }
 
   private:
-    GMenu * menu;
-    GActionMap * action_map;
+    std::shared_ptr<GMenu> menu;
+    std::shared_ptr<GSimpleActionGroup> action_group;
 
   private:
-    UALocationServiceController * location_service_controller;
-    static void on_location_service_controller_status_changed (UALocationServiceStatusFlags, void*);
-    UALocationServiceController * create_location_service_controller ();
+    //UALocationServiceController * location_service_controller;
+    //static void on_location_service_controller_status_changed (UALocationServiceStatusFlags, void*);
+    //UALocationServiceController * create_location_service_controller ();
 
   private:
-    GMenu * create_menu ();
+    std::shared_ptr<GMenu> create_menu ();
 
   private:
     bool should_be_visible ();

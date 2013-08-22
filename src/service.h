@@ -20,9 +20,11 @@
 #ifndef __INDICATOR_LOCATION_SERVICE_H__
 #define __INDICATOR_LOCATION_SERVICE_H__
 
+#include <memory>
 #include <set>
 
 #include "phone.h"
+#include "utils.h" // GObjectDeleter
 
 class Service
 {
@@ -31,10 +33,9 @@ class Service
     virtual ~Service ();
 
   private:
-    GSimpleActionGroup * action_group;
-    GDBusConnection * connection;
+    std::shared_ptr<GSimpleActionGroup> action_group;
+    std::unique_ptr<GDBusConnection,GObjectDeleter> connection;
     Phone phone_profile;
-
 
   public:
     typedef void (*name_lost_callback_func)(Service*, void* user_data);

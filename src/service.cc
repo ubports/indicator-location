@@ -30,9 +30,8 @@
 **/
 
 Service :: Service ():
-  action_group (g_simple_action_group_new ()),
-  connection (0),
-  phone_profile (G_ACTION_MAP (action_group)),
+  action_group (g_simple_action_group_new(), GObjectDeleter()),
+  phone_profile (action_group),
   name_lost_callback (0),
   name_lost_user_data (0),
   action_group_export_id (0),
@@ -50,16 +49,11 @@ Service :: Service ():
 
 Service :: ~Service ()
 {
-  if (connection != 0)
-    {
-      unexport ();
-      g_object_unref (connection);
-    }
+  if (connection)
+    unexport ();
 
   if (bus_own_id != 0)
     g_bus_unown_name (bus_own_id);
-
-  g_object_unref (action_group);
 }
 
 void
@@ -72,17 +66,17 @@ Service :: set_name_lost_callback (name_lost_callback_func callback, void* user_
 void
 Service :: unexport ()
 {
-  g_return_if_fail (connection != 0);
+  g_return_if_fail (connection);
 
   // unexport the menu(s)
   for (auto& id : exported_menus)
-    g_dbus_connection_unexport_menu_model (connection, id);
+    g_dbus_connection_unexport_menu_model (connection.get(), id);
   exported_menus.clear ();
 
   // unexport the action group
   if (action_group_export_id != 0)
     {
-      g_dbus_connection_unexport_action_group (connection, action_group_export_id);
+      g_dbus_connection_unexport_action_group (connection.get(), action_group_export_id);
       action_group_export_id = 0;
     }
 }
@@ -121,7 +115,7 @@ Service :: on_bus_acquired (GDBusConnection * connection,
 {
   g_debug ("%s::%s: %s %p", G_STRLOC, G_STRFUNC, name, connection);
 
-  connection = G_DBUS_CONNECTION (g_object_ref (connection));
+  this->connection.reset (G_DBUS_CONNECTION (g_object_ref(connection)));
 
   GError * error = 0;
 
@@ -129,7 +123,7 @@ Service :: on_bus_acquired (GDBusConnection * connection,
 
   unsigned int export_id = g_dbus_connection_export_action_group (connection,
                                                                   BUS_PATH,
-                                                                  G_ACTION_GROUP (action_group),
+                                                                  G_ACTION_GROUP (action_group.get()),
                                                                   &error);
   if (error != 0)
     {
@@ -144,7 +138,7 @@ Service :: on_bus_acquired (GDBusConnection * connection,
   /* export the menu(s) */
 
   struct {
-    GMenu * menu;
+    std::shared_ptr<GMenu> menu;
     const char * path;
   } menus[] = {
     { phone_profile.get_menu(), BUS_PATH "/phone" }
@@ -154,7 +148,7 @@ Service :: on_bus_acquired (GDBusConnection * connection,
     { 
       export_id = g_dbus_connection_export_menu_model (connection,
                                                        menus[i].path,
-                                                       G_MENU_MODEL (menus[i].menu),
+                                                       G_MENU_MODEL (menus[i].menu.get()),
                                                        &error);
       if (error != 0)
         {
@@ -165,8 +159,6 @@ Service :: on_bus_acquired (GDBusConnection * connection,
         {
           exported_menus.insert (export_id);
         }
-
-      g_object_unref (menus[i].menu);
     }
 }
 
