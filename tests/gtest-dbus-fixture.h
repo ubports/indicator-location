@@ -35,7 +35,7 @@ class GTestDBusFixture : public ::testing::Test
     {
       GTestDBusFixture * self = static_cast<GTestDBusFixture*>(gself);
 
-      GError * err = 0;
+      GError * err = nullptr;
       self->conn = g_bus_get_finish (res, &err);
       g_assert_no_error (err);
 
@@ -47,7 +47,7 @@ class GTestDBusFixture : public ::testing::Test
     {
       GTestDBusFixture * self = static_cast<GTestDBusFixture*>(gself);
 
-      GError * err = 0;
+      GError * err = nullptr;
       g_dbus_connection_close_finish (self->conn, res, &err);
       g_assert_no_error (err);
 
@@ -65,16 +65,16 @@ class GTestDBusFixture : public ::testing::Test
 
     virtual void SetUp ()
     {
-      conn = 0;
-      test_dbus = 0;
-      loop = 0;
+      conn = nullptr;
+      test_dbus = nullptr;
+      loop = nullptr;
 
       //g_setenv ("GSETTINGS_SCHEMA_DIR", SCHEMA_DIR, TRUE);
       //g_setenv ("GSETTINGS_BACKEND", "memory", TRUE);
       //g_debug ("SCHEMA_DIR is %s", SCHEMA_DIR);
 
       // pull up a test dbus
-      loop = g_main_loop_new (NULL, FALSE);
+      loop = g_main_loop_new (nullptr, FALSE);
       test_dbus = g_test_dbus_new (G_TEST_DBUS_NONE);
       //g_test_dbus_add_service_dir (test_dbus, INDICATOR_SERVICE_DIR);
       //g_debug ("INDICATOR_SERVICE_DIR is %s", INDICATOR_SERVICE_DIR);
@@ -85,14 +85,14 @@ class GTestDBusFixture : public ::testing::Test
       g_debug ("test_dbus's address is %s", address);
 
       // wait for the GDBusConnection before returning
-      g_bus_get (G_BUS_TYPE_SYSTEM, NULL, on_bus_opened, this);
+      g_bus_get (G_BUS_TYPE_SYSTEM, nullptr, on_bus_opened, this);
       g_main_loop_run (loop);
     }
 
     virtual void TearDown()
     {
       // close the bus connection
-      g_dbus_connection_close (conn, NULL, on_bus_closed, this);
+      g_dbus_connection_close (conn, nullptr, on_bus_closed, this);
       g_main_loop_run (loop);
       g_clear_object (&conn);
 

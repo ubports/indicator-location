@@ -32,7 +32,7 @@
 Service :: Service (std::shared_ptr<Controller> controller):
   action_group (g_simple_action_group_new(), GObjectDeleter()),
   phone_profile (controller, action_group),
-  name_lost_callback (0),
+  name_lost_callback (nullptr),
   name_lost_user_data (0),
   action_group_export_id (0),
   bus_own_id (0)
@@ -41,10 +41,10 @@ Service :: Service (std::shared_ptr<Controller> controller):
                                BUS_NAME,
                                G_BUS_NAME_OWNER_FLAGS_NONE,
                                on_bus_acquired,
-                               NULL,
+                               nullptr,
                                on_name_lost,
                                this,
-                               NULL);
+                               nullptr);
 }
 
 Service :: ~Service ()
@@ -100,7 +100,7 @@ Service :: on_name_lost (GDBusConnection * connection,
 {
   g_debug ("%s::%s: %s %p", G_STRLOC, G_STRFUNC, name, connection);
 
-  if (name_lost_callback != 0)
+  if (name_lost_callback != nullptr)
     (name_lost_callback)(this, name_lost_user_data);
 }
 
@@ -119,7 +119,7 @@ Service :: on_bus_acquired (GDBusConnection * connection,
 
   this->connection.reset (G_DBUS_CONNECTION (g_object_ref(connection)));
 
-  GError * error = 0;
+  GError * error = nullptr;
 
   /* export the action group */
 
@@ -127,7 +127,7 @@ Service :: on_bus_acquired (GDBusConnection * connection,
                                                                   BUS_PATH,
                                                                   G_ACTION_GROUP (action_group.get()),
                                                                   &error);
-  if (error != 0)
+  if (error != nullptr)
     {
       g_warning ("Unable to export action group: %s", error->message);
       g_clear_error (&error);
@@ -152,7 +152,7 @@ Service :: on_bus_acquired (GDBusConnection * connection,
                                                        menus[i].path,
                                                        G_MENU_MODEL (menus[i].menu.get()),
                                                        &error);
-      if (error != 0)
+      if (error != nullptr)
         {
           g_warning ("Unable to export phone menu: %s", error->message);
           g_clear_error (&error);

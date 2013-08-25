@@ -42,7 +42,7 @@ main (int argc G_GNUC_UNUSED, char ** argv G_GNUC_UNUSED)
   textdomain (GETTEXT_PACKAGE);
  
   /* set up the service */
-  loop = g_main_loop_new (NULL, false);
+  loop = g_main_loop_new (nullptr, false);
   std::shared_ptr<Controller> controller (new MockController());//UbuntuAppLocController ());
   Service service (controller);
   service.set_name_lost_callback (on_name_lost, loop);

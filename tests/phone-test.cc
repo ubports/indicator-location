@@ -108,7 +108,7 @@ TEST_F (PhoneTest, PlatformTogglesGPS)
 
   // check that the current state is the default value of 'false'
   v = g_action_group_get_action_state (ag, key);
-  ASSERT_TRUE (v != 0);
+  ASSERT_TRUE (v != nullptr);
   enabled = g_variant_get_boolean (v);
   g_variant_unref (v);
   ASSERT_FALSE (enabled);
@@ -121,7 +121,7 @@ TEST_F (PhoneTest, PlatformTogglesGPS)
       myController->set_gps_enabled (enabled);
       wait_for_action_state_change (key);
       v = g_action_group_get_action_state (ag, key);
-      ASSERT_TRUE (v != 0);
+      ASSERT_TRUE (v != nullptr);
       ASSERT_EQ (enabled, g_variant_get_boolean (v));
       g_variant_unref (v);
     }
@@ -136,7 +136,7 @@ TEST_F (PhoneTest, UserTogglesGPS)
 
   // check that the current state is the default value of 'false'
   v = g_action_group_get_action_state (ag, key);
-  ASSERT_TRUE (v != 0);
+  ASSERT_TRUE (v != nullptr);
   enabled = g_variant_get_boolean (v);
   g_variant_unref (v);
   ASSERT_FALSE (enabled);
@@ -146,7 +146,7 @@ TEST_F (PhoneTest, UserTogglesGPS)
     {
       clear_callbacks ();
 
-      g_action_group_activate_action (ag, key, NULL);
+      g_action_group_activate_action (ag, key, nullptr);
       while (!gps_enabled_changed)
         wait_msec (50);
 
@@ -165,7 +165,7 @@ TEST_F (PhoneTest, PlatformTogglesLocation)
 
   // check that the current state is the default value of 'false'
   v = g_action_group_get_action_state (ag, key);
-  ASSERT_TRUE (v != 0);
+  ASSERT_TRUE (v != nullptr);
   enabled = g_variant_get_boolean (v);
   g_variant_unref (v);
   ASSERT_FALSE (enabled);
@@ -178,7 +178,7 @@ TEST_F (PhoneTest, PlatformTogglesLocation)
       myController->set_location_service_enabled (enabled);
       wait_for_action_state_change (key);
       v = g_action_group_get_action_state (ag, key);
-      ASSERT_TRUE (v != 0);
+      ASSERT_TRUE (v != nullptr);
       ASSERT_EQ (enabled, g_variant_get_boolean (v));
       g_variant_unref (v);
     }
@@ -193,7 +193,7 @@ TEST_F (PhoneTest, UserTogglesLocation)
 
   // check that the current state is the default value of 'false'
   v = g_action_group_get_action_state (ag, key);
-  ASSERT_TRUE (v != 0);
+  ASSERT_TRUE (v != nullptr);
   enabled = g_variant_get_boolean (v);
   g_variant_unref (v);
   ASSERT_FALSE (enabled);
@@ -203,7 +203,7 @@ TEST_F (PhoneTest, UserTogglesLocation)
     {
       clear_callbacks ();
 
-      g_action_group_activate_action (ag, key, NULL);
+      g_action_group_activate_action (ag, key, nullptr);
       while (!loc_enabled_changed)
         wait_msec (50);
 

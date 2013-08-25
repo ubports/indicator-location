@@ -33,7 +33,7 @@ class UbuntuAppLocController: public Controller
     UbuntuAppLocController ();
     virtual ~UbuntuAppLocController();
 
-    bool is_valid () const { return ualc != 0; }
+    bool is_valid () const { return ualc != nullptr; }
     bool is_gps_enabled () const;
     bool is_location_service_enabled () const;
 

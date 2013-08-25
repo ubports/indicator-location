@@ -91,7 +91,7 @@ GSimpleAction *
 Phone :: create_root_action ()
 {
   return g_simple_action_new_stateful (HEADER_ACTION_KEY,
-                                       NULL,
+                                       nullptr,
                                        action_state_for_root ());
 }
 
@@ -130,7 +130,7 @@ Phone :: create_detection_enabled_action ()
   GSimpleAction * action;
 
   action = g_simple_action_new_stateful (LOCATION_ACTION_KEY,
-                                         NULL,
+                                         nullptr,
                                          action_state_for_location_detection());
 
   g_simple_action_set_enabled (action, controller->is_valid());
@@ -176,7 +176,7 @@ Phone :: create_gps_enabled_action ()
   GSimpleAction * action;
 
   action = g_simple_action_new_stateful (GPS_ACTION_KEY,
-                                         NULL,
+                                         nullptr,
                                          action_state_for_gps_detection());
 
   g_simple_action_set_enabled (action, controller->is_valid());
@@ -201,9 +201,9 @@ show_settings (void)
 
   g_debug ("%s calling \"%s\"", G_STRFUNC, cmd);
 
-  GError * err = NULL;
+  GError * err = nullptr;
   g_spawn_command_line_async (cmd, &err);
-  if (err != NULL)
+  if (err != nullptr)
     {
       g_warning ("Unable to show location settings: %s", err->message);
       g_error_free (err);
@@ -215,10 +215,10 @@ Phone :: create_settings_action ()
 {
   GSimpleAction * action;
 
-  action = g_simple_action_new (SETTINGS_ACTION_KEY, NULL);
+  action = g_simple_action_new (SETTINGS_ACTION_KEY, nullptr);
 
   g_signal_connect (action, "activate",
-                    G_CALLBACK(show_settings), NULL);
+                    G_CALLBACK(show_settings), nullptr);
 
   return action;
 }
@@ -241,7 +241,7 @@ Phone :: create_menu ()
   g_menu_append (submenu, _("Location settings…"), "indicator." SETTINGS_ACTION_KEY);
 
   /* add the submenu to a new header */
-  header = g_menu_item_new (NULL, "indicator." HEADER_ACTION_KEY);
+  header = g_menu_item_new (nullptr, "indicator." HEADER_ACTION_KEY);
   g_menu_item_set_attribute (header, "x-canonical-type", "s", "com.canonical.indicator.root");
   g_menu_item_set_submenu (header, G_MENU_MODEL (submenu));
   g_object_unref (submenu);

@@ -63,7 +63,7 @@ UbuntuAppLocController :: is_gps_enabled () const
 {
   UALocationServiceStatusFlags flags = 0;
 
-  return (ualc != 0)
+  return (ualc != nullptr)
       && (!ua_location_service_controller_query_status (ualc, &flags))
       && (flags & UA_LOCATION_SERVICE_GPS_ENABLED);
 }
@@ -88,7 +88,7 @@ UbuntuAppLocController :: is_location_service_enabled () const
 {
   UALocationServiceStatusFlags flags = 0;
 
-  return (ualc != 0)
+  return (ualc != nullptr)
       && (!ua_location_service_controller_query_status (ualc, &flags))
       && (flags & UA_LOCATION_SERVICE_ENABLED);
 }
