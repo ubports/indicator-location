@@ -26,8 +26,8 @@ class MockController: public Controller
 {
   public:
 
-    MockController (): valid(true), gps(true), loc(true) {}
-    virtual ~MockController() {}
+    MockController (): valid(true), gps(false), loc(false) { }
+    virtual ~MockController() { }
 
     bool is_valid () const { return valid; }
     bool is_gps_enabled () const { return gps; }

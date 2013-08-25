@@ -31,6 +31,8 @@ Phone :: Phone (std::shared_ptr<Controller> controller_,
   menu (create_menu ()),
   action_group (action_group_)
 {
+  controller->add_listener (this);
+
   /* create the actions & add them to the group */
   std::array<GSimpleAction*, 4> actions = { create_root_action(),
                                             create_detection_enabled_action(),
@@ -41,6 +43,11 @@ Phone :: Phone (std::shared_ptr<Controller> controller_,
       g_action_map_add_action (G_ACTION_MAP(action_group.get()), G_ACTION(a));
       g_object_unref (a);
     }
+}
+
+Phone :: ~Phone ()
+{
+  controller->remove_listener (this);
 }
 
 /***

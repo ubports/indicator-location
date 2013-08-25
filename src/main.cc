@@ -28,6 +28,7 @@
 static void
 on_name_lost (Service * service G_GNUC_UNUSED, gpointer loop)
 {
+g_message ("name lost");
   g_main_loop_quit (static_cast<GMainLoop*>(loop));
 }
 
@@ -35,6 +36,8 @@ int
 main (int argc G_GNUC_UNUSED, char ** argv G_GNUC_UNUSED)
 {
   GMainLoop * loop;
+
+g_message ("%s %s", G_STRLOC, G_STRFUNC);
 
   /* boilerplate i18n */
   setlocale (LC_ALL, "");

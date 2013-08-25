@@ -19,30 +19,28 @@
 
 #include "controller.h"
 
-unsigned int
+void
 Controller :: add_listener (ControllerListener * l)
 {
-  unsigned int tag = next_tag++;
-  listeners[tag] = l;
-  return tag;
+  listeners.insert (l);
 }
 
 void
-Controller :: remove_listener (unsigned int tag)
+Controller :: remove_listener (ControllerListener * l)
 {
-  listeners.erase (tag);
+  listeners.erase (l);
 }
 
 void
 Controller :: notify_gps_enabled (bool enabled)
 {
   for (auto it : listeners)
-    it.second->on_gps_enabled_changed (enabled);
+    it->on_gps_enabled_changed (enabled);
 }
 
 void
 Controller :: notify_location_service_enabled (bool enabled)
 {
   for (auto it : listeners)
-    it.second->on_location_service_enabled_changed (enabled);
+    it->on_location_service_enabled_changed (enabled);
 }

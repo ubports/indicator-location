@@ -1,0 +1,69 @@
+#
+# Copyright (C) 2013 Canonical Ltd
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+Compile-time build dependencies
+-------------------------------
+ - gettext (gettext 0.18.1.1-10ubuntu3 or later)
+ - glib (libglib2.0, 2.36 or later)
+ - cmake (cmake, 2.8.9 or later)
+ - gcovr (gcovr, 2.4 or later)
+ - lcov (lcov, 1.9 or later)
+ - google test (libgtest-dev, 1.6.0 or later)
+ - ubuntu-platform-api (libubuntu-platform-api1)
+
+Building the code
+-----------------
+The simplest case is:
+ $ cd indicator-location-X.Y.Z
+ $ mkdir build
+ $ cd build
+ $ cmake ..
+ $ make
+
+Running the tests
+-----------------
+ $ cd indicator-location-X.Y.Z
+ $ mkdir build
+ $ cd build
+ $ cmake ..
+ $ make
+ $ make test
+
+Generating Test Coverage Reports
+--------------------------------
+ $ cd indicator-location-X.Y.Z
+ $ mkdir build-coverage
+ $ cd build-coverage
+ $ cmake -DCMAKE_BUILD_TYPE=coverage ..
+ $ make
+ $ make coverage-html
+
+Installation
+------------
+ $ mkdir build
+ $ cd build
+ $ cmake -DCMAKE_INSTALL_PREFIX=/usr .. # Or wherever...
+ $ make
+ $ make release
+ $ make install
+
+What Gets Installed
+-------------------
+  ${datadir}/dbus-1/indicator-location.service
+  ${datadir}/unity/indicators/com.canonical.indicator.location
+  ${libexecdir}/indicator-location/indicator-location-service
+
+

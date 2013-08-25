@@ -20,7 +20,7 @@
 #ifndef __INDICATOR_LOCATION_CONTROLLER_H__
 #define __INDICATOR_LOCATION_CONTROLLER_H__
 
-#include <map>
+#include <set>
 
 class ControllerListener
 {
@@ -37,11 +37,11 @@ class Controller
 {
   public:
 
-    Controller (): next_tag(0) {}
+    Controller () {}
     virtual ~Controller() {}
 
-    unsigned int add_listener (ControllerListener *);
-    void remove_listener (unsigned int tag);
+    void add_listener (ControllerListener *);
+    void remove_listener (ControllerListener *);
 
     virtual bool is_valid () const = 0;
     virtual bool is_gps_enabled () const = 0;
@@ -52,8 +52,7 @@ class Controller
 
   private:
 
-    unsigned int next_tag;
-    std::map<unsigned int,ControllerListener *> listeners;
+    std::set<ControllerListener*> listeners;
 
   protected:
 

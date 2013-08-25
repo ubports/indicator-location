@@ -1,4 +1,6 @@
 if (CMAKE_BUILD_TYPE MATCHES coverage)
+  set(LCOV_RAW_FILE "lcov-raw.info")
+  set(LCOV_FILE "lcov.info")
   set(GCOV_FLAGS "${GCOV_FLAGS} --coverage")
   set(CMAKE_EXE_LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS}    ${GCOV_FLAGS}")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${GCOV_FLAGS}")
@@ -28,14 +30,15 @@ if (CMAKE_BUILD_TYPE MATCHES coverage)
       add_custom_target (coverage-html
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMAND "${CMAKE_CTEST_COMMAND}" --force-new-ctest-process --verbose
-        COMMAND "${LCOV_EXECUTABLE}" --directory ${CMAKE_BINARY_DIR} --capture | ${CMAKE_SOURCE_DIR}/trim-lcov.py > dconf-lcov.info
-        COMMAND LANG=C "${GENHTML_EXECUTABLE}" --prefix ${CMAKE_BINARY_DIR} --output-directory lcov-html --legend --show-details dconf-lcov.info
+        # generate the raw lcov data
+        COMMAND "${LCOV_EXECUTABLE}" --directory ${CMAKE_BINARY_DIR} --capture -o ${LCOV_RAW_FILE}
+        # FIXME: when ubuntu gets lcov 1.10 we can use --no-external instead of the brittle --remove
+        COMMAND "${LCOV_EXECUTABLE}" --remove ${LCOV_RAW_FILE} "/usr/include/*" | ${CMAKE_SOURCE_DIR}/trim-lcov.py > ${LCOV_FILE}
+        COMMAND LANG=C "${GENHTML_EXECUTABLE}" --prefix ${CMAKE_BINARY_DIR} --output-directory lcov-html --legend --show-details ${LCOV_FILE}
         COMMAND ${CMAKE_COMMAND} -E echo ""
         COMMAND ${CMAKE_COMMAND} -E echo "file://${CMAKE_BINARY_DIR}/lcov-html/index.html"
-        COMMAND ${CMAKE_COMMAND} -E echo "")
-        #COMMAND "${LCOV_EXECUTABLE}" --directory ${CMAKE_BINARY_DIR} --capture --output-file coverage.info --no-checksum
-        #COMMAND "${GENHTML_EXECUTABLE}" --prefix ${CMAKE_BINARY_DIR} --output-directory coveragereport --title "Code Coverage" --legend --show-details coverage.info
-        #COMMAND ${CMAKE_COMMAND} -E echo "\\#define foo \\\"bar\\\"" 
+        COMMAND ${CMAKE_COMMAND} -E echo ""
+        VERBATIM) # VERBATIM is necessary here for the wildcard in --remove... again, when we go to lcov 1.10 we can drop this
         #)
     endif()
   endif()

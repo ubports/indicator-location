@@ -32,7 +32,7 @@ class Phone: public ControllerListener
   public:
     Phone (std::shared_ptr<Controller> controller,
            std::shared_ptr<GSimpleActionGroup> action_group);
-    virtual ~Phone () {}
+    virtual ~Phone ();
     std::shared_ptr<GMenu> get_menu () { return menu; }
 
   protected:

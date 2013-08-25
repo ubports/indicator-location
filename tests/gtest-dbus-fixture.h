@@ -114,7 +114,7 @@ class GTestDBusFixture : public ::testing::Test
                                                    loop);
       gulong timeout_id = g_timeout_add_seconds (timeout_seconds,
                                                  wait_for_signal__timeout,
-                                                 loop);
+                                                 const_cast<gchar*>(signal));
       g_main_loop_run (loop);
       g_source_remove (timeout_id);
       g_signal_handler_disconnect (o, handler_id);

@@ -90,6 +90,8 @@ Service :: on_name_lost (GDBusConnection * connection,
                          const char      * name,
                          gpointer          gself)
 {
+  g_debug ("%s::%s: %s %p", G_STRLOC, G_STRFUNC, name, connection);
+
   static_cast<Service*>(gself)->on_name_lost (connection, name);
 }
 void

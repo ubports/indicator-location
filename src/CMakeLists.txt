@@ -14,7 +14,7 @@ set_property (DIRECTORY
 
 set (INDICATOR_LIB "libindicator-location-service")
 
-add_library (${INDICATOR_LIB} STATIC controller.cc main.cc phone.cc service.cc)
+add_library (${INDICATOR_LIB} STATIC controller.cc phone.cc service.cc)
 
 set_property (TARGET ${INDICATOR_LIB}
               APPEND PROPERTY LINK_LIBRARIES ${INDICATOR_LIB} ${SERVICE_LIBRARIES} ${GCOV_LIBS})
@@ -41,5 +41,5 @@ install (TARGETS ${INDICATOR_EXEC}
 
 
 set_property (TARGET ${INDICATOR_LIB} ${INDICATOR_EXEC}
-              APPEND_STRING PROPERTY COMPILE_FLAGS " ${CC_WARNING_ARGS} --std=c++11")
+              APPEND_STRING PROPERTY COMPILE_FLAGS " ${CC_WARNING_ARGS} ${GCOV_FLAGS} --std=c++11")
 
