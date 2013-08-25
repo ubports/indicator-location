@@ -20,6 +20,9 @@
 #include <locale.h>
 #include <glib/gi18n.h>
 #include <glib.h>
+
+//#include "controller-ualc.h"
+#include "controller-mock.h"
 #include "service.h"
 
 static void
@@ -38,9 +41,10 @@ main (int argc G_GNUC_UNUSED, char ** argv G_GNUC_UNUSED)
   bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
   textdomain (GETTEXT_PACKAGE);
  
-  /* set up the service */ 
+  /* set up the service */
   loop = g_main_loop_new (NULL, false);
-  Service service;
+  std::shared_ptr<Controller> controller (new MockController());//UbuntuAppLocController ());
+  Service service (controller);
   service.set_name_lost_callback (on_name_lost, loop);
   g_main_loop_run (loop);
 

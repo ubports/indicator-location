@@ -23,13 +23,14 @@
 #include <memory>
 #include <set>
 
+#include "controller.h"
 #include "phone.h"
 #include "utils.h" // GObjectDeleter
 
 class Service
 {
   public:
-    Service ();
+    Service (std::shared_ptr<Controller> controller);
     virtual ~Service ();
 
   private:

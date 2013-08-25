@@ -21,25 +21,28 @@
 #define __INDICATOR_LOCATION_PHONE_H__
 
 #include <memory>
+
+#include <glib.h>
 #include <gio/gio.h>
-//#include <ubuntu/application/location/controller.h>
 
+#include "controller.h"
 
-class Phone
+class Phone: public ControllerListener
 {
   public:
-    Phone (std::shared_ptr<GSimpleActionGroup> action_group);
-    virtual ~Phone ();
+    Phone (std::shared_ptr<Controller> controller,
+           std::shared_ptr<GSimpleActionGroup> action_group);
+    virtual ~Phone () {}
     std::shared_ptr<GMenu> get_menu () { return menu; }
+
+  protected:
+    std::shared_ptr<Controller> controller;
+    virtual void on_gps_enabled_changed (bool is_enabled);
+    virtual void on_location_service_enabled_changed (bool is_enabled);
 
   private:
     std::shared_ptr<GMenu> menu;
     std::shared_ptr<GSimpleActionGroup> action_group;
-
-  private:
-    //UALocationServiceController * location_service_controller;
-    //static void on_location_service_controller_status_changed (UALocationServiceStatusFlags, void*);
-    //UALocationServiceController * create_location_service_controller ();
 
   private:
     std::shared_ptr<GMenu> create_menu ();
@@ -50,16 +53,14 @@ class Phone
     GSimpleAction * create_root_action ();
 
   private:
-    GSimpleAction * create_detection_enabled_action ();
     GVariant * action_state_for_location_detection ();
+    GSimpleAction * create_detection_enabled_action ();
     static void on_detection_location_activated (GSimpleAction*, GVariant*, gpointer);
-    void update_location_detection_state ();
 
   private:
     GVariant * action_state_for_gps_detection ();
-    void update_gps_detection_state ();
-    static void on_detection_gps_activated (GSimpleAction*, GVariant*, gpointer);
     GSimpleAction * create_gps_enabled_action ();
+    static void on_detection_gps_activated (GSimpleAction*, GVariant*, gpointer);
 
   private:
     GSimpleAction * create_settings_action ();

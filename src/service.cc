@@ -29,9 +29,9 @@
 ***
 **/
 
-Service :: Service ():
+Service :: Service (std::shared_ptr<Controller> controller):
   action_group (g_simple_action_group_new(), GObjectDeleter()),
-  phone_profile (action_group),
+  phone_profile (controller, action_group),
   name_lost_callback (0),
   name_lost_user_data (0),
   action_group_export_id (0),
