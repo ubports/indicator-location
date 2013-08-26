@@ -31,17 +31,3 @@ set (UNITY_INDICATOR_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${UNITY_INDICATOR_NAME}")
 
 install (FILES "${UNITY_INDICATOR_FILE}"
          DESTINATION "${UNITY_INDICATOR_DIR}")
-
-##
-##  Icons
-##
-
-# where to install
-set (ICON_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}/icons/hicolor")
-message (STATUS "${ICON_DIR} is the Icon install dir")
-
-install (DIRECTORY icons
-         icons/16x16
-         DESTINATION "${ICON_DIR}"
-         FILES_MATCHING PATTERN "*.png" PATTERN "*.svg")
-
