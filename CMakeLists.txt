@@ -53,6 +53,7 @@ endif ()
 
 add_subdirectory (src)
 add_subdirectory (data)
+add_subdirectory (po)
 if (${enable_tests})
   add_subdirectory (tests)
 endif ()
