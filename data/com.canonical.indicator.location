@@ -1,0 +1,8 @@
+[Indicator Service]
+Name=indicator-location
+ObjectPath=/com/canonical/indicator/location
+Position=90
+
+[phone]
+ObjectPath=/com/canonical/indicator/location/phone
+

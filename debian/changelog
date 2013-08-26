@@ -1,3 +1,11 @@
+indicator-location (13.10.0-0ubuntu1) UNRELEASED; urgency=low
+
+  [ Charles Kerr]
+  * Implement the phone's location indicator
+  * Switch build system from autotools to cmake
+
+ -- Charles Kerr <charles.kerr@canonical.com>  Mon, 26 Aug 2013 16:07:44 -0500
+
 indicator-location (0.0.4+13.10.20130719-0ubuntu1) saucy; urgency=low
 
   [ Ken VanDine ]
