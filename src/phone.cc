@@ -71,7 +71,7 @@ Phone :: action_state_for_root ()
   GVariantBuilder builder;
   g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
 
-  const char * a11y = "Location";
+  const char * a11y = _("Location");
   g_variant_builder_add (&builder, "{sv}", "accessible-desc", g_variant_new_string (a11y));
 
   gboolean visible = should_be_visible ();
