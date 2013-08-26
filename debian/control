@@ -5,9 +5,11 @@ Maintainer: Charles Kerr <charles.kerr@canonical.com>
 Build-Depends: cmake,
                dbus,
                debhelper (>= 9),
+               dh-translations,
                intltool (>= 0.35.0), 
                libglib2.0-dev (>= 2.36),
                libgtest-dev,
+               python,
 Standards-Version: 3.9.4
 Homepage: http://launchpad.net/indicator-location/
 # If you aren't a member of ~indicator-applet-developers but need to upload 
