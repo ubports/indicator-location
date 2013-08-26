@@ -20,6 +20,9 @@
 #include <array>
 
 #include <glib/gi18n.h>
+
+#include <url-dispatcher.h>
+
 #include "phone.h"
 #include "utils.h" // GObjectDeleter
 
@@ -194,20 +197,27 @@ Phone :: create_gps_enabled_action ()
 
 #define SETTINGS_ACTION_KEY "settings"
 
-static void
-show_settings (void)
+namespace
 {
-  const char * cmd = "ubuntu-system-settings location";
+  void
+  on_uri_dispatched (const gchar * uri,
+                     gboolean      success     G_GNUC_UNUSED,
+                     gpointer      user_data   G_GNUC_UNUSED)
+  {
+    if (!success)
+      g_warning ("Unable to activate '%s'", uri);
+  }
 
-  g_debug ("%s calling \"%s\"", G_STRFUNC, cmd);
-
-  GError * err = nullptr;
-  g_spawn_command_line_async (cmd, &err);
-  if (err != nullptr)
-    {
-      g_warning ("Unable to show location settings: %s", err->message);
-      g_error_free (err);
-    }
+  void
+  on_settings_activated (GSimpleAction * simple      G_GNUC_UNUSED,
+                         GVariant      * parameter,
+                         gpointer        user_data   G_GNUC_UNUSED)
+  {
+    const char * key = g_variant_get_string (parameter, nullptr);
+    gchar * uri = g_strdup_printf ("settings://system/%s", key);
+    url_dispatch_send (uri, on_uri_dispatched, nullptr);
+    g_free (uri);
+  }
 }
 
 GSimpleAction *
@@ -215,10 +225,10 @@ Phone :: create_settings_action ()
 {
   GSimpleAction * action;
 
-  action = g_simple_action_new (SETTINGS_ACTION_KEY, nullptr);
+  action = g_simple_action_new (SETTINGS_ACTION_KEY, G_VARIANT_TYPE_STRING);
 
   g_signal_connect (action, "activate",
-                    G_CALLBACK(show_settings), nullptr);
+                    G_CALLBACK(on_settings_activated), nullptr);
 
   return action;
 }
@@ -238,7 +248,7 @@ Phone :: create_menu ()
   submenu = g_menu_new ();
   g_menu_append (submenu, _("Location detection"), "indicator." LOCATION_ACTION_KEY);
   g_menu_append (submenu, _("GPS"), "indicator." GPS_ACTION_KEY);
-  g_menu_append (submenu, _("Location settings…"), "indicator." SETTINGS_ACTION_KEY);
+  g_menu_append (submenu, _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::location");
 
   /* add the submenu to a new header */
   header = g_menu_item_new (nullptr, "indicator." HEADER_ACTION_KEY);
