@@ -1,10 +1,16 @@
 #!/usr/bin/make -f
-# -*- makefile -*-
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
 
-override_dh_autoreconf:
-	NOCONFIGURE=1 dh_autoreconf ./autogen.sh
+export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 
 %:
-	dh $@ --with autoreconf --fail-missing
+	dh $@ --with translations
+
+override_dh_install:
+	find debian/indicator-session/usr/lib -name *.la -delete
+	find debian/indicator-session/usr/lib -name *.a -delete
+	dh_install --fail-missing
+
+# Hack as it seems it's not possible to easy run that under dbus-test-runner
+override_dh_auto_test:
+	env -u LD_PRELOAD dh_auto_test
+
