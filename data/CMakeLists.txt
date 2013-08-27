@@ -4,9 +4,9 @@
 
 # where to install
 set (UPSTART_JOBS_DIR "${CMAKE_INSTALL_FULL_DATADIR}/upstart/sessions")
-message (STATUS "${UPSTART_JOBS_DIR} is the DBus Service File install dir")
+message (STATUS "${UPSTART_JOBS_DIR} is the Upstart Jobs File install dir")
 
-set (UPSTART_JOB_NAME "${CMAKE_PROJECT_NAME}.service")
+set (UPSTART_JOB_NAME "${CMAKE_PROJECT_NAME}.conf")
 set (UPSTART_JOB_FILE "${CMAKE_CURRENT_BINARY_DIR}/${UPSTART_JOB_NAME}")
 set (UPSTART_JOB_FILE_IN "${CMAKE_CURRENT_SOURCE_DIR}/${UPSTART_JOB_NAME}.in")
 
