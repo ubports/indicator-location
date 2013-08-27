@@ -1,22 +1,22 @@
 ##
-##  DBus Service File
+##  Upstart Job File
 ##
 
 # where to install
-set (DBUS_SERVICE_DIR "${CMAKE_INSTALL_FULL_DATADIR}/dbus-1/services")
-message (STATUS "${DBUS_SERVICE_DIR} is the DBus Service File install dir")
+set (UPSTART_JOBS_DIR "${CMAKE_INSTALL_FULL_DATADIR}/upstart/sessions")
+message (STATUS "${UPSTART_JOBS_DIR} is the DBus Service File install dir")
 
-set (SERVICE_NAME "${CMAKE_PROJECT_NAME}.service")
-set (SERVICE_FILE "${CMAKE_CURRENT_BINARY_DIR}/${SERVICE_NAME}")
-set (SERVICE_FILE_IN "${CMAKE_CURRENT_SOURCE_DIR}/${SERVICE_NAME}.in")
+set (UPSTART_JOB_NAME "${CMAKE_PROJECT_NAME}.service")
+set (UPSTART_JOB_FILE "${CMAKE_CURRENT_BINARY_DIR}/${UPSTART_JOB_NAME}")
+set (UPSTART_JOB_FILE_IN "${CMAKE_CURRENT_SOURCE_DIR}/${UPSTART_JOB_NAME}.in")
 
 # build it
 set (pkglibexecdir "${CMAKE_INSTALL_FULL_PKGLIBEXECDIR}")
-configure_file ("${SERVICE_FILE_IN}" "${SERVICE_FILE}")
+configure_file ("${UPSTART_JOB_FILE_IN}" "${UPSTART_JOB_FILE}")
 
 # install it
-install (FILES "${SERVICE_FILE}"
-         DESTINATION "${DBUS_SERVICE_DIR}")
+install (FILES "${UPSTART_JOB_FILE}"
+         DESTINATION "${UPSTART_JOBS_DIR}")
 
 ##
 ##  Unity Indicator File
