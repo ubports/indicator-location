@@ -25,7 +25,7 @@
 UbuntuAppLocController :: UbuntuAppLocController ():
   ualc (ua_location_service_create_controller ())
 {
-  if (ualc)
+  if (ualc != nullptr)
     {
       ua_location_service_controller_set_status_changed_handler (
         ualc,
@@ -36,7 +36,7 @@ UbuntuAppLocController :: UbuntuAppLocController ():
 
 UbuntuAppLocController :: ~UbuntuAppLocController ()
 {
-  if (ualc)
+  if (ualc != nullptr)
     ua_location_service_controller_unref (ualc);
 }
 

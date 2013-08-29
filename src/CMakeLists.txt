@@ -26,7 +26,7 @@ set_property (TARGET ${INDICATOR_LIB}
 
 set (INDICATOR_EXEC "indicator-location-service")
 
-add_executable (${INDICATOR_EXEC} main.cc)
+add_executable (${INDICATOR_EXEC} main.cc controller-ualc.cc)
 
 set_property (SOURCE main.cc
               APPEND PROPERTY COMPILE_DEFINITIONS
