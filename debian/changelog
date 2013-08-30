@@ -1,3 +1,16 @@
+indicator-location (13.10.0+13.10.20130830.2-0ubuntu1) saucy; urgency=low
+
+  [ Charles Kerr ]
+  * ubuntu's location API's got the FTBFS resolved, so let's use it as
+    the backend. This commit changes which controller instance we pass
+    to the service. Before it was a MockController; now it's an
+    UbuntuAppLocController.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 42
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 30 Aug 2013 10:07:47 +0000
+
 indicator-location (13.10.0+13.10.20130827.3-0ubuntu1) saucy; urgency=low
 
   [ Charles Kerr ]
