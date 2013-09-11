@@ -77,6 +77,9 @@ Phone :: action_state_for_root ()
   const char * a11y = _("Location");
   g_variant_builder_add (&builder, "{sv}", "accessible-desc", g_variant_new_string (a11y));
 
+  const char * title = _("Location");
+  g_variant_builder_add (&builder, "{sv}", "title", g_variant_new_string (title));
+
   gboolean visible = should_be_visible ();
   g_variant_builder_add (&builder, "{sv}", "visible", g_variant_new_boolean (visible));
 
