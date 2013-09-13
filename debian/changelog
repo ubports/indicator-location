@@ -1,3 +1,13 @@
+indicator-location (13.10.0+13.10.20130913-0ubuntu1) saucy; urgency=low
+
+  [ Ted Gould ]
+  * Add a title to the root action state. (LP: #1223635)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 44
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 13 Sep 2013 15:15:27 +0000
+
 indicator-location (13.10.0+13.10.20130830.2-0ubuntu1) saucy; urgency=low
 
   [ Charles Kerr ]
