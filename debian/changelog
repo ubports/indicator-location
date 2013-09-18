@@ -1,3 +1,13 @@
+indicator-location (13.10.0+13.10.20130918-0ubuntu1) saucy; urgency=low
+
+  [ Ted Gould ]
+  * Moving indicator to be on the right of bluetooth. (LP: #1226033)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 46
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 18 Sep 2013 06:23:42 +0000
+
 indicator-location (13.10.0+13.10.20130913-0ubuntu1) saucy; urgency=low
 
   [ Ted Gould ]
