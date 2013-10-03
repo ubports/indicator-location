@@ -217,7 +217,7 @@ namespace
                          gpointer        user_data   G_GNUC_UNUSED)
   {
     const char * key = g_variant_get_string (parameter, nullptr);
-    gchar * uri = g_strdup_printf ("settings://system/%s", key);
+    gchar * uri = g_strdup_printf ("settings:///system/%s", key);
     url_dispatch_send (uri, on_uri_dispatched, nullptr);
     g_free (uri);
   }
