@@ -6,3 +6,6 @@ Position=60
 [phone]
 ObjectPath=/com/canonical/indicator/location/phone
 
+[phone_greeter]
+ObjectPath=/com/canonical/indicator/location/phone
+
