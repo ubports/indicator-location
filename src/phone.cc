@@ -262,7 +262,8 @@ Phone :: create_menu ()
   g_menu_append_item (submenu, gps);
   g_object_unref (gps);
 
-  g_menu_append (submenu, _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::location");
+  // disabled for 13.04 -- the location settings panel isn't complete
+  // g_menu_append (submenu, _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::location");
 
   /* add the submenu to a new header */
   header = g_menu_item_new (nullptr, "indicator." HEADER_ACTION_KEY);

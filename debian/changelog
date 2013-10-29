@@ -1,3 +1,15 @@
+indicator-location (13.10.0+13.10.20131011-0ubuntu1) saucy; urgency=low
+
+  [ Charles Kerr ]
+  * Since the "Location Settings" panel is disabled in system-settings
+    for 13.10, hide the indicator's menuitem that activates that panel.
+    (LP: #1234975)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 51
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 11 Oct 2013 04:26:58 +0000
+
 indicator-location (13.10.0+13.10.20131004-0ubuntu1) saucy; urgency=low
 
   [ Charles Kerr ]
