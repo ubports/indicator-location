@@ -5,7 +5,7 @@ list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set (PROJECT_VERSION "13.10.0")
 set (PACKAGE ${CMAKE_PROJECT_NAME})
-set (GETTEXT_PACKAGE ${CMAKE_PROJECT_NAME})
+set (GETTEXT_PACKAGE indicator-location)
 
 option (enable_tests "Build the package's automatic tests." ON)
 option (enable_lcov "Generate lcov code coverage reports." ON)
@@ -29,10 +29,10 @@ find_package (PkgConfig REQUIRED)
 
 include (FindPkgConfig)
 pkg_check_modules (SERVICE REQUIRED
+                   ubuntu-platform-api>=1.0.0
                    url-dispatcher-1
                    gio-unix-2.0>=2.36
                    glib-2.0>=2.36)
-                   #ubuntu-platform-api>=1.0.0
 
 ##
 ##

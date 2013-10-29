@@ -77,6 +77,9 @@ Phone :: action_state_for_root ()
   const char * a11y = _("Location");
   g_variant_builder_add (&builder, "{sv}", "accessible-desc", g_variant_new_string (a11y));
 
+  const char * title = _("Location");
+  g_variant_builder_add (&builder, "{sv}", "title", g_variant_new_string (title));
+
   gboolean visible = should_be_visible ();
   g_variant_builder_add (&builder, "{sv}", "visible", g_variant_new_boolean (visible));
 
@@ -214,7 +217,7 @@ namespace
                          gpointer        user_data   G_GNUC_UNUSED)
   {
     const char * key = g_variant_get_string (parameter, nullptr);
-    gchar * uri = g_strdup_printf ("settings://system/%s", key);
+    gchar * uri = g_strdup_printf ("settings:///system/%s", key);
     url_dispatch_send (uri, on_uri_dispatched, nullptr);
     g_free (uri);
   }
@@ -243,12 +246,24 @@ Phone :: create_menu ()
   GMenu * menu;
   GMenu * submenu;
   GMenuItem * header;
+  GMenuItem * location;
+  GMenuItem * gps;
 
   /* create the submenu */
   submenu = g_menu_new ();
-  g_menu_append (submenu, _("Location detection"), "indicator." LOCATION_ACTION_KEY);
-  g_menu_append (submenu, _("GPS"), "indicator." GPS_ACTION_KEY);
-  g_menu_append (submenu, _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::location");
+
+  location = g_menu_item_new (_("Location detection"), "indicator." LOCATION_ACTION_KEY);
+  g_menu_item_set_attribute (location, "x-canonical-type", "s", "com.canonical.indicator.switch");
+  g_menu_append_item (submenu, location);
+  g_object_unref (location);
+
+  gps = g_menu_item_new (_("GPS"), "indicator." GPS_ACTION_KEY);
+  g_menu_item_set_attribute (gps, "x-canonical-type", "s", "com.canonical.indicator.switch");
+  g_menu_append_item (submenu, gps);
+  g_object_unref (gps);
+
+  // disabled for 13.04 -- the location settings panel isn't complete
+  // g_menu_append (submenu, _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::location");
 
   /* add the submenu to a new header */
   header = g_menu_item_new (nullptr, "indicator." HEADER_ACTION_KEY);
