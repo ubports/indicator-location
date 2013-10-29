@@ -246,11 +246,22 @@ Phone :: create_menu ()
   GMenu * menu;
   GMenu * submenu;
   GMenuItem * header;
+  GMenuItem * location;
+  GMenuItem * gps;
 
   /* create the submenu */
   submenu = g_menu_new ();
-  g_menu_append (submenu, _("Location detection"), "indicator." LOCATION_ACTION_KEY);
-  g_menu_append (submenu, _("GPS"), "indicator." GPS_ACTION_KEY);
+
+  location = g_menu_item_new (_("Location detection"), "indicator." LOCATION_ACTION_KEY);
+  g_menu_item_set_attribute (location, "x-canonical-type", "s", "com.canonical.indicator.switch");
+  g_menu_append_item (submenu, location);
+  g_object_unref (location);
+
+  gps = g_menu_item_new (_("GPS"), "indicator." GPS_ACTION_KEY);
+  g_menu_item_set_attribute (gps, "x-canonical-type", "s", "com.canonical.indicator.switch");
+  g_menu_append_item (submenu, gps);
+  g_object_unref (gps);
+
   g_menu_append (submenu, _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::location");
 
   /* add the submenu to a new header */
