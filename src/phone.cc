@@ -28,8 +28,8 @@
 
 #define PROFILE_NAME "phone"
 
-Phone :: Phone (std::shared_ptr<Controller> controller_,
-                std::shared_ptr<GSimpleActionGroup> action_group_):
+Phone :: Phone (const std::shared_ptr<Controller>& controller_,
+                const std::shared_ptr<GSimpleActionGroup>& action_group_):
   controller (controller_),
   menu (create_menu ()),
   action_group (action_group_)
