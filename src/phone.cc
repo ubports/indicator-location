@@ -85,7 +85,12 @@ Phone :: action_state_for_root ()
 
   const char * icon_name = "gps";
   GIcon * icon = g_themed_icon_new_with_default_fallbacks (icon_name);
-  g_variant_builder_add (&builder, "{sv}", "icon", g_icon_serialize (icon));
+  GVariant * serialized_icon = g_icon_serialize (icon);
+  if (serialized_icon != NULL)
+    {
+      g_variant_builder_add (&builder, "{sv}", "icon", serialized_icon);
+      g_variant_unref (serialized_icon);
+    }
   g_object_unref (icon);
 
   return g_variant_builder_end (&builder);
