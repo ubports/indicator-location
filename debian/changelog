@@ -1,3 +1,22 @@
+indicator-location (13.10.0+14.04.20131125-0ubuntu1) trusty; urgency=low
+
+  [ Charles Kerr ]
+  * A bit of fine tuning suggested by michi.
+  * fix a minor memory leak that was caused by treating the variant
+    returned by g_icon_serialize() as floating.
+
+  [ Ted Gould ]
+  * Adding a phone_greeter profile.
+  * No description needed. (LP: #1185565)
+
+  [ Nick Dedekind ]
+  * Location & GPS menu items should be switches. (LP: #1245711)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 57
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 25 Nov 2013 03:55:05 +0000
+
 indicator-location (13.10.0+13.10.20131011-0ubuntu1) saucy; urgency=low
 
   [ Charles Kerr ]
