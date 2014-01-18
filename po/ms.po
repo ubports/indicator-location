@@ -1,4 +1,4 @@
-# Uyghur translation for indicator-location
+# Malay translation for indicator-location
 # Copyright (c) 2014 Rosetta Contributors and Canonical Ltd 2014
 # This file is distributed under the same license as the indicator-location package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2014-01-15 19:55+0100\n"
-"PO-Revision-Date: 2014-01-17 04:29+0000\n"
-"Last-Translator: Gheyret T.Kenji <Unknown>\n"
-"Language-Team: Uyghur <ug@li.org>\n"
+"PO-Revision-Date: 2014-01-17 09:09+0000\n"
+"Last-Translator: abuyop <Unknown>\n"
+"Language-Team: Malay <ms@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,11 +19,11 @@ msgstr ""
 
 #: ../src/phone.cc:77 ../src/phone.cc:80
 msgid "Location"
-msgstr "ئورۇن"
+msgstr "Lokasi"
 
 #: ../src/phone.cc:260
 msgid "Location detection"
-msgstr "ئورۇن بايقاش"
+msgstr "Pengesanan lokasi"
 
 #: ../src/phone.cc:265
 msgid "GPS"
