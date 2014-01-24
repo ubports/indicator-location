@@ -1,3 +1,14 @@
+indicator-location (13.10.0+14.04.20140124-0ubuntu1) trusty; urgency=low
+
+  [ Nick Dedekind ]
+  * Fixed position as per design spec (lp#1262611)
+    https://wiki.ubuntu.com/StatusBar. (LP: #1262611)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 65
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 24 Jan 2014 12:46:56 +0000
+
 indicator-location (13.10.0+14.04.20131125-0ubuntu1) trusty; urgency=low
 
   [ Charles Kerr ]
