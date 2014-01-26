@@ -18,7 +18,7 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#include <cassert>
+#include <glib.h>
 #include <iostream>
 
 #include "controller-ualc.h"
@@ -26,8 +26,7 @@
 UbuntuAppLocController :: UbuntuAppLocController ():
   ualc (ua_location_service_create_controller ())
 {
-  if (ualc == nullptr)
-    return;
+  g_return_if_fail (ualc != nullptr);
 
   // update our state when the ualc changes
   ua_location_service_controller_set_status_changed_handler (ualc,
@@ -79,7 +78,7 @@ UbuntuAppLocController :: set_gps_enabled (bool enabled)
                         : ua_location_service_controller_disable_gps (ualc);
 
   if (status != U_STATUS_SUCCESS)
-    std::cerr << "Error turning GPS " << (enabled?"on":"off") << std::endl;
+    g_warning ("Error turning GPS %s", (enabled?"on":"off"));
 }
 
 void
@@ -89,6 +88,5 @@ UbuntuAppLocController :: set_location_service_enabled (bool enabled)
                         : ua_location_service_controller_disable_service (ualc);
 
   if (status != U_STATUS_SUCCESS)
-    std::cerr << "Error turning Location Service " << (enabled?"on":"off")
-              << std::endl;
+    g_warning ("Error turning Location Service %s", (enabled?"on":"off"));
 }
