@@ -33,9 +33,9 @@ UbuntuAppLocController :: UbuntuAppLocController ():
                                                              this);
 
   // query the ualc to bootstrap our initial status
-  UALocationServiceStatusFlags new_status = 0;
-  if (ua_location_service_controller_query_status (ualc, &new_status) == U_STATUS_SUCCESS)
-    set_status (new_status);
+  UALocationServiceStatusFlags initial_status = 0;
+  if (ua_location_service_controller_query_status (ualc, &initial_status) == U_STATUS_SUCCESS)
+    set_status (initial_status);
 }
 
 UbuntuAppLocController :: ~UbuntuAppLocController ()
