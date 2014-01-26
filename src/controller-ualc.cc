@@ -63,7 +63,7 @@ UbuntuAppLocController :: set_status (UALocationServiceStatusFlags new_status)
     notify_location_service_enabled (loc_is_enabled);
 
   if (gps_was_enabled != gps_is_enabled)
-      notify_gps_enabled (is_gps_enabled());
+      notify_gps_enabled (gps_is_enabled);
 }
 
 /***
