@@ -26,13 +26,19 @@
 UbuntuAppLocController :: UbuntuAppLocController ():
   ualc (ua_location_service_create_controller ())
 {
-  if (ualc != nullptr)
-    {
-      ua_location_service_controller_set_status_changed_handler (
-        ualc,
-        on_controller_status_changed_static,
-        this);
-    }
+  if (ualc == nullptr)
+    return;
+
+  // update our state when the location service changes
+  ua_location_service_controller_set_status_changed_handler (
+    ualc,
+    on_controller_status_changed_static,
+    this);
+
+  // bootstrap our initial state
+  UALocationServiceStatusFlags new_status = 0;
+  if (ua_location_service_controller_query_status (ualc, &new_status) == U_STATUS_SUCCESS)
+    on_controller_status_changed (new_status);
 }
 
 UbuntuAppLocController :: ~UbuntuAppLocController ()
