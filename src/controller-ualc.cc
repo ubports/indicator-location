@@ -29,16 +29,15 @@ UbuntuAppLocController :: UbuntuAppLocController ():
   if (ualc == nullptr)
     return;
 
-  // update our state when the location service changes
-  ua_location_service_controller_set_status_changed_handler (
-    ualc,
-    on_controller_status_changed_static,
-    this);
+  // update our state when the ualc changes
+  ua_location_service_controller_set_status_changed_handler (ualc,
+                                                             on_ualc_status_changed,
+                                                             this);
 
-  // bootstrap our initial state
+  // query the ualc to bootstrap our initial status
   UALocationServiceStatusFlags new_status = 0;
   if (ua_location_service_controller_query_status (ualc, &new_status) == U_STATUS_SUCCESS)
-    on_controller_status_changed (new_status);
+    set_status (new_status);
 }
 
 UbuntuAppLocController :: ~UbuntuAppLocController ()
@@ -48,80 +47,46 @@ UbuntuAppLocController :: ~UbuntuAppLocController ()
 }
 
 void
-UbuntuAppLocController :: on_controller_status_changed_static (UALocationServiceStatusFlags flags, void *vself)
+UbuntuAppLocController :: on_ualc_status_changed (UALocationServiceStatusFlags flags, void *vself)
 {
-  static_cast<UbuntuAppLocController*>(vself)->on_controller_status_changed (flags);
+  static_cast<UbuntuAppLocController*>(vself)->set_status (flags);
 }
 
 void
-UbuntuAppLocController :: on_controller_status_changed (UALocationServiceStatusFlags new_status)
+UbuntuAppLocController :: set_status (UALocationServiceStatusFlags new_status)
 {
-  const bool loc_was_enabled = (old_status & UA_LOCATION_SERVICE_ENABLED) != 0;
-  const bool loc_is_enabled = (new_status & UA_LOCATION_SERVICE_ENABLED) != 0;
-  const bool gps_was_enabled = (old_status & UA_LOCATION_SERVICE_GPS_ENABLED) != 0;
-  const bool gps_is_enabled = (new_status & UA_LOCATION_SERVICE_GPS_ENABLED) != 0;
-  old_status = new_status;
+  const bool loc_was_enabled = is_location_service_enabled();
+  const bool gps_was_enabled = is_gps_enabled();
+  current_status = new_status;
+  const bool loc_is_enabled = is_location_service_enabled();
+  const bool gps_is_enabled = is_gps_enabled();
 
   if (loc_was_enabled != loc_is_enabled)
-    {
-      g_assert (loc_is_enabled == is_location_service_enabled());
-
-      notify_location_service_enabled (loc_is_enabled);
-    }
+    notify_location_service_enabled (loc_is_enabled);
 
   if (gps_was_enabled != gps_is_enabled)
-    {
-      g_assert (gps_is_enabled == is_gps_enabled());
-
       notify_gps_enabled (is_gps_enabled());
-    }
 }
 
 /***
 ****
 ***/
 
-bool
-UbuntuAppLocController :: is_gps_enabled () const
-{
-  UALocationServiceStatusFlags flags = 0;
-
-  return (ualc != nullptr)
-      && (ua_location_service_controller_query_status (ualc, &flags) == U_STATUS_SUCCESS)
-      && (flags & UA_LOCATION_SERVICE_GPS_ENABLED);
-}
-
 void
 UbuntuAppLocController :: set_gps_enabled (bool enabled)
 {
-  UStatus status = enabled
-    ? ua_location_service_controller_enable_gps (ualc)
-    : ua_location_service_controller_disable_gps (ualc);
+  auto status = enabled ? ua_location_service_controller_enable_gps (ualc)
+                        : ua_location_service_controller_disable_gps (ualc);
 
   if (status != U_STATUS_SUCCESS)
     std::cerr << "Error turning GPS " << (enabled?"on":"off") << std::endl;
 }
 
-/***
-****
-***/
-
-bool
-UbuntuAppLocController :: is_location_service_enabled () const
-{
-  UALocationServiceStatusFlags flags = 0;
-
-  return (ualc != nullptr)
-      && (ua_location_service_controller_query_status (ualc, &flags) == U_STATUS_SUCCESS)
-      && (flags & UA_LOCATION_SERVICE_ENABLED);
-}
-
 void
 UbuntuAppLocController :: set_location_service_enabled (bool enabled)
 {
-  UStatus status = enabled
-    ? ua_location_service_controller_enable_service (ualc)
-    : ua_location_service_controller_disable_service (ualc);
+  auto status = enabled ? ua_location_service_controller_enable_service (ualc)
+                        : ua_location_service_controller_disable_service (ualc);
 
   if (status != U_STATUS_SUCCESS)
     std::cerr << "Error turning Location Service " << (enabled?"on":"off")
