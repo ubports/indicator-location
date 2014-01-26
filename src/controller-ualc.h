@@ -42,10 +42,11 @@ class UbuntuAppLocController: public Controller
 
   private:
 
+    UbuntuApplicationLocationServiceStatus old_status = 0;
     UbuntuApplicationLocationServiceController * ualc;
 
-    static void on_location_service_controller_status_changed (
-                              UALocationServiceStatusFlags, void *);
+    static void on_controller_status_changed_static (UALocationServiceStatusFlags, void *vself);
+    void on_controller_status_changed (UALocationServiceStatusFlags);
 };
 
 #endif // __INDICATOR_LOCATION_CONTROLLER_UALC__H__

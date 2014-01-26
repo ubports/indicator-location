@@ -18,6 +18,7 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
+#include <cassert>
 #include <iostream>
 
 #include "controller-ualc.h"
@@ -29,7 +30,7 @@ UbuntuAppLocController :: UbuntuAppLocController ():
     {
       ua_location_service_controller_set_status_changed_handler (
         ualc,
-        on_location_service_controller_status_changed,
+        on_controller_status_changed_static,
         this);
     }
 }
@@ -41,17 +42,33 @@ UbuntuAppLocController :: ~UbuntuAppLocController ()
 }
 
 void
-UbuntuAppLocController :: on_location_service_controller_status_changed (
-                                                UALocationServiceStatusFlags f,
-                                                void * vself)
+UbuntuAppLocController :: on_controller_status_changed_static (UALocationServiceStatusFlags flags, void *vself)
 {
-  auto self = static_cast<UbuntuAppLocController*>(vself);
+  static_cast<UbuntuAppLocController*>(vself)->on_controller_status_changed (flags);
+}
 
-  if (f & (UA_LOCATION_SERVICE_ENABLED | UA_LOCATION_SERVICE_DISABLED))
-    self->notify_gps_enabled (self->is_location_service_enabled ());
+void
+UbuntuAppLocController :: on_controller_status_changed (UALocationServiceStatusFlags new_status)
+{
+  const bool loc_was_enabled = (old_status & UA_LOCATION_SERVICE_ENABLED) != 0;
+  const bool loc_is_enabled = (new_status & UA_LOCATION_SERVICE_ENABLED) != 0;
+  const bool gps_was_enabled = (old_status & UA_LOCATION_SERVICE_GPS_ENABLED) != 0;
+  const bool gps_is_enabled = (new_status & UA_LOCATION_SERVICE_GPS_ENABLED) != 0;
+  old_status = new_status;
 
-  if (f & (UA_LOCATION_SERVICE_GPS_ENABLED | UA_LOCATION_SERVICE_GPS_DISABLED))
-    self->notify_gps_enabled (self->is_gps_enabled());
+  if (loc_was_enabled != loc_is_enabled)
+    {
+      g_assert (loc_is_enabled == is_location_service_enabled());
+
+      notify_location_service_enabled (loc_is_enabled);
+    }
+
+  if (gps_was_enabled != gps_is_enabled)
+    {
+      g_assert (gps_is_enabled == is_gps_enabled());
+
+      notify_gps_enabled (is_gps_enabled());
+    }
 }
 
 /***
