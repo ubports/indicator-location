@@ -19,7 +19,6 @@
  */
 
 #include <glib.h>
-#include <iostream>
 
 #include "controller-ualc.h"
 
@@ -28,7 +27,7 @@ UbuntuAppLocController :: UbuntuAppLocController ():
 {
   g_return_if_fail (ualc != nullptr);
 
-  // update our state when the ualc changes
+  // update our status when the ualc changes
   ua_location_service_controller_set_status_changed_handler (ualc,
                                                              on_ualc_status_changed,
                                                              this);
