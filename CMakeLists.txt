@@ -28,11 +28,12 @@ set (CMAKE_INSTALL_FULL_PKGLIBEXECDIR "${CMAKE_INSTALL_FULL_LIBEXECDIR}/${CMAKE_
 find_package (PkgConfig REQUIRED)
 
 include (FindPkgConfig)
-pkg_check_modules (SERVICE REQUIRED
+pkg_check_modules (SERVICE_DEPS REQUIRED
                    ubuntu-platform-api>=1.0.0
                    url-dispatcher-1
                    gio-unix-2.0>=2.36
                    glib-2.0>=2.36)
+include_directories (SYSTEM ${SERVICE_DEPS_INCLUDE_DIRS})
 
 ##
 ##

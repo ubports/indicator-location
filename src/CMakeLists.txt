@@ -1,9 +1,12 @@
+set (SERVICE_LIB "indicatordatetimeservice")
+set (SERVICE_EXEC "indicator-datetime-service")
+SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g ${CXX_WARNING_ARGS} ${GCOV_FLAGS}")
 
-set_property (DIRECTORY
-              APPEND PROPERTY INCLUDE_DIRECTORIES ${SERVICE_INCLUDE_DIRS})
-
-set_property (DIRECTORY
-              APPEND PROPERTY LINK_DIRECTORIES ${SERVICE_INCLUDE_DIRS})
+#set_property (DIRECTORY
+#              APPEND PROPERTY INCLUDE_DIRECTORIES ${SERVICE_INCLUDE_DIRS})
+#
+#set_property (DIRECTORY
+#              APPEND PROPERTY LINK_DIRECTORIES ${SERVICE_INCLUDE_DIRS})
 
 
 ###
@@ -12,34 +15,22 @@ set_property (DIRECTORY
 ###  it's built apart from main() as a convenience for tests/
 ###
 
-set (INDICATOR_LIB "libindicator-location-service")
-
-add_library (${INDICATOR_LIB} STATIC controller.cc phone.cc service.cc)
-
-set_property (TARGET ${INDICATOR_LIB}
-              APPEND PROPERTY LINK_LIBRARIES ${INDICATOR_LIB} ${SERVICE_LIBRARIES} ${GCOV_LIBS})
+add_library (${SERVICE_LIB} STATIC controller.cc phone.cc service.cc controller-ualc.cc)
+include_directories (${CMAKE_SOURCE_DIR})
+link_directories (${SERVICE_DEPS_LIBRARY_DIRS})
 
 
 ###
 ###  The service execuable.
 ###
 
-set (INDICATOR_EXEC "indicator-location-service")
-
-add_executable (${INDICATOR_EXEC} main.cc controller-ualc.cc)
+add_executable (${SERVICE_EXEC} main.cc)
+target_link_libraries (${SERVICE_EXEC} ${SERVICE_LIB} ${SERVICE_DEPS_LIBRARIES})
+install (TARGETS ${SERVICE_EXEC}
+         RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_PKGLIBEXECDIR})
 
 set_property (SOURCE main.cc
               APPEND PROPERTY COMPILE_DEFINITIONS
               GETTEXT_PACKAGE="${GETTEXT_PACKAGE}"
               GNOMELOCALEDIR="@CMAKE_INSTALL_FULL_LOCALEDIR@")
-
-target_link_libraries (${INDICATOR_EXEC} libindicator-location-service)
-
-install (TARGETS ${INDICATOR_EXEC}
-         RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_PKGLIBEXECDIR})
-
-
-
-set_property (TARGET ${INDICATOR_LIB} ${INDICATOR_EXEC}
-              APPEND_STRING PROPERTY COMPILE_FLAGS " ${CC_WARNING_ARGS} ${GCOV_FLAGS} --std=c++11")
 
