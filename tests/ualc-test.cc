@@ -187,3 +187,49 @@ TEST_F(UalcFixture, ControllerMutators)
   EXPECT_EQ(0, flags);
 }
 
+/***
+****
+***/
+
+namespace
+{
+  struct MockListener: public ControllerListener {
+    bool last_gps = false;
+    bool last_service = false;
+    bool gps_tickled = false;
+    bool service_tickled = false;
+    void reset() { gps_tickled = service_tickled = last_gps = last_service = false; }
+    void on_gps_enabled_changed (bool b) { gps_tickled = true; last_gps = b; }
+    void on_location_service_enabled_changed (bool b) { service_tickled = true; last_service = b; }
+  };
+
+} // unnamed namespace
+
+TEST_F(UalcFixture, ControllerListeners)
+{
+  UbuntuAppLocController c;
+  MockListener l;
+  c.add_listener(&l);
+  EXPECT_FALSE(l.service_tickled);
+  EXPECT_FALSE(l.gps_tickled);
+
+  // turn on the gps...
+  c.set_gps_enabled(true);
+  EXPECT_FALSE(l.service_tickled);
+  EXPECT_TRUE(l.gps_tickled);
+  EXPECT_TRUE(l.last_gps);
+  l.reset();
+
+  // turn on the location service...
+  c.set_location_service_enabled(true);
+  EXPECT_FALSE(l.gps_tickled);
+  EXPECT_TRUE(l.service_tickled);
+  EXPECT_TRUE(l.last_service);
+  l.reset();
+
+  // service is /already/ enabled so turning
+  // it on again shouldn't trigger any changes
+  c.set_location_service_enabled(true);
+  EXPECT_FALSE(l.service_tickled);
+  EXPECT_FALSE(l.gps_tickled);
+}
