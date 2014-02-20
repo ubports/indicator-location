@@ -2,7 +2,7 @@
 Type=Application
 Name=Indicator Location
 Exec=@pkglibexecdir@/indicator-location-service
-NotShowIn=Unity;
+OnlyShowIn=Unity;
 NoDisplay=true
 StartupNotify=false
 Terminal=false
