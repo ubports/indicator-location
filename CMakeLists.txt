@@ -7,6 +7,9 @@ set (PROJECT_VERSION "13.10.0")
 set (PACKAGE ${CMAKE_PROJECT_NAME})
 set (GETTEXT_PACKAGE indicator-location)
 
+set (SERVICE_LIB ${PACKAGE})
+set (SERVICE_EXEC "${PACKAGE}-service")
+
 option (enable_tests "Build the package's automatic tests." ON)
 option (enable_lcov "Generate lcov code coverage reports." ON)
 

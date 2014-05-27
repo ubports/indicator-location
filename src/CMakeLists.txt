@@ -1,5 +1,3 @@
-set (SERVICE_LIB "indicatordatetimeservice")
-set (SERVICE_EXEC "indicator-datetime-service")
 SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g ${CXX_WARNING_ARGS} ${GCOV_FLAGS}")
 
 #set_property (DIRECTORY

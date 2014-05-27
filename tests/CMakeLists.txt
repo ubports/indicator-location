@@ -26,8 +26,8 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${CC_WARNING_ARGS} -std=c++11")
 set (TEST_NAME phone-test)
 add_executable (${TEST_NAME} ${TEST_NAME}.cc)
 add_test (${TEST_NAME} ${TEST_NAME})
-add_dependencies (${TEST_NAME} libindicatorlocationservice)
-target_link_libraries (${TEST_NAME} indicatordatetimeservice gtest ${SERVICE_DEPS_LIBRARIES} ${GTEST_LIBS})
+add_dependencies (${TEST_NAME} ${SERVICE_LIB})
+target_link_libraries (${TEST_NAME} ${SERVICE_LIB} gtest ${SERVICE_DEPS_LIBRARIES} ${GTEST_LIBS})
 
 ###
 ###  ualc-test
@@ -36,8 +36,8 @@ target_link_libraries (${TEST_NAME} indicatordatetimeservice gtest ${SERVICE_DEP
 set (TEST_NAME ualc-test)
 add_executable (${TEST_NAME} ${TEST_NAME}.cc ualc-mock.c)
 add_test (${TEST_NAME} ${TEST_NAME})
-add_dependencies (${TEST_NAME} libindicatorlocationservice)
-target_link_libraries (${TEST_NAME} indicatordatetimeservice gtest ${SERVICE_DEPS_LIBRARIES} ${GTEST_LIBS})
+add_dependencies (${TEST_NAME} ${SERVICE_LIB})
+target_link_libraries (${TEST_NAME} ${SERVICE_LIB} gtest ${SERVICE_DEPS_LIBRARIES} ${GTEST_LIBS})
 
 ###
 ###  globals
