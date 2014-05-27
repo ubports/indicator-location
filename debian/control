@@ -1,7 +1,7 @@
 Source: indicator-location
 Section: misc
 Priority: optional
-Maintainer: Charles Kerr <charles.kerr@ubuntu.com>
+Maintainer: Charles Kerr <charles.kerr@canonical.com>
 Build-Depends: cmake,
                dbus,
                debhelper (>= 9),
