@@ -8,23 +8,23 @@ msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2014-05-27 10:43+0200\n"
-"PO-Revision-Date: 2014-07-20 20:47+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2014-07-23 10:11+0000\n"
+"Last-Translator: Ask Hjorth Larsen <asklarsen@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2014-07-21 07:50+0000\n"
+"X-Launchpad-Export-Date: 2014-07-24 06:35+0000\n"
 "X-Generator: Launchpad (build 17114)\n"
 
 #: src/phone.cc:77 src/phone.cc:80
 msgid "Location"
-msgstr ""
+msgstr "Sted"
 
 #: src/phone.cc:260
 msgid "Location detection"
-msgstr ""
+msgstr "Positionsbestemmelse"
 
 #: src/phone.cc:265
 msgid "GPS"
-msgstr ""
+msgstr "GPS"
