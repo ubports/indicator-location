@@ -1,21 +1,22 @@
 # Swedish translation for indicator-location
-# Copyright (c) 2014 Rosetta Contributors and Canonical Ltd 2014
+# Copyright © 2014 Rosetta Contributors and Canonical Ltd 2014
 # This file is distributed under the same license as the indicator-location package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+# Josef Andersson <josef.andersson@fripost.org>, 2014.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2014-05-27 10:43+0200\n"
-"PO-Revision-Date: 2014-06-07 17:18+0000\n"
+"PO-Revision-Date: 2014-07-26 09:18+0000\n"
 "Last-Translator: Anders Pamdal <anders@pamdal.se>\n"
-"Language-Team: Swedish <sv@li.org>\n"
+"Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2014-06-08 06:17+0000\n"
-"X-Generator: Launchpad (build 17031)\n"
+"X-Launchpad-Export-Date: 2014-07-27 06:55+0000\n"
+"X-Generator: Launchpad (build 17131)\n"
+"Language: sv\n"
 
 #: src/phone.cc:77 src/phone.cc:80
 msgid "Location"
@@ -23,7 +24,7 @@ msgstr "Plats"
 
 #: src/phone.cc:260
 msgid "Location detection"
-msgstr "Platsdetektering"
+msgstr "Platsbestämning"
 
 #: src/phone.cc:265
 msgid "GPS"
