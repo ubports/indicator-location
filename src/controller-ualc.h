@@ -46,7 +46,7 @@ class UbuntuAppLocController: public Controller
     UbuntuApplicationLocationServiceController * ualc;
 
     static void on_ualc_status_changed (UALocationServiceStatusFlags, void *vself);
-    void set_status (UALocationServiceStatusFlags);
+    void update_status ();
 };
 
 #endif // __INDICATOR_LOCATION_CONTROLLER_UALC__H__
