@@ -32,10 +32,7 @@ UbuntuAppLocController :: UbuntuAppLocController ():
                                                              on_ualc_status_changed,
                                                              this);
 
-  // query the ualc to bootstrap our initial status
-  UALocationServiceStatusFlags initial_status;
-  if (ua_location_service_controller_query_status (ualc, &initial_status) == U_STATUS_SUCCESS)
-    set_status (initial_status);
+  update_status();
 }
 
 UbuntuAppLocController :: ~UbuntuAppLocController ()
@@ -45,17 +42,25 @@ UbuntuAppLocController :: ~UbuntuAppLocController ()
 }
 
 void
-UbuntuAppLocController :: on_ualc_status_changed (UALocationServiceStatusFlags flags, void *vself)
+UbuntuAppLocController :: on_ualc_status_changed (UALocationServiceStatusFlags /*flags*/, void *vself)
 {
-  static_cast<UbuntuAppLocController*>(vself)->set_status (flags);
+  static_cast<UbuntuAppLocController*>(vself)->update_status();
 }
 
 void
-UbuntuAppLocController :: set_status (UALocationServiceStatusFlags new_status)
+UbuntuAppLocController :: update_status ()
 {
   const bool loc_was_enabled = is_location_service_enabled();
   const bool gps_was_enabled = is_gps_enabled();
-  current_status = new_status;
+
+  // update this.current_status with a fresh ualc status
+  UALocationServiceStatusFlags flags;
+  if (ua_location_service_controller_query_status (ualc, &flags) == U_STATUS_SUCCESS)
+    {
+      g_debug("%s %s updating ualc controller status with flags: %d", G_STRLOC, G_STRFUNC, (int)flags);
+      current_status = flags;
+    }
+
   const bool loc_is_enabled = is_location_service_enabled();
   const bool gps_is_enabled = is_gps_enabled();
 
@@ -63,7 +68,7 @@ UbuntuAppLocController :: set_status (UALocationServiceStatusFlags new_status)
     notify_location_service_enabled (loc_is_enabled);
 
   if (gps_was_enabled != gps_is_enabled)
-      notify_gps_enabled (gps_is_enabled);
+    notify_gps_enabled (gps_is_enabled);
 }
 
 /***
