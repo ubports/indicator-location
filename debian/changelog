@@ -1,3 +1,14 @@
+indicator-location (13.10.0+14.10.20140814-0ubuntu1) utopic; urgency=low
+
+  [ Charles Kerr ]
+  * Re-use the same Translations.cmake file across indicators (LP:
+    #1354058)
+
+  [ CI bot ]
+  * Resync trunk
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 14 Aug 2014 14:57:11 +0000
+
 indicator-location (13.10.0+14.10.20140808-0ubuntu1) utopic; urgency=low
 
   [ Charles Kerr ]
