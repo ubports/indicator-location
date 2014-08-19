@@ -20,6 +20,7 @@ Homepage: http://launchpad.net/indicator-location/
 # packaging changes, just go ahead.  ~indicator-applet-developers will notice and 
 # sync up the code again.
 Vcs-Bzr: https://code.launchpad.net/~indicator-applet-developers/indicator-location/trunk.13.10
+X-Ubuntu-Use-Langpack: yes
 
 Package: indicator-location
 Architecture: any
