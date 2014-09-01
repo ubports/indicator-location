@@ -70,7 +70,7 @@ namespace
             g_variant_new ("(ss)",
             ACCOUNTS_SERVICE,
             "LicenseAccepted"),
-            G_VARIANT_TYPE_VARIANT,
+            G_VARIANT_TYPE ("(v)"),
             G_DBUS_CALL_FLAGS_NONE,
             -1,
             nullptr, &error);
@@ -112,7 +112,7 @@ namespace
               g_variant_new ("(ss)",
               ACCOUNTS_SERVICE,
               "LicenseBasePath"),
-              G_VARIANT_TYPE_VARIANT,
+              G_VARIANT_TYPE ("(v)"),
               G_DBUS_CALL_FLAGS_NONE,
               -1,
               nullptr, &error);
