@@ -61,7 +61,7 @@ namespace
     }
 
     error = nullptr;
-    GVariant * accepted_variant = g_dbus_connection_call_sync(
+    GVariant * response = g_dbus_connection_call_sync(
             connection,
             ACCOUNTS_NAME,
             user_path().c_str(),
@@ -75,7 +75,7 @@ namespace
             -1,
             nullptr, &error);
 
-    if (!accepted_variant)
+    if (!response)
     {
       g_warning ("Could not get LicenseAccepted property '%s'", error->message);
       g_error_free(error);
@@ -83,8 +83,20 @@ namespace
       return false;
     }
 
+    GVariant *accepted_variant = nullptr;
+    g_variant_get(response, "(v)", &accepted_variant);
+
+    if (!accepted_variant)
+    {
+      g_warning ("Invalid LicenseAccepted property");
+      g_variant_unref(response);
+      g_object_unref(connection);
+      return false;
+    }
+
     bool result = g_variant_get_boolean(accepted_variant);
     g_variant_unref(accepted_variant);
+    g_variant_unref(response);
     g_object_unref(connection);
 
     return result;
@@ -103,7 +115,7 @@ namespace
     }
 
     error = nullptr;
-    GVariant * path_variant = g_dbus_connection_call_sync(
+    GVariant * response = g_dbus_connection_call_sync(
               connection,
               ACCOUNTS_NAME,
               user_path().c_str(),
@@ -117,12 +129,23 @@ namespace
               -1,
               nullptr, &error);
 
-      if (!path_variant)
+      if (!response)
       {
         g_warning ("Could not get LicenseBasePath property '%s'", error->message);
         g_error_free(error);
         g_object_unref(connection);
         return std::string();
+      }
+
+      GVariant *path_variant = nullptr;
+      g_variant_get(response, "(v)", &path_variant);
+
+      if (!path_variant)
+      {
+          g_warning ("Invalid LicenseBasePath property");
+          g_variant_unref(response);
+          g_object_unref(connection);
+          return std::string();
       }
 
       std::string result;
@@ -132,6 +155,7 @@ namespace
         result = path;
       }
       g_variant_unref(path_variant);
+      g_variant_unref(response);
       g_object_unref(connection);
 
       return result;
