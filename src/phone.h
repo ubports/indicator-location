@@ -64,6 +64,9 @@ class Phone: public ControllerListener
 
   private:
     GSimpleAction * create_settings_action ();
+
+  private:
+    GSimpleAction * create_licence_action ();
 };
 
 #endif /* __INDICATOR_LOCATION_PHONE_H__ */

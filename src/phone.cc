@@ -28,6 +28,116 @@
 
 #define PROFILE_NAME "phone"
 
+#define ACCOUNTS_NAME "org.freedesktop.Accounts"
+#define PROPERTIES_INTERFACE "org.freedesktop.DBus.Properties"
+#define ACCOUNTS_SERVICE "com.ubuntu.location.providers.here.AccountsService"
+
+namespace
+{
+  void
+  on_uri_dispatched (const gchar * uri,
+                     gboolean      success     G_GNUC_UNUSED,
+                     gpointer      user_data   G_GNUC_UNUSED)
+  {
+    if (!success)
+      g_warning ("Unable to activate '%s'", uri);
+  }
+
+  std::string user_path()
+  {
+    return "/org/freedesktop/Accounts/User" + std::to_string(getuid());
+  }
+
+  bool
+  here_licence_accepted ()
+  {
+    GError * error = nullptr;
+    GDBusConnection * connection = g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error);
+    if (connection == nullptr)
+    {
+      g_warning ("Could not get system bus '%s'", error->message);
+      g_error_free(error);
+      return false;
+    }
+
+    error = nullptr;
+    GVariant * accepted_variant = g_dbus_connection_call_sync(
+            connection,
+            ACCOUNTS_NAME,
+            user_path().c_str(),
+            PROPERTIES_INTERFACE,
+            "Get",
+            g_variant_new ("(ss)",
+            ACCOUNTS_SERVICE,
+            "LicenseAccepted(<false>,)"),
+            G_VARIANT_TYPE_BOOLEAN,
+            G_DBUS_CALL_FLAGS_NONE,
+            -1,
+            nullptr, &error);
+
+    if (!accepted_variant)
+    {
+      g_warning ("Could not get LicenseAccepted property '%s'", error->message);
+      g_error_free(error);
+      g_object_unref(connection);
+      return false;
+    }
+
+    bool result = g_variant_get_boolean(accepted_variant);
+    g_variant_unref(accepted_variant);
+    g_object_unref(connection);
+
+    return result;
+  }
+
+  std::string
+  here_licence_path ()
+  {
+    GError * error = nullptr;
+    GDBusConnection * connection = g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error);
+    if (connection == nullptr)
+    {
+      g_warning ("Could not get system bus '%s'", error->message);
+      g_error_free(error);
+      return std::string();
+    }
+
+    error = nullptr;
+    GVariant * path_variant = g_dbus_connection_call_sync(
+              connection,
+              ACCOUNTS_NAME,
+              user_path().c_str(),
+              PROPERTIES_INTERFACE,
+              "Get",
+              g_variant_new ("(ss)",
+              ACCOUNTS_SERVICE,
+              "LicenseBasePath"),
+              G_VARIANT_TYPE_STRING,
+              G_DBUS_CALL_FLAGS_NONE,
+              -1,
+              nullptr, &error);
+
+      if (!path_variant)
+      {
+        g_warning ("Could not get LicenseBasePath property '%s'", error->message);
+        g_error_free(error);
+        g_object_unref(connection);
+        return std::string();
+      }
+
+      std::string result;
+      const gchar * path = g_variant_get_string(path_variant, NULL);
+      if (path != nullptr)
+      {
+        result = path;
+      }
+      g_variant_unref(path_variant);
+      g_object_unref(connection);
+
+      return result;
+  }
+}
+
 Phone :: Phone (const std::shared_ptr<Controller>& controller_,
                 const std::shared_ptr<GSimpleActionGroup>& action_group_):
   controller (controller_),
@@ -37,10 +147,11 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
   controller->add_listener (this);
 
   /* create the actions & add them to the group */
-  std::array<GSimpleAction*, 4> actions = { create_root_action(),
+  std::array<GSimpleAction*, 5> actions = { create_root_action(),
                                             create_detection_enabled_action(),
                                             create_gps_enabled_action(),
-                                            create_settings_action() };
+                                            create_settings_action(),
+                                            create_licence_action() };
   for (auto a : actions)
     {
       g_action_map_add_action (G_ACTION_MAP(action_group.get()), G_ACTION(a));
@@ -198,6 +309,35 @@ Phone :: create_gps_enabled_action ()
   return action;
 }
 
+/***
+****
+***/
+
+#define LICENCE_ACTION_KEY "licence"
+
+namespace
+{
+  void
+  on_licence_activated (GSimpleAction * simple      G_GNUC_UNUSED,
+                         GVariant      * parameter,
+                         gpointer        user_data   G_GNUC_UNUSED)
+  {
+    url_dispatch_send (here_licence_path().c_str(), on_uri_dispatched, nullptr);
+  }
+}
+
+GSimpleAction *
+Phone :: create_licence_action ()
+{
+  GSimpleAction * action;
+
+  action = g_simple_action_new (LICENCE_ACTION_KEY, nullptr);
+
+  g_signal_connect (action, "activate",
+                    G_CALLBACK(on_licence_activated), nullptr);
+
+  return action;
+}
 
 /***
 ****
@@ -207,15 +347,6 @@ Phone :: create_gps_enabled_action ()
 
 namespace
 {
-  void
-  on_uri_dispatched (const gchar * uri,
-                     gboolean      success     G_GNUC_UNUSED,
-                     gpointer      user_data   G_GNUC_UNUSED)
-  {
-    if (!success)
-      g_warning ("Unable to activate '%s'", uri);
-  }
-
   void
   on_settings_activated (GSimpleAction * simple      G_GNUC_UNUSED,
                          GVariant      * parameter,
@@ -261,6 +392,11 @@ Phone :: create_menu ()
   g_menu_item_set_attribute (location, "x-canonical-type", "s", "com.canonical.indicator.switch");
   g_menu_append_item (submenu, location);
   g_object_unref (location);
+
+  if (here_licence_accepted ())
+  {
+    g_menu_append (submenu, _("View HERE terms and conditions"), "indicator." LICENCE_ACTION_KEY);
+  }
 
   gps = g_menu_item_new (_("GPS"), "indicator." GPS_ACTION_KEY);
   g_menu_item_set_attribute (gps, "x-canonical-type", "s", "com.canonical.indicator.switch");
