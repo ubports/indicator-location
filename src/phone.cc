@@ -69,7 +69,7 @@ namespace
             "Get",
             g_variant_new ("(ss)",
             ACCOUNTS_SERVICE,
-            "LicenseAccepted(<false>,)"),
+            "LicenseAccepted"),
             G_VARIANT_TYPE_BOOLEAN,
             G_DBUS_CALL_FLAGS_NONE,
             -1,
