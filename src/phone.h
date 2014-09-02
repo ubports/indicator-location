@@ -47,10 +47,12 @@ class Phone: public ControllerListener, public LicenseControllerListener
 
   private:
     std::shared_ptr<GMenu> menu;
+    std::shared_ptr<GMenu> submenu;
     std::shared_ptr<GSimpleActionGroup> action_group;
 
   private:
-    std::shared_ptr<GMenu> create_menu ();
+    void create_menu ();
+    void rebuild_submenu();
 
   private:
     bool should_be_visible ();

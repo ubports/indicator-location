@@ -34,9 +34,9 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
                 const std::shared_ptr<GSimpleActionGroup>& action_group_):
   controller (controller_),
   license_controller (license_controller_),
-  menu (create_menu ()),
   action_group (action_group_)
 {
+  create_menu ();
   controller->add_listener (this);
   license_controller->add_listener (this);
 
@@ -134,13 +134,12 @@ Phone :: on_location_service_enabled_changed (bool is_enabled G_GNUC_UNUSED)
 void
 Phone::on_license_accepted_changed(bool license_accepted)
 {
-  g_warning("license accepted = %d", license_accepted);
+  rebuild_submenu();
 }
 
 void
 Phone::on_license_path_changed(const std::string & license_path)
 {
-  g_warning("license path = %s", license_path.c_str());
 }
 
 void
@@ -294,33 +293,16 @@ Phone :: create_settings_action ()
 ****
 ***/
 
-std::shared_ptr <GMenu>
+void
 Phone :: create_menu ()
 {
-  GMenu * menu;
-  GMenu * submenu;
   GMenuItem * header;
-  GMenuItem * location;
-  GMenuItem * gps;
 
   /* create the submenu */
-  submenu = g_menu_new ();
+  submenu.reset(g_menu_new (), GObjectDeleter());
 
-  location = g_menu_item_new (_("Location detection"), "indicator." LOCATION_ACTION_KEY);
-  g_menu_item_set_attribute (location, "x-canonical-type", "s", "com.canonical.indicator.switch");
-  g_menu_append_item (submenu, location);
-  g_object_unref (location);
-
-  if (license_controller->license_accepted())
-  {
-    g_warning("MAKING MENU %s", license_controller->license_path().c_str());
-    g_menu_append (submenu, _("View HERE terms and conditions"), "indicator." LICENCE_ACTION_KEY);
-  }
-
-  gps = g_menu_item_new (_("GPS"), "indicator." GPS_ACTION_KEY);
-  g_menu_item_set_attribute (gps, "x-canonical-type", "s", "com.canonical.indicator.switch");
-  g_menu_append_item (submenu, gps);
-  g_object_unref (gps);
+  /* populate the submenu */
+  rebuild_submenu();
 
   // disabled for 13.04 -- the location settings panel isn't complete
   // g_menu_append (submenu, _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::location");
@@ -328,13 +310,35 @@ Phone :: create_menu ()
   /* add the submenu to a new header */
   header = g_menu_item_new (nullptr, "indicator." HEADER_ACTION_KEY);
   g_menu_item_set_attribute (header, "x-canonical-type", "s", "com.canonical.indicator.root");
-  g_menu_item_set_submenu (header, G_MENU_MODEL (submenu));
-  g_object_unref (submenu);
+  g_menu_item_set_submenu (header, G_MENU_MODEL (submenu.get()));
 
   /* add the header to a new menu */
-  menu = g_menu_new ();
-  g_menu_append_item (menu, header);
+  menu.reset(g_menu_new (), GObjectDeleter());
+  g_menu_append_item (menu.get(), header);
   g_object_unref (header);
+}
 
-  return std::shared_ptr<GMenu>(menu, GObjectDeleter());
+void
+Phone::rebuild_submenu()
+{
+  g_menu_remove_all(submenu.get());
+
+  GMenuItem * location = g_menu_item_new(_("Location detection"),
+                                         "indicator." LOCATION_ACTION_KEY);
+  g_menu_item_set_attribute(location, "x-canonical-type", "s",
+                            "com.canonical.indicator.switch");
+  g_menu_append_item(submenu.get(), location);
+  g_object_unref(location);
+
+  if (license_controller->license_accepted())
+  {
+    g_menu_append(submenu.get(), _("View HERE terms and conditions"),
+                  "indicator." LICENCE_ACTION_KEY);
+  }
+
+  GMenuItem * gps = g_menu_item_new(_("GPS"), "indicator." GPS_ACTION_KEY);
+  g_menu_item_set_attribute(gps, "x-canonical-type", "s",
+                            "com.canonical.indicator.switch");
+  g_menu_append_item(submenu.get(), gps);
+  g_object_unref(gps);
 }
