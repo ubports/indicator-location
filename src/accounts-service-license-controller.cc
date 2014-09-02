@@ -53,7 +53,7 @@ build_full_path(const std::string & path)
     result = make_path(path, lang);
   }
 
-  if (!g_file_test(path.c_str(), G_FILE_TEST_EXISTS))
+  if (!g_file_test(result.c_str(), G_FILE_TEST_EXISTS))
   {
     result = make_path(path, "en_US");
   }
