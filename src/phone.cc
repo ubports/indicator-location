@@ -18,6 +18,7 @@
  */
 
 #include <array>
+#include <fstream>
 
 #include <glib/gi18n.h>
 
@@ -103,6 +104,12 @@ namespace
   }
 
   std::string
+  make_path(const std::string& path, const std::string& lang)
+  {
+    return std::string("file://") + path + "/" + lang + ".html";
+  }
+
+  std::string
   here_licence_path ()
   {
     GError * error = nullptr;
@@ -152,7 +159,23 @@ namespace
       const gchar * path = g_variant_get_string(path_variant, NULL);
       if (path != nullptr)
       {
-        result = path;
+        char * lang_char = getenv("LANG");
+        if (lang_char)
+        {
+          std::string lang = lang_char;
+          auto pos = lang.find('.');
+          if (pos != std::string::npos)
+          {
+            lang = lang.substr(0, pos);
+          }
+          result = make_path(path, lang);
+        }
+
+        std::ifstream infile(result);
+        if (!infile.good())
+        {
+          result = make_path(path, "en_US");
+        }
       }
       g_variant_unref(path_variant);
       g_variant_unref(response);
