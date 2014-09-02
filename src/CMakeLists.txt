@@ -13,7 +13,14 @@ SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g ${CXX_WARNING_ARGS} ${GCO
 ###  it's built apart from main() as a convenience for tests/
 ###
 
-add_library (${SERVICE_LIB} STATIC controller.cc phone.cc service.cc controller-ualc.cc)
+add_library (${SERVICE_LIB} STATIC
+  controller.cc
+  phone.cc
+  service.cc
+  controller-ualc.cc
+  accounts-service-license-controller.cc
+  license-controller.cc
+)
 include_directories (${CMAKE_SOURCE_DIR})
 link_directories (${SERVICE_DEPS_LIBRARY_DIRS})
 

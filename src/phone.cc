@@ -29,10 +29,6 @@
 
 #define PROFILE_NAME "phone"
 
-#define ACCOUNTS_NAME "org.freedesktop.Accounts"
-#define PROPERTIES_INTERFACE "org.freedesktop.DBus.Properties"
-#define ACCOUNTS_SERVICE "com.ubuntu.location.providers.here.AccountsService"
-
 namespace
 {
   void
@@ -43,155 +39,18 @@ namespace
     if (!success)
       g_warning ("Unable to activate '%s'", uri);
   }
-
-  std::string user_path()
-  {
-    return "/org/freedesktop/Accounts/User" + std::to_string(getuid());
-  }
-
-  bool
-  here_licence_accepted ()
-  {
-    GError * error = nullptr;
-    GDBusConnection * connection = g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error);
-    if (connection == nullptr)
-    {
-      g_warning ("Could not get system bus '%s'", error->message);
-      g_error_free(error);
-      return false;
-    }
-
-    error = nullptr;
-    GVariant * response = g_dbus_connection_call_sync(
-            connection,
-            ACCOUNTS_NAME,
-            user_path().c_str(),
-            PROPERTIES_INTERFACE,
-            "Get",
-            g_variant_new ("(ss)",
-            ACCOUNTS_SERVICE,
-            "LicenseAccepted"),
-            G_VARIANT_TYPE ("(v)"),
-            G_DBUS_CALL_FLAGS_NONE,
-            -1,
-            nullptr, &error);
-
-    if (!response)
-    {
-      g_warning ("Could not get LicenseAccepted property '%s'", error->message);
-      g_error_free(error);
-      g_object_unref(connection);
-      return false;
-    }
-
-    GVariant *accepted_variant = nullptr;
-    g_variant_get(response, "(v)", &accepted_variant);
-
-    if (!accepted_variant)
-    {
-      g_warning ("Invalid LicenseAccepted property");
-      g_variant_unref(response);
-      g_object_unref(connection);
-      return false;
-    }
-
-    bool result = g_variant_get_boolean(accepted_variant);
-    g_variant_unref(accepted_variant);
-    g_variant_unref(response);
-    g_object_unref(connection);
-
-    return result;
-  }
-
-  std::string
-  make_path(const std::string& path, const std::string& lang)
-  {
-    return std::string("file://") + path + "/" + lang + ".html";
-  }
-
-  std::string
-  here_licence_path ()
-  {
-    GError * error = nullptr;
-    GDBusConnection * connection = g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error);
-    if (connection == nullptr)
-    {
-      g_warning ("Could not get system bus '%s'", error->message);
-      g_error_free(error);
-      return std::string();
-    }
-
-    error = nullptr;
-    GVariant * response = g_dbus_connection_call_sync(
-              connection,
-              ACCOUNTS_NAME,
-              user_path().c_str(),
-              PROPERTIES_INTERFACE,
-              "Get",
-              g_variant_new ("(ss)",
-              ACCOUNTS_SERVICE,
-              "LicenseBasePath"),
-              G_VARIANT_TYPE ("(v)"),
-              G_DBUS_CALL_FLAGS_NONE,
-              -1,
-              nullptr, &error);
-
-      if (!response)
-      {
-        g_warning ("Could not get LicenseBasePath property '%s'", error->message);
-        g_error_free(error);
-        g_object_unref(connection);
-        return std::string();
-      }
-
-      GVariant *path_variant = nullptr;
-      g_variant_get(response, "(v)", &path_variant);
-
-      if (!path_variant)
-      {
-          g_warning ("Invalid LicenseBasePath property");
-          g_variant_unref(response);
-          g_object_unref(connection);
-          return std::string();
-      }
-
-      std::string result;
-      const gchar * path = g_variant_get_string(path_variant, NULL);
-      if (path != nullptr)
-      {
-        char * lang_char = getenv("LANG");
-        if (lang_char)
-        {
-          std::string lang = lang_char;
-          auto pos = lang.find('.');
-          if (pos != std::string::npos)
-          {
-            lang = lang.substr(0, pos);
-          }
-          result = make_path(path, lang);
-        }
-
-        std::ifstream infile(result);
-        if (!infile.good())
-        {
-          result = make_path(path, "en_US");
-        }
-      }
-      g_variant_unref(path_variant);
-      g_variant_unref(response);
-      g_object_unref(connection);
-
-      return result;
-  }
 }
 
 Phone :: Phone (const std::shared_ptr<Controller>& controller_,
+                const std::shared_ptr<LicenseController>& license_controller_,
                 const std::shared_ptr<GSimpleActionGroup>& action_group_):
   controller (controller_),
+  license_controller (license_controller_),
   menu (create_menu ()),
   action_group (action_group_)
 {
   controller->add_listener (this);
+  license_controller->add_listener (this);
 
   /* create the actions & add them to the group */
   std::array<GSimpleAction*, 5> actions = { create_root_action(),
@@ -209,6 +68,7 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
 Phone :: ~Phone ()
 {
   controller->remove_listener (this);
+  license_controller->remove_listener (this);
 }
 
 /***
@@ -281,6 +141,18 @@ Phone :: on_location_service_enabled_changed (bool is_enabled G_GNUC_UNUSED)
 {
   GAction * action = g_action_map_lookup_action (G_ACTION_MAP(action_group.get()), LOCATION_ACTION_KEY);
   g_simple_action_set_state (G_SIMPLE_ACTION(action), action_state_for_location_detection());
+}
+
+void
+Phone::on_license_accepted_changed(bool license_accepted)
+{
+  g_warning("license accepted = %d", license_accepted);
+}
+
+void
+Phone::on_license_path_changed(const std::string & license_path)
+{
+  g_warning("license path = %s", license_path.c_str());
 }
 
 void
@@ -369,7 +241,7 @@ namespace
                          GVariant      * parameter,
                          gpointer        user_data   G_GNUC_UNUSED)
   {
-    url_dispatch_send (here_licence_path().c_str(), on_uri_dispatched, nullptr);
+//    url_dispatch_send (here_licence_path().c_str(), on_uri_dispatched, nullptr);
   }
 }
 
@@ -440,8 +312,9 @@ Phone :: create_menu ()
   g_menu_append_item (submenu, location);
   g_object_unref (location);
 
-  if (here_licence_accepted ())
+  if (license_controller->license_accepted())
   {
+    g_warning("MAKING MENU %s", license_controller->license_path().c_str());
     g_menu_append (submenu, _("View HERE terms and conditions"), "indicator." LICENCE_ACTION_KEY);
   }
 

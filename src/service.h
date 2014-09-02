@@ -23,6 +23,7 @@
 #include <memory>
 #include <set>
 
+#include "license-controller.h"
 #include "controller.h"
 #include "phone.h"
 #include "utils.h" // GObjectDeleter
@@ -30,7 +31,7 @@
 class Service
 {
   public:
-    Service (const std::shared_ptr<Controller>& controller);
+    Service (const std::shared_ptr<Controller>& controller, const std::shared_ptr<LicenseController>& license_controller);
     virtual ~Service ();
 
   private:
