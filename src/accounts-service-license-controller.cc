@@ -34,7 +34,7 @@ user_path()
 std::string
 make_path(const std::string& path, const std::string& lang)
 {
-  return std::string("file://") + path + "/" + lang + ".html";
+  return path + "/" + lang + ".html";
 }
 
 std::string
@@ -58,7 +58,7 @@ build_full_path(const std::string & path)
     result = make_path(path, "en_US");
   }
 
-  return result;
+  return std::string("file://") + result;
 }
 
 }
@@ -96,6 +96,7 @@ AccountsServiceLicenseController::license_accepted() const
   if (accepted_variant)
   {
     result = g_variant_get_boolean(accepted_variant);
+    g_variant_unref(accepted_variant);
   }
 
   return result;
@@ -111,6 +112,7 @@ AccountsServiceLicenseController::license_path() const
   if (base_path_variant)
   {
     path = g_variant_get_string(base_path_variant, NULL);
+    g_variant_unref(base_path_variant);
   }
 
   return build_full_path(path);
