@@ -111,7 +111,11 @@ AccountsServiceLicenseController::license_path() const
       proxy.get(), "LicenseBasePath");
   if (base_path_variant)
   {
-    path = g_variant_get_string(base_path_variant, NULL);
+    const char * temp = g_variant_get_string(base_path_variant, NULL);
+    if (temp)
+    {
+      path = temp;
+    }
     g_variant_unref(base_path_variant);
   }
 
@@ -136,6 +140,11 @@ AccountsServiceLicenseController::on_properties_changed(
     g_variant_get(changed_properties, "a{sv}", &iter);
     while (g_variant_iter_loop(iter, "{&sv}", &key, &value))
     {
+      if (!key)
+      {
+        continue;
+      }
+
       property_name = key;
 
       if (property_name == "LicenseAccepted")
@@ -144,7 +153,12 @@ AccountsServiceLicenseController::on_properties_changed(
       }
       else if (property_name == "LicenseBasePath")
       {
-        const gchar * path = g_variant_get_string(value, NULL);
+        const gchar * temp = g_variant_get_string(value, NULL);
+        std::string path;
+        if (temp)
+        {
+          path = temp;
+        }
         self->notify_license_path(build_full_path(path));
       }
     }
