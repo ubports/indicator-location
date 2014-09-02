@@ -229,7 +229,8 @@ namespace
                          gpointer        user_data   G_GNUC_UNUSED)
   {
     LicenseController * license_controller = static_cast<LicenseController *>(user_data);
-    const gchar * urls[1] = {license_controller->license_path().c_str()};
+    std::string path = license_controller->license_path();
+    const gchar * urls[1] = {path.c_str()};
     ubuntu_app_launch_start_application("webbrowser-app", urls);
   }
 }
