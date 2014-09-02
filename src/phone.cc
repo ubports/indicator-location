@@ -18,7 +18,6 @@
  */
 
 #include <array>
-#include <fstream>
 
 #include <glib/gi18n.h>
 
