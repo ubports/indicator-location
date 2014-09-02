@@ -29,18 +29,6 @@
 
 #define PROFILE_NAME "phone"
 
-namespace
-{
-  void
-  on_uri_dispatched (const gchar * uri,
-                     gboolean      success     G_GNUC_UNUSED,
-                     gpointer      user_data   G_GNUC_UNUSED)
-  {
-    if (!success)
-      g_warning ("Unable to activate '%s'", uri);
-  }
-}
-
 Phone :: Phone (const std::shared_ptr<Controller>& controller_,
                 const std::shared_ptr<LicenseController>& license_controller_,
                 const std::shared_ptr<GSimpleActionGroup>& action_group_):
@@ -268,6 +256,15 @@ Phone :: create_licence_action ()
 
 namespace
 {
+  void
+  on_uri_dispatched (const gchar * uri,
+                     gboolean      success     G_GNUC_UNUSED,
+                     gpointer      user_data   G_GNUC_UNUSED)
+  {
+    if (!success)
+      g_warning ("Unable to activate '%s'", uri);
+  }
+
   void
   on_settings_activated (GSimpleAction * simple      G_GNUC_UNUSED,
                          GVariant      * parameter,
