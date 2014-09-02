@@ -18,6 +18,7 @@
  */
 
 #include "accounts-service-license-controller.h"
+#include "utils.h"
 
 #define ACCOUNTS_NAME "org.freedesktop.Accounts"
 #define ACCOUNTS_SERVICE "com.ubuntu.location.providers.here.AccountsService"
@@ -72,7 +73,7 @@ AccountsServiceLicenseController::AccountsServiceLicenseController()
           nullptr, ACCOUNTS_NAME, user_path().c_str(),
           ACCOUNTS_SERVICE,
           nullptr, &error),
-      &g_object_unref);
+          GObjectDeleter());
 
   if (proxy.get() == nullptr)
   {
