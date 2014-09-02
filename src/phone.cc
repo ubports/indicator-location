@@ -230,7 +230,7 @@ namespace
   {
     LicenseController * license_controller = static_cast<LicenseController *>(user_data);
     std::string path = license_controller->license_path();
-    const gchar * urls[1] = {path.c_str()};
+    const gchar * urls[2] = {path.c_str(), nullptr};
     ubuntu_app_launch_start_application("webbrowser-app", urls);
   }
 }
