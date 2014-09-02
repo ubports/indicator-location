@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-01 11:47+0100\n"
+"POT-Creation-Date: 2014-09-02 18:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,18 +17,18 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/phone.cc:188 src/phone.cc:191
+#: src/phone.cc:83 src/phone.cc:86
 msgid "Location"
 msgstr ""
 
-#: src/phone.cc:391
+#: src/phone.cc:326
 msgid "Location detection"
 msgstr ""
 
-#: src/phone.cc:398
+#: src/phone.cc:335
 msgid "View HERE terms and conditions"
 msgstr ""
 
-#: src/phone.cc:401
+#: src/phone.cc:339
 msgid "GPS"
 msgstr ""
