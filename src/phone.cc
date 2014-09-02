@@ -23,6 +23,7 @@
 #include <glib/gi18n.h>
 
 #include <url-dispatcher.h>
+#include <ubuntu-app-launch.h>
 
 #include "phone.h"
 #include "utils.h" // GObjectDeleter
@@ -241,7 +242,9 @@ namespace
                          GVariant      * parameter,
                          gpointer        user_data   G_GNUC_UNUSED)
   {
-//    url_dispatch_send (here_licence_path().c_str(), on_uri_dispatched, nullptr);
+    LicenseController * license_controller = static_cast<LicenseController *>(user_data);
+    const gchar * urls[1] = {license_controller->license_path().c_str()};
+    ubuntu_app_launch_start_application("webbrowser-app", urls);
   }
 }
 
@@ -252,8 +255,8 @@ Phone :: create_licence_action ()
 
   action = g_simple_action_new (LICENCE_ACTION_KEY, nullptr);
 
-  g_signal_connect (action, "activate",
-                    G_CALLBACK(on_licence_activated), nullptr);
+  g_signal_connect(action, "activate", G_CALLBACK(on_licence_activated),
+                   static_cast<void *>(license_controller.get()));
 
   return action;
 }
