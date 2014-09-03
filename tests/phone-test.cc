@@ -22,6 +22,7 @@
 #define INDICATOR_PROFILE     "phone"
 #include "gtest-dbus-indicator-fixture.h"
 
+#include "src/mock-license-controller.h"
 #include "src/controller-mock.h"
 #include "src/service.h"
 
@@ -73,7 +74,7 @@ class PhoneTest: public GTestDBusIndicatorFixture,
     {
       myController.reset (new MockController ());
       myController->add_listener (this);
-      myService.reset (new Service (myController));
+      myService.reset (new Service (myController, std::make_shared<MockLicenseController>()));
     }
 
     virtual void teardown_service ()

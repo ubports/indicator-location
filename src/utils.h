@@ -28,6 +28,7 @@ struct GObjectDeleter
   void operator()(GObject            * o) { g_object_unref (o); }
 
   void operator()(GMenu              * o) { operator()(G_OBJECT(o)); }
+  void operator()(GDBusProxy         * o) { operator()(G_OBJECT(o)); }
   void operator()(GDBusConnection    * o) { operator()(G_OBJECT(o)); }
   void operator()(GSimpleActionGroup * o) { operator()(G_OBJECT(o)); }
 };

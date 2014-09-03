@@ -25,27 +25,34 @@
 #include <glib.h>
 #include <gio/gio.h>
 
+#include "license-controller.h"
 #include "controller.h"
 
-class Phone: public ControllerListener
+class Phone: public ControllerListener, public LicenseControllerListener
 {
   public:
     Phone (const std::shared_ptr<Controller>& controller,
+           const std::shared_ptr<LicenseController>& license_controller,
            const std::shared_ptr<GSimpleActionGroup>& action_group);
     virtual ~Phone ();
     std::shared_ptr<GMenu> get_menu () { return menu; }
 
   protected:
     std::shared_ptr<Controller> controller;
+    std::shared_ptr<LicenseController> license_controller;
     virtual void on_gps_enabled_changed (bool is_enabled);
     virtual void on_location_service_enabled_changed (bool is_enabled);
+    void on_license_accepted_changed(bool license_accepted) override;
+    void on_license_path_changed(const std::string & license_path) override;
 
   private:
     std::shared_ptr<GMenu> menu;
+    std::shared_ptr<GMenu> submenu;
     std::shared_ptr<GSimpleActionGroup> action_group;
 
   private:
-    std::shared_ptr<GMenu> create_menu ();
+    void create_menu ();
+    void rebuild_submenu();
 
   private:
     bool should_be_visible ();
@@ -64,6 +71,9 @@ class Phone: public ControllerListener
 
   private:
     GSimpleAction * create_settings_action ();
+
+  private:
+    GSimpleAction * create_licence_action ();
 };
 
 #endif /* __INDICATOR_LOCATION_PHONE_H__ */

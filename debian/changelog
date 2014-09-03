@@ -1,3 +1,13 @@
+indicator-location (13.10.0+14.10.20140902.7-0ubuntu1) utopic; urgency=low
+
+  [ Pete Woods ]
+  * Add here licence action (new dependency on libUAL)
+
+  [ CI bot ]
+  * Resync trunk
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 02 Sep 2014 23:24:25 +0000
+
 indicator-location (13.10.0+14.10.20140820-0ubuntu1) utopic; urgency=low
 
   [ Martin Pitt ]

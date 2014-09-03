@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) YEAR Canonical Ltd.
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-09 18:22-0500\n"
+"POT-Creation-Date: 2014-09-02 19:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,18 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /home/charles/canonical/src/indicator-location/lp-1354058-use-standard-translations-cmake-file/po/../src//phone.cc:77
-#: /home/charles/canonical/src/indicator-location/lp-1354058-use-standard-translations-cmake-file/po/../src//phone.cc:80
+#: src/phone.cc:83 src/phone.cc:86
 msgid "Location"
 msgstr ""
 
-#: /home/charles/canonical/src/indicator-location/lp-1354058-use-standard-translations-cmake-file/po/../src//phone.cc:260
+#: src/phone.cc:327
 msgid "Location detection"
 msgstr ""
 
-#: /home/charles/canonical/src/indicator-location/lp-1354058-use-standard-translations-cmake-file/po/../src//phone.cc:265
+#: src/phone.cc:336
+msgid "View HERE terms and conditions"
+msgstr ""
+
+#: src/phone.cc:340
 msgid "GPS"
 msgstr ""
