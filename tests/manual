@@ -22,3 +22,21 @@ Test-case indicator-location/unity8-items-check
 		<dd>The menu is populated with items</dd>
 </dl>
 
+Test-case indicator-location/phone-visibility
+<dl>
+	<dt>If the location indicator is visible, disable both location and GPS from its menu</dt>
+		<dd>The Location indicator should disappear from the panel</dd>
+	<dt>In ubuntu-system-settings's Battery sheet, enable the GPS setting</dt>
+		<dd>The Location indicator should be visible in the panel</dd>
+	<dt>In the location indicator, disable both Location and GPS settings</dt>
+		<dd>The Location indicator should disappear from the panel</dd>
+	<dt>In ubuntu-system-settings's Battery sheet, re-enable the GPS setting.
+	    (NB: bug #1336715 causes ubuntu-system-settings's toggles
+	    to fall out-of-sync with indicator toggles. In the interim
+	    until that is fixed, you may have to tap the uss controls
+	    multiple times to activate them, and they may not correctly
+	    match the indicator's state.)</dt>
+		<dd>The Location indicator should appear in the panel</dd>
+</dl>
+
+
