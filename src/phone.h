@@ -55,9 +55,10 @@ class Phone: public ControllerListener, public LicenseControllerListener
     void rebuild_submenu();
 
   private:
-    bool should_be_visible ();
-    GVariant * action_state_for_root ();
+    bool should_be_visible () const;
+    GVariant * action_state_for_root () const;
     GSimpleAction * create_root_action ();
+    void update_header();
 
   private:
     GVariant * action_state_for_location_detection ();

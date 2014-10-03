@@ -64,18 +64,16 @@ Phone :: ~Phone ()
 ***/
 
 bool
-Phone :: should_be_visible ()
+Phone :: should_be_visible () const
 {
-  // NB: this is a placeholder for now.
-  // The spec requires that the location indicator be visible iff
-  // an application has accessed location info recently,
-  // but there's not a platform API to support that yet.
-
-  return true;
+  // as per "Indicators - RTM Usability Fix" document:
+  // visible iff location and/or GPS is enabled
+  return controller->is_location_service_enabled()
+      || controller->is_gps_enabled();
 }
 
 GVariant *
-Phone :: action_state_for_root ()
+Phone :: action_state_for_root () const
 {
   GVariantBuilder builder;
   g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
@@ -112,6 +110,14 @@ Phone :: create_root_action ()
                                        action_state_for_root ());
 }
 
+void
+Phone::update_header()
+{
+  g_action_group_change_action_state(G_ACTION_GROUP(action_group.get()),
+                                     HEADER_ACTION_KEY,
+                                     action_state_for_root());
+}
+
 /***
 ****
 ***/
@@ -129,6 +135,7 @@ Phone :: on_location_service_enabled_changed (bool is_enabled G_GNUC_UNUSED)
 {
   GAction * action = g_action_map_lookup_action (G_ACTION_MAP(action_group.get()), LOCATION_ACTION_KEY);
   g_simple_action_set_state (G_SIMPLE_ACTION(action), action_state_for_location_detection());
+  update_header();
 }
 
 void
@@ -186,6 +193,7 @@ Phone :: on_gps_enabled_changed (bool is_enabled G_GNUC_UNUSED)
 {
   GAction * action = g_action_map_lookup_action (G_ACTION_MAP(action_group.get()), GPS_ACTION_KEY);
   g_simple_action_set_state (G_SIMPLE_ACTION(action), action_state_for_gps_detection());
+  update_header();
 }
 
 void
