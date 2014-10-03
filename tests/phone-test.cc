@@ -45,7 +45,7 @@ class PhoneTest: public GTestDBusIndicatorFixture,
     {
       gps_enabled = false;
       gps_enabled_changed = false;
-      gps_enabled = false;
+      loc_enabled = false;
       loc_enabled_changed = false;
     }
 
