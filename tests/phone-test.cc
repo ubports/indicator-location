@@ -270,6 +270,34 @@ TEST_F (PhoneTest, Header)
   g_clear_pointer(&v, g_variant_unref);
   g_clear_pointer(&dict, g_variant_unref);
 
+  // test visibility states
+  struct {
+    bool gps_enabled;
+    bool location_service_enabled;
+    bool expected_visible;
+  } visibility_tests[] = {
+    { false, false, false },
+    { true,  false, true },
+    { false, true,  true },
+    { true,  true,  true }
+  };
+  for (const auto& test : visibility_tests)
+    {
+      myController->set_gps_enabled(test.gps_enabled);
+      myController->set_location_service_enabled(test.location_service_enabled);
+      wait_msec();
+
+      // cusory first look at the header
+      dict = g_action_group_get_action_state(action_group, action_name);
+      EXPECT_TRUE(dict != nullptr);
+      EXPECT_TRUE(g_variant_is_of_type(dict, G_VARIANT_TYPE_VARDICT));
+      v = g_variant_lookup_value(dict, "visible", G_VARIANT_TYPE_BOOLEAN);
+      EXPECT_TRUE(v != nullptr);
+      EXPECT_EQ(test.expected_visible, g_variant_get_boolean(v));
+      g_clear_pointer(&v, g_variant_unref);
+      g_clear_pointer(&dict, g_variant_unref);
+    }
+
   // cleanup
   g_clear_object(&action_group);
   g_clear_object(&dbus_menu_model);
