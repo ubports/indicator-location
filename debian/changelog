@@ -1,3 +1,11 @@
+indicator-location (13.10.0+14.10.20141007-0ubuntu1) utopic; urgency=low
+
+  [ Charles Kerr ]
+  * Show the indicator in the panel only if either Location Services or
+    GPS is enabled. (LP: #1377275)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 07 Oct 2014 19:43:29 +0000
+
 indicator-location (13.10.0+14.10.20141006-0ubuntu1) utopic; urgency=low
 
   [ Charles Kerr ]
