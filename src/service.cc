@@ -20,10 +20,8 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 
+#include "dbus-shared.h"
 #include "service.h"
-
-#define BUS_NAME "com.canonical.indicator.location"
-#define BUS_PATH "/com/canonical/indicator/location"
 
 /**
 ***
@@ -38,7 +36,7 @@ Service :: Service (const std::shared_ptr<Controller>& controller, const std::sh
   bus_own_id (0)
 {
   bus_own_id = g_bus_own_name (G_BUS_TYPE_SESSION,
-                               BUS_NAME,
+                               INDICATOR_BUS_NAME,
                                G_BUS_NAME_OWNER_FLAGS_NONE,
                                on_bus_acquired,
                                nullptr,
@@ -124,7 +122,7 @@ Service :: on_bus_acquired (GDBusConnection * connection,
   /* export the action group */
 
   unsigned int export_id = g_dbus_connection_export_action_group (connection,
-                                                                  BUS_PATH,
+                                                                  INDICATOR_OBJECT_PATH,
                                                                   G_ACTION_GROUP (action_group.get()),
                                                                   &error);
   if (error != nullptr)
@@ -143,7 +141,7 @@ Service :: on_bus_acquired (GDBusConnection * connection,
     std::shared_ptr<GMenu> menu;
     const char * path;
   } menus[] = {
-    { phone_profile.get_menu(), BUS_PATH "/phone" }
+    { phone_profile.get_menu(), INDICATOR_OBJECT_PATH "/phone" }
   };
 
   for (unsigned int i=0, n=G_N_ELEMENTS(menus); i<n; i++)

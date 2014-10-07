@@ -17,7 +17,7 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-
+#include "src/dbus-shared.h"
 #include "gtest-dbus-fixture.h"
 
 class GTestDBusIndicatorFixture: public GTestDBusFixture

@@ -17,11 +17,11 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#define INDICATOR_BUS_NAME    "com.canonical.indicator.location"
-#define INDICATOR_OBJECT_PATH "/com/canonical/indicator/location"
-#define INDICATOR_PROFILE     "phone"
+// must be defined before including gtest-dbus-indicator-fixture
+#define INDICATOR_PROFILE "phone"
 #include "gtest-dbus-indicator-fixture.h"
 
+#include "src/dbus-shared.h"
 #include "src/mock-license-controller.h"
 #include "src/controller-mock.h"
 #include "src/service.h"
@@ -45,7 +45,7 @@ class PhoneTest: public GTestDBusIndicatorFixture,
     {
       gps_enabled = false;
       gps_enabled_changed = false;
-      gps_enabled = false;
+      loc_enabled = false;
       loc_enabled_changed = false;
     }
 
@@ -213,3 +213,94 @@ TEST_F (PhoneTest, UserTogglesLocation)
       ASSERT_EQ (enabled, loc_enabled);
     }
 }
+
+TEST_F (PhoneTest, Header)
+{
+  wait_msec();
+
+  auto connection = g_bus_get_sync(G_BUS_TYPE_SESSION, nullptr, nullptr);
+
+  // SETUP: get the action group and wait for it to be populated
+  auto dbus_action_group = g_dbus_action_group_get(connection, INDICATOR_BUS_NAME, INDICATOR_OBJECT_PATH);
+  auto action_group = G_ACTION_GROUP(dbus_action_group);
+  auto names_strv = g_action_group_list_actions(action_group);
+  if (g_strv_length(names_strv) == 0)
+    {
+      g_strfreev(names_strv);
+      wait_for_signal(dbus_action_group, "action-added");
+      names_strv = g_action_group_list_actions(action_group);
+    }
+  g_clear_pointer(&names_strv, g_strfreev);
+
+  // SETUP: get the menu model and wait for it to be activated
+  auto dbus_menu_model = g_dbus_menu_model_get(connection, INDICATOR_BUS_NAME, INDICATOR_OBJECT_PATH "/" INDICATOR_PROFILE);
+  auto menu_model = G_MENU_MODEL(dbus_menu_model);
+  int n = g_menu_model_get_n_items(menu_model);
+  if (!n)
+    {
+      // give the model a moment to populate its info
+      wait_msec(100);
+      n = g_menu_model_get_n_items(menu_model);
+    }
+  EXPECT_TRUE(menu_model != nullptr);
+  EXPECT_NE(0, n);
+
+  // test to confirm that a header menuitem exists
+  gchar* str = nullptr;
+  g_menu_model_get_item_attribute(menu_model, 0, "x-canonical-type", "s", &str);
+  EXPECT_STREQ("com.canonical.indicator.root", str);
+  g_clear_pointer(&str, g_free);
+  g_menu_model_get_item_attribute(menu_model, 0, G_MENU_ATTRIBUTE_ACTION, "s", &str);
+  const auto action_name = INDICATOR_PROFILE "-header";
+  EXPECT_EQ(std::string("indicator.")+action_name, str);
+  g_clear_pointer(&str, g_free);
+
+  // cusory first look at the header
+  auto dict = g_action_group_get_action_state(action_group, action_name);
+  EXPECT_TRUE(dict != nullptr);
+  EXPECT_TRUE(g_variant_is_of_type(dict, G_VARIANT_TYPE_VARDICT));
+  auto v = g_variant_lookup_value(dict, "accessible-desc", G_VARIANT_TYPE_STRING);
+  EXPECT_TRUE(v != nullptr);
+  g_variant_unref(v);
+  v = g_variant_lookup_value(dict, "title", G_VARIANT_TYPE_STRING);
+  EXPECT_TRUE(v != nullptr);
+  g_variant_unref(v);
+  v = g_variant_lookup_value(dict, "visible", G_VARIANT_TYPE_BOOLEAN);
+  EXPECT_TRUE(v != nullptr);
+  g_clear_pointer(&v, g_variant_unref);
+  g_clear_pointer(&dict, g_variant_unref);
+
+  // test visibility states
+  struct {
+    bool gps_enabled;
+    bool location_service_enabled;
+    bool expected_visible;
+  } visibility_tests[] = {
+    { false, false, false },
+    { true,  false, true },
+    { false, true,  true },
+    { true,  true,  true }
+  };
+  for (const auto& test : visibility_tests)
+    {
+      myController->set_gps_enabled(test.gps_enabled);
+      myController->set_location_service_enabled(test.location_service_enabled);
+      wait_msec();
+
+      // cusory first look at the header
+      dict = g_action_group_get_action_state(action_group, action_name);
+      EXPECT_TRUE(dict != nullptr);
+      EXPECT_TRUE(g_variant_is_of_type(dict, G_VARIANT_TYPE_VARDICT));
+      v = g_variant_lookup_value(dict, "visible", G_VARIANT_TYPE_BOOLEAN);
+      EXPECT_TRUE(v != nullptr);
+      EXPECT_EQ(test.expected_visible, g_variant_get_boolean(v));
+      g_clear_pointer(&v, g_variant_unref);
+      g_clear_pointer(&dict, g_variant_unref);
+    }
+
+  // cleanup
+  g_clear_object(&action_group);
+  g_clear_object(&dbus_menu_model);
+  g_clear_object(&connection);
+}
+
