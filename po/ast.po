@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2014-09-02 19:21+0100\n"
-"PO-Revision-Date: 2014-09-05 16:44+0000\n"
+"PO-Revision-Date: 2014-10-19 16:19+0000\n"
 "Last-Translator: ivarela <ivarela@ubuntu.com>\n"
 "Language-Team: Asturian <ast@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2014-10-15 20:18+0000\n"
+"X-Launchpad-Export-Date: 2014-10-20 07:18+0000\n"
 "X-Generator: Launchpad (build 17196)\n"
 
 #: ../src/phone.cc:81 ../src/phone.cc:84
@@ -27,7 +27,7 @@ msgstr "Deteición d'allugamientu"
 
 #: ../src/phone.cc:344
 msgid "View HERE terms and conditions"
-msgstr "Ver EQUÍ los términos y condiciones"
+msgstr "Ver los términos y condiciones del serviciu HERE"
 
 #: ../src/phone.cc:348
 msgid "GPS"
