@@ -55,16 +55,9 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
       g_object_unref (a);
     }
 
-  // enable/disable the menuitems based on whether the controller is valid
-  auto update_enabled = [this](){
-    const auto map = G_ACTION_MAP(action_group.get());
-    const bool is_valid = controller->is_valid().get();
-    std::array<const char*,2> keys = { LOCATION_ACTION_KEY, GPS_ACTION_KEY };
-    for(const auto& key : keys)
-      g_simple_action_set_enabled(G_SIMPLE_ACTION(g_action_map_lookup_action(map, key)), is_valid);
-  };
-  controller->is_valid().changed().connect([update_enabled](bool){update_enabled();});
-  update_enabled();
+  // the profile should track whether the controller is valid or not
+  controller->is_valid().changed().connect([this](bool){on_is_valid_changed();});
+  on_is_valid_changed();
 }
 
 Phone :: ~Phone ()
@@ -80,6 +73,9 @@ Phone :: ~Phone ()
 bool
 Phone :: should_be_visible () const
 {
+  if (!controller->is_valid())
+    return false;
+
   // as per "Indicators - RTM Usability Fix" document:
   // visible iff location and/or GPS is enabled
   return controller->is_location_service_enabled()
@@ -130,6 +126,18 @@ Phone::update_header()
   g_action_group_change_action_state(G_ACTION_GROUP(action_group.get()),
                                      HEADER_ACTION_KEY,
                                      action_state_for_root());
+}
+
+void
+Phone :: on_is_valid_changed()
+{
+  const auto map = G_ACTION_MAP(action_group.get());
+  const bool is_valid = controller->is_valid().get();
+  std::array<const char*,2> keys = { LOCATION_ACTION_KEY, GPS_ACTION_KEY };
+  for(const auto& key : keys)
+    g_simple_action_set_enabled(G_SIMPLE_ACTION(g_action_map_lookup_action(map, key)), is_valid);
+
+  update_header();
 }
 
 /***

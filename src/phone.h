@@ -40,6 +40,7 @@ class Phone: public ControllerListener, public LicenseControllerListener
   protected:
     std::shared_ptr<Controller> controller;
     std::shared_ptr<LicenseController> license_controller;
+    virtual void on_is_valid_changed();
     virtual void on_gps_enabled_changed (bool is_enabled);
     virtual void on_location_service_enabled_changed (bool is_enabled);
     void on_license_accepted_changed(bool license_accepted) override;
