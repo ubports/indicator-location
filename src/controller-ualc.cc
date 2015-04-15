@@ -37,6 +37,9 @@ UbuntuAppLocController :: UbuntuAppLocController ():
 
 UbuntuAppLocController :: ~UbuntuAppLocController ()
 {
+  if (m_update_status_tag)
+    g_source_remove(m_update_status_tag);
+
   if (ualc != nullptr)
     ua_location_service_controller_unref (ualc);
 }
@@ -48,13 +51,36 @@ UbuntuAppLocController :: on_ualc_status_changed (UALocationServiceStatusFlags /
 }
 
 void
+UbuntuAppLocController :: update_status_soon()
+{
+  if (m_update_status_tag == 0)
+    {
+      constexpr int retry_interval_seconds = 5;
+
+      auto callback = [](gpointer gself){
+        g_debug("%s periodic check", G_STRLOC);
+        auto self = static_cast<UbuntuAppLocController*>(gself);
+        self->m_update_status_tag = 0;
+        self->update_status();
+        return G_SOURCE_REMOVE;
+      };
+
+      m_update_status_tag = g_timeout_add_seconds(retry_interval_seconds,
+                                                  callback,
+                                                  this);
+    }
+}
+
+void
 UbuntuAppLocController :: update_status ()
 {
+  g_message("%s %s", G_STRLOC, G_STRFUNC);
+
   const bool loc_was_enabled = is_location_service_enabled();
   const bool gps_was_enabled = is_gps_enabled();
 
   // update this.current_status with a fresh ualc status
-  UALocationServiceStatusFlags flags;
+  UALocationServiceStatusFlags flags {};
   auto status = ua_location_service_controller_query_status(ualc, &flags);
   if (status == U_STATUS_SUCCESS)
     {
@@ -66,6 +92,7 @@ UbuntuAppLocController :: update_status ()
     {
       g_warning("%s %s ualc_query_status returned %d", G_STRLOC, G_STRFUNC, status);
       m_is_valid.set(false);
+      update_status_soon();
     }
 
   const bool loc_is_enabled = is_location_service_enabled();

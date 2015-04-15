@@ -44,10 +44,12 @@ class UbuntuAppLocController: public Controller
 
     UALocationServiceStatusFlags current_status {};
     UbuntuApplicationLocationServiceController* ualc {};
-    core::Property<bool> m_is_valid { false };
+    core::Property<bool> m_is_valid {false};
+    unsigned int m_update_status_tag {};
 
     static void on_ualc_status_changed (UALocationServiceStatusFlags, void *vself);
-    void update_status ();
+    void update_status();
+    void update_status_soon();
 };
 
 #endif // __INDICATOR_LOCATION_CONTROLLER_UALC__H__
