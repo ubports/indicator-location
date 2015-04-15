@@ -29,6 +29,7 @@ class MockController: public Controller
     MockController() =default;
     virtual ~MockController() =default;
 
+    core::Property<bool>& is_valid() { return m_is_valid; }
     const core::Property<bool>& is_valid() const override { return m_is_valid; }
     bool is_gps_enabled () const { return gps; }
     bool is_location_service_enabled () const { return loc; }

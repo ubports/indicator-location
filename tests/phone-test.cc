@@ -91,6 +91,7 @@ TEST_F (PhoneTest, ActionsExit)
   ASSERT_TRUE (action_exists ("location-detection-enabled"));
   ASSERT_TRUE (action_exists ("phone-header"));
   ASSERT_TRUE (action_exists ("settings"));
+  ASSERT_TRUE (action_exists ("licence"));
 }
 
 TEST_F (PhoneTest, MenuitemsExist)
@@ -98,6 +99,55 @@ TEST_F (PhoneTest, MenuitemsExist)
   ASSERT_TRUE (action_menuitem_exists ("indicator.location-detection-enabled"));
   ASSERT_TRUE (action_menuitem_exists ("indicator.gps-detection-enabled"));
   //ASSERT_TRUE (action_menuitem_exists ("indicator.settings"));
+}
+
+TEST_F (PhoneTest, IsValidEnabled)
+{
+  bool is_valid = myController->is_valid().get();
+  auto ag = G_ACTION_GROUP(action_group);
+  constexpr int n_iters = 4;
+  const std::array<const char*,2> action_names = { "gps-detection-enabled",
+                                                   "location-detection-enabled" };
+
+  // test that the loc/gps actions are enabled/disabled based on controller->is_valid()
+  for (int i=0; i<n_iters; ++i)
+  {
+    is_valid = !is_valid;
+    myController->is_valid().set(is_valid);
+    wait_for_action_enabled_change(action_names[0]);
+    for(const auto& action_name : action_names)
+    {
+      EXPECT_EQ(is_valid, g_action_group_get_action_enabled(ag, action_name));
+    }
+  }
+}
+
+TEST_F (PhoneTest, IsValidVisible)
+{
+  // make sure something's enabled so that the indicator should be visible
+  if (!myController->is_gps_enabled()) {
+    myController->set_gps_enabled(true);
+    wait_for_action_state_change("gps-detection-enabled");
+  }
+
+  // test the header's 'invisible' entry tracks the controller's is_valid() state
+  constexpr int n_iters = 4;
+  const char* header_action_name = INDICATOR_PROFILE "-header";
+  auto ag = G_ACTION_GROUP(action_group);
+  for (int i=0; i<n_iters; ++i)
+  {
+    myController->is_valid().set(!myController->is_valid().get());
+    wait_for_action_state_change(header_action_name);
+
+    auto dict = g_action_group_get_action_state(ag, header_action_name);
+    EXPECT_TRUE(dict != nullptr);
+    EXPECT_TRUE(g_variant_is_of_type(dict, G_VARIANT_TYPE_VARDICT));
+    auto v = g_variant_lookup_value(dict, "visible", G_VARIANT_TYPE_BOOLEAN);
+    EXPECT_TRUE(v != nullptr);
+    EXPECT_EQ(myController->is_valid().get(), g_variant_get_boolean(v));
+    g_clear_pointer(&v, g_variant_unref);
+    g_clear_pointer(&dict, g_variant_unref);
+  }
 }
 
 TEST_F (PhoneTest, PlatformTogglesGPS)
@@ -255,7 +305,7 @@ TEST_F (PhoneTest, Header)
   EXPECT_EQ(std::string("indicator.")+action_name, str);
   g_clear_pointer(&str, g_free);
 
-  // cusory first look at the header
+  // cursory first look at the header
   auto dict = g_action_group_get_action_state(action_group, action_name);
   EXPECT_TRUE(dict != nullptr);
   EXPECT_TRUE(g_variant_is_of_type(dict, G_VARIANT_TYPE_VARDICT));
