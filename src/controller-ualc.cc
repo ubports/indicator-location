@@ -27,6 +27,12 @@
 ****
 ***/
 
+#define BUS_NAME "com.ubuntu.location.Service"
+#define OBJECT_PATH "/com/ubuntu/location/Service"
+
+#define LOC_IFACE_NAME "com.ubuntu.location.Service"
+
+#define PROP_IFACE_NAME "org.freedesktop.DBus.Properties"
 #define PROP_KEY_SERVICE_ENABLED "IsOnline"
 #define PROP_KEY_GPS_ENABLED "DoesSatelliteBasedPositioning"
 
@@ -42,18 +48,14 @@ public:
             g_object_unref(c);
         });
 
-        g_dbus_proxy_new_for_bus(G_BUS_TYPE_SYSTEM,
-                                 G_DBUS_PROXY_FLAGS_NONE,
-                                 nullptr, // interface info
-                                 "com.ubuntu.location.Service", // name
-                                 "/com/ubuntu/location/Service", // path
-                                 "com.ubuntu.location.Service", // interface name
-                                 m_cancellable.get(),
-                                 on_proxy_ready,
-                                 this);
+        g_bus_get(G_BUS_TYPE_SYSTEM, m_cancellable.get(), on_system_bus_ready, this);
     }
 
-    ~Impl() =default;
+    ~Impl()
+    {
+        if (m_name_tag)
+            g_bus_unwatch_name(m_name_tag);
+    }
 
     const core::Property<bool>& is_valid() const
     {
@@ -62,12 +64,12 @@ public:
 
     bool is_gps_enabled () const
     {
-        return get_cached_bool_property(PROP_KEY_GPS_ENABLED);
+        return m_is_gps_enabled;
     }
 
     bool is_location_service_enabled () const
     {
-        return get_cached_bool_property(PROP_KEY_SERVICE_ENABLED);
+        return m_location_service_enabled;
     }
 
     void set_gps_enabled (bool enabled)
@@ -82,39 +84,172 @@ public:
 
 private:
 
-    bool get_cached_bool_property(const char* property_name) const
+    static void on_system_bus_ready(GObject*, GAsyncResult* res, gpointer gself)
     {
-        bool result = false;
+        GError* error;
+        GDBusConnection* system_bus;
 
-        auto v = g_dbus_proxy_get_cached_property(m_proxy.get(), property_name);
-g_message("cached property for %s; %s", property_name, g_variant_print(v, true));
+        error = nullptr;
+        system_bus = g_bus_get_finish(res, &error);
+        if (system_bus != nullptr)
+        {
+            auto self = static_cast<Impl*>(gself);
+
+            self->m_system_bus.reset(system_bus, GObjectDeleter());
+
+            self->m_name_tag = g_bus_watch_name_on_connection(system_bus,
+                                                              BUS_NAME,
+                                                              G_BUS_NAME_WATCHER_FLAGS_AUTO_START,
+                                                              on_name_appeared,
+                                                              on_name_vanished,
+                                                              gself,
+                                                              nullptr);
+        }
+        else if (error != nullptr)
+        {
+            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                g_warning("Couldn't get AccountsService proxy: %s", error->message);
+            g_error_free(error);
+        }
+    }
+
+    static void on_name_appeared(GDBusConnection * system_bus,
+                                 const gchar * bus_name,
+                                 const gchar * name_owner,
+                                 gpointer gself)
+    {
+        auto self = static_cast<Impl*>(gself);
+
+        self->m_signal_tag = g_dbus_connection_signal_subscribe(system_bus,
+                                                                name_owner,
+                                                                PROP_IFACE_NAME,
+                                                                "PropertiesChanged",
+                                                                OBJECT_PATH,
+                                                                nullptr, // arg0
+                                                                G_DBUS_SIGNAL_FLAGS_NONE,
+                                                                on_properties_changed,
+                                                                gself,
+                                                                nullptr);
+
+        struct {
+            const char * name;
+            GAsyncReadyCallback callback;
+        } properties[] = {
+            { PROP_KEY_SERVICE_ENABLED, on_service_enabled_reply },
+            { PROP_KEY_GPS_ENABLED, on_gps_enabled_reply }
+        };
+        for (const auto& prop : properties)
+        { 
+            g_dbus_connection_call(system_bus,
+                                   BUS_NAME,
+                                   OBJECT_PATH,
+                                   PROP_IFACE_NAME,
+                                   "Get",
+                                   g_variant_new("(ss)", LOC_IFACE_NAME, prop.name), // args
+                                   G_VARIANT_TYPE("(s)"), // return type
+                                   G_DBUS_CALL_FLAGS_NONE,
+                                   -1, // use default timeout
+                                  self->m_cancellable.get(),
+                                  prop.callback,
+                                  gself);
+        }
+    }
+
+    static void on_name_vanished(GDBusConnection * system_bus,
+                                 const gchar*,
+                                 gpointer gself)
+    {
+        auto self = static_cast<Impl*>(gself);
+
+        if (self->m_signal_tag)
+        {
+            g_dbus_connection_signal_unsubscribe(system_bus, self->m_signal_tag);
+            self->m_signal_tag = 0;
+        }
+    }
+
+    static void on_properties_changed(GDBusConnection* /*connection*/,
+                                      const gchar *sender_name,
+                                      const gchar *object_path,
+                                      const gchar *interface_name,
+                                      const gchar *signal_name,
+                                      GVariant *parameters,
+                                      gpointer /*gself*/)
+    {
+        g_message("FIXME");
+        g_message("sender_name %s", sender_name);
+        g_message("object_path %s", object_path);
+        g_message("interface_name %s", interface_name);
+        g_message("signal_name %s", signal_name);
+        g_message("parameters %s", g_variant_print(parameters, true));
+    }
+
+    static void on_service_enabled_reply(GObject      * source_object,
+                                         GAsyncResult * res,
+                                         gpointer       gself)
+    {
+        GError * error;
+        GVariant * v;
+
+        error = nullptr;
+        v = g_dbus_connection_call_finish(G_DBUS_CONNECTION(source_object), res, &error);
         if (v != nullptr)
         {
-            result = g_variant_get_boolean(v);
+            g_message("%s got %s", G_STRFUNC, g_variant_print(v, true));
             g_variant_unref(v);
         }
- 
-        return result;
+        else if (error != nullptr)
+        {
+            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                g_warning("Couldn't get AccountsService proxy: %s", error->message);
+            g_error_free(error);
+        }
     }
+
+    static void on_gps_enabled_reply(GObject      * source_object,
+                                     GAsyncResult * res,
+                                     gpointer       gself)
+    {
+        GError * error;
+        GVariant * v;
+
+        error = nullptr;
+        v = g_dbus_connection_call_finish(G_DBUS_CONNECTION(source_object), res, &error);
+        if (v != nullptr)
+        {
+            g_message("%s got %s", G_STRFUNC, g_variant_print(v, true));
+            g_variant_unref(v);
+        }
+        else if (error != nullptr)
+        {
+            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                g_warning("Couldn't get AccountsService proxy: %s", error->message);
+            g_error_free(error);
+        }
+    }
+
+    /***
+    ****
+    ***/
 
     void set_bool_property(const char* property_name, bool b)
     {
-        g_return_if_fail(m_proxy);
+        g_return_if_fail(m_system_bus);
 
-        auto args = g_variant_new("(ssv)", "com.ubuntu.location.Service", property_name, g_variant_new_boolean(b));
+        auto args = g_variant_new("(ssv)", LOC_IFACE_NAME, property_name, g_variant_new_boolean(b));
 g_message("args: %s", g_variant_print(args, true));
-        g_dbus_connection_call(g_dbus_proxy_get_connection(m_proxy.get()),
-                                                           "com.ubuntu.location.Service", // bus name
-                                                           "/com/ubuntu/location/Service", // object path
-                                                           "org.freedesktop.DBus.Properties", // interface name,
-                                                           "Set", // method name,
-                                                           args,
-                                                           nullptr, // reply type
-                                                           G_DBUS_CALL_FLAGS_NONE,
-                                                           -1, // timeout msec
-                                                           m_cancellable.get(),
-                                                           on_set_response,
-                                                           this);
+        g_dbus_connection_call(m_system_bus.get(),
+                               BUS_NAME,
+                               OBJECT_PATH,
+                               PROP_IFACE_NAME,
+                               "Set", // method name,
+                               args,
+                               nullptr, // reply type
+                               G_DBUS_CALL_FLAGS_NONE,
+                               -1, // timeout msec
+                               m_cancellable.get(),
+                               on_set_response,
+                               this);
     }
 
     static void on_set_response(GObject      *connection,
@@ -148,42 +283,7 @@ g_message("%s %s", G_STRLOC, g_variant_print(v, true));
         }
     }
 
-    static void on_proxy_ready(GObject*, GAsyncResult* res, gpointer gself)
-    {
-        GError * error;
-        GDBusProxy * proxy;
-
-        error = nullptr;
-        proxy = g_dbus_proxy_new_for_bus_finish(res, &error);
-g_message("%s proxy ready %p", G_STRLOC, (void*)proxy);
-        if (proxy != nullptr)
-        {
-            // if we got one, cache it and start listening for properties-changed
-            auto self = static_cast<Impl*>(gself);
-            self->m_proxy.reset(proxy, GObjectDeleter());
-            g_signal_connect(proxy, "g-properties-changed",
-                             G_CALLBACK(on_properties_changed), gself);
-            g_signal_connect(proxy, "notify::g-name-owner",
-                             G_CALLBACK(on_owner_changed), gself);
-            on_owner_changed(G_OBJECT(proxy), nullptr, gself);
-        }
-        else if (error != nullptr)
-        {
-            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-                g_warning("Couldn't get AccountsService proxy: %s", error->message);
-            g_error_free(error);
-        }
-    }
-
-    static void on_owner_changed(GObject* o, GParamSpec*, gpointer gself)
-    {
-      auto self = static_cast<Impl*>(gself);
-      gchar* name_owner = nullptr;
-      g_object_get(o, "g-name-owner", &name_owner, nullptr);
-      g_message("name owner is now {%s}", name_owner);
-      self->m_is_valid.set(name_owner && *name_owner);
-    }
-
+#if 0
     static void on_properties_changed(GDBusProxy   * proxy,
                                       GVariant     * changed_properties,
                                       const gchar ** invalidated_properties,
@@ -212,11 +312,16 @@ g_message("%s on properties changed", G_STRLOC);
             g_variant_iter_free(iter);
         }
     }
+#endif
 
     UbuntuAppLocController& m_owner;
     std::shared_ptr<GCancellable> m_cancellable {};
-    std::shared_ptr<GDBusProxy> m_proxy {};
+    std::shared_ptr<GDBusConnection> m_system_bus {};
     core::Property<bool> m_is_valid {false};
+    bool m_is_gps_enabled {false};
+    bool m_location_service_enabled {false};
+    guint m_name_tag {};
+    guint m_signal_tag {};
 };
 
 /***
