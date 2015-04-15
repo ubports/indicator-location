@@ -45,7 +45,9 @@ class Controller
     void add_listener (ControllerListener *);
     void remove_listener (ControllerListener *);
 
+    /// True iff we've gotten status info from the location service
     virtual const core::Property<bool>& is_valid() const =0;
+
     virtual bool is_gps_enabled () const = 0;
     virtual bool is_location_service_enabled () const = 0;
 
