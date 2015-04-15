@@ -74,8 +74,6 @@ UbuntuAppLocController :: update_status_soon()
 void
 UbuntuAppLocController :: update_status ()
 {
-  g_message("%s %s", G_STRLOC, G_STRFUNC);
-
   const bool loc_was_enabled = is_location_service_enabled();
   const bool gps_was_enabled = is_gps_enabled();
 
