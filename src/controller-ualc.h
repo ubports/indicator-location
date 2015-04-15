@@ -20,36 +20,26 @@
 #ifndef __INDICATOR_LOCATION_CONTROLLER_UALC__H__
 #define __INDICATOR_LOCATION_CONTROLLER_UALC__H__
 
-#include <ubuntu/status.h>
-#include <ubuntu/application/location/controller.h>
-#include <ubuntu/application/location/service.h>
-
 #include "controller.h"
+
+#include <memory> // std::unique_ptr
 
 class UbuntuAppLocController: public Controller
 {
   public:
-
     UbuntuAppLocController ();
     virtual ~UbuntuAppLocController();
 
-    virtual const core::Property<bool>& is_valid() const override { return m_is_valid; }
-    bool is_gps_enabled () const { return (current_status & UA_LOCATION_SERVICE_GPS_ENABLED) != 0; }
-    bool is_location_service_enabled () const { return (current_status & UA_LOCATION_SERVICE_ENABLED) != 0; }
-
-    void set_gps_enabled (bool enabled);
-    void set_location_service_enabled (bool enabled);
+    virtual const core::Property<bool>& is_valid() const override;
+    bool is_gps_enabled () const override;
+    bool is_location_service_enabled () const override;
+    void set_gps_enabled (bool enabled) override;
+    void set_location_service_enabled (bool enabled) override;
 
   private:
-
-    UALocationServiceStatusFlags current_status {};
-    UbuntuApplicationLocationServiceController* ualc {};
-    core::Property<bool> m_is_valid {false};
-    unsigned int m_update_status_tag {};
-
-    static void on_ualc_status_changed (UALocationServiceStatusFlags, void *vself);
-    void update_status();
-    void update_status_soon();
+    friend class Impl;
+    class Impl;
+    std::unique_ptr<Impl> impl;
 };
 
 #endif // __INDICATOR_LOCATION_CONTROLLER_UALC__H__
