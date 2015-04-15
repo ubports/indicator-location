@@ -29,6 +29,9 @@
 
 #define PROFILE_NAME "phone"
 
+#define LOCATION_ACTION_KEY "location-detection-enabled"
+#define GPS_ACTION_KEY "gps-detection-enabled"
+
 Phone :: Phone (const std::shared_ptr<Controller>& controller_,
                 const std::shared_ptr<LicenseController>& license_controller_,
                 const std::shared_ptr<GSimpleActionGroup>& action_group_):
@@ -51,6 +54,17 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
       g_action_map_add_action (G_ACTION_MAP(action_group.get()), G_ACTION(a));
       g_object_unref (a);
     }
+
+  // enable/disable the menuitems based on whether the controller is valid
+  auto update_enabled = [this](){
+    const auto map = G_ACTION_MAP(action_group.get());
+    const bool is_valid = controller->is_valid().get();
+    std::array<const char*,2> keys = { LOCATION_ACTION_KEY, GPS_ACTION_KEY };
+    for(const auto& key : keys)
+      g_simple_action_set_enabled(G_SIMPLE_ACTION(g_action_map_lookup_action(map, key)), is_valid);
+  };
+  controller->is_valid().changed().connect([update_enabled](bool){update_enabled();});
+  update_enabled();
 }
 
 Phone :: ~Phone ()
@@ -122,8 +136,6 @@ Phone::update_header()
 ****
 ***/
 
-#define LOCATION_ACTION_KEY "location-detection-enabled"
-
 GVariant *
 Phone :: action_state_for_location_detection ()
 {
@@ -168,8 +180,6 @@ Phone :: create_detection_enabled_action ()
                                          nullptr,
                                          action_state_for_location_detection());
 
-  g_simple_action_set_enabled (action, controller->is_valid());
-
   g_signal_connect (action, "activate",
                     G_CALLBACK(on_detection_location_activated), this);
 
@@ -179,8 +189,6 @@ Phone :: create_detection_enabled_action ()
 /***
 ****
 ***/
-
-#define GPS_ACTION_KEY "gps-detection-enabled"
 
 GVariant *
 Phone :: action_state_for_gps_detection ()
@@ -214,8 +222,6 @@ Phone :: create_gps_enabled_action ()
   action = g_simple_action_new_stateful (GPS_ACTION_KEY,
                                          nullptr,
                                          action_state_for_gps_detection());
-
-  g_simple_action_set_enabled (action, controller->is_valid());
 
   g_signal_connect (action, "activate",
                     G_CALLBACK(on_detection_gps_activated), this);

@@ -33,7 +33,7 @@ class UbuntuAppLocController: public Controller
     UbuntuAppLocController ();
     virtual ~UbuntuAppLocController();
 
-    bool is_valid () const { return ualc != nullptr; }
+    virtual const core::Property<bool>& is_valid() const override { return m_is_valid; }
     bool is_gps_enabled () const { return (current_status & UA_LOCATION_SERVICE_GPS_ENABLED) != 0; }
     bool is_location_service_enabled () const { return (current_status & UA_LOCATION_SERVICE_ENABLED) != 0; }
 
@@ -42,8 +42,9 @@ class UbuntuAppLocController: public Controller
 
   private:
 
-    UALocationServiceStatusFlags current_status = 0;
-    UbuntuApplicationLocationServiceController * ualc;
+    UALocationServiceStatusFlags current_status {};
+    UbuntuApplicationLocationServiceController* ualc {};
+    core::Property<bool> m_is_valid { false };
 
     static void on_ualc_status_changed (UALocationServiceStatusFlags, void *vself);
     void update_status ();

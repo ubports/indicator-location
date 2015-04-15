@@ -55,10 +55,17 @@ UbuntuAppLocController :: update_status ()
 
   // update this.current_status with a fresh ualc status
   UALocationServiceStatusFlags flags;
-  if (ua_location_service_controller_query_status (ualc, &flags) == U_STATUS_SUCCESS)
+  auto status = ua_location_service_controller_query_status(ualc, &flags);
+  if (status == U_STATUS_SUCCESS)
     {
       g_debug("%s %s updating ualc controller status with flags: %d", G_STRLOC, G_STRFUNC, (int)flags);
       current_status = flags;
+      m_is_valid.set(true);
+    }
+  else
+    {
+      g_warning("%s %s ualc_query_status returned %d", G_STRLOC, G_STRFUNC, status);
+      m_is_valid.set(false);
     }
 
   const bool loc_is_enabled = is_location_service_enabled();
