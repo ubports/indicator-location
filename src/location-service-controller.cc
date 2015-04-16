@@ -31,20 +31,19 @@ class LocationServiceController::Impl
 {
 public:
 
-    Impl(LocationServiceController& owner):
-        m_owner(owner)
+    Impl(LocationServiceController& owner)
     {
         m_cancellable.reset(g_cancellable_new(), [](GCancellable* c) {
             g_cancellable_cancel(c);
             g_object_unref(c);
         });
 
-        m_gps_enabled.changed().connect([this](bool b){
-            m_owner.notify_gps_enabled(b);
+        m_gps_enabled.changed().connect([owner](bool b){
+            owner.notify_gps_enabled(b);
         });
 
-        m_loc_enabled.changed().connect([this](bool b){
-            m_owner.notify_location_service_enabled(b);
+        m_loc_enabled.changed().connect([owner](bool b){
+            owner.notify_location_service_enabled(b);
         });
 
         g_bus_get(G_BUS_TYPE_SYSTEM,
@@ -359,7 +358,6 @@ private:
     static constexpr const char* PROP_KEY_LOC_ENABLED {"IsOnline"};
     static constexpr const char* PROP_KEY_GPS_ENABLED {"DoesSatelliteBasedPositioning"};
 
-    LocationServiceController& m_owner;
     core::Property<bool> m_gps_enabled {false};
     core::Property<bool> m_loc_enabled {false};
     core::Property<bool> m_is_valid {false};
