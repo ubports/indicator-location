@@ -250,14 +250,7 @@ private:
         error = nullptr;
         GDBusConnection * conn = G_DBUS_CONNECTION(source);
         v = g_dbus_connection_call_finish(conn, res, &error);
-        if (error != nullptr)
-        {
-            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-                g_warning("Error calling dbus method: %s", error->message);
-            g_error_free(error);
-            success = false;
-        }
-        else if (v != nullptr)
+        if (v != nullptr)
         {
             if (g_variant_is_of_type(v, G_VARIANT_TYPE("(v)")))
             {
@@ -269,6 +262,13 @@ private:
             }
 
             g_variant_unref(v);
+        }
+        else if (error != nullptr)
+        {
+            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                g_warning("Error calling dbus method: %s", error->message);
+            g_error_free(error);
+            success = false;
         }
 
         return std::make_tuple(success, result);
@@ -332,19 +332,19 @@ private:
         error = nullptr;
         auto connection = G_DBUS_CONNECTION(oconnection);
         v = g_dbus_connection_call_finish(connection, res, &error);
-        if (error != nullptr)
-        {
-            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-                g_warning("DBus method returned an error : %s", error->message);
-
-            g_error_free(error);
-        }
-        else if (v != nullptr)
+        if (v != nullptr)
         {
             auto vs = g_variant_print(v, true);
             g_debug("method call returned '%s'", vs);
             g_free(vs);
             g_variant_unref(v);
+        }
+        else if (error != nullptr)
+        {
+            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                g_warning("dbus method returned an error : %s", error->message);
+
+            g_error_free(error);
         }
     }
 
