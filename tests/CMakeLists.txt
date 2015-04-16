@@ -30,16 +30,6 @@ add_dependencies (${TEST_NAME} ${SERVICE_LIB})
 target_link_libraries (${TEST_NAME} ${SERVICE_LIB} gtest ${SERVICE_DEPS_LIBRARIES} ${GTEST_LIBS})
 
 ###
-###  ualc-test
-###
-
-#set (TEST_NAME ualc-test)
-#add_executable (${TEST_NAME} ${TEST_NAME}.cc ualc-mock.c)
-#add_test (${TEST_NAME} ${TEST_NAME})
-#add_dependencies (${TEST_NAME} ${SERVICE_LIB})
-#target_link_libraries (${TEST_NAME} ${SERVICE_LIB} gtest ${SERVICE_DEPS_LIBRARIES} ${GTEST_LIBS})
-
-###
 ###  globals
 ###
 

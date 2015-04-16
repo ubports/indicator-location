@@ -20,18 +20,18 @@
 
 #include <glib.h>
 
-#include "controller-ualc.h"
+#include "location-service-controller.h"
 #include "utils.h"
 
 /***
 ****
 ***/
 
-class UbuntuAppLocController::Impl
+class LocationServiceController::Impl
 {
 public:
 
-    Impl(UbuntuAppLocController& owner):
+    Impl(LocationServiceController& owner):
         m_owner(owner)
     {
         m_cancellable.reset(g_cancellable_new(), [](GCancellable* c) {
@@ -359,7 +359,7 @@ private:
     static constexpr const char* PROP_KEY_LOC_ENABLED {"IsOnline"};
     static constexpr const char* PROP_KEY_GPS_ENABLED {"DoesSatelliteBasedPositioning"};
 
-    UbuntuAppLocController& m_owner;
+    LocationServiceController& m_owner;
     core::Property<bool> m_gps_enabled {false};
     core::Property<bool> m_loc_enabled {false};
     core::Property<bool> m_is_valid {false};
@@ -374,40 +374,40 @@ private:
 ****
 ***/
 
-UbuntuAppLocController::UbuntuAppLocController():
+LocationServiceController::LocationServiceController():
   impl{new Impl{*this}}
 {
 }
 
-UbuntuAppLocController::~UbuntuAppLocController()
+LocationServiceController::~LocationServiceController()
 {
 }
 
 const core::Property<bool>&
-UbuntuAppLocController::is_valid() const
+LocationServiceController::is_valid() const
 {
   return impl->is_valid();
 }
 
 bool
-UbuntuAppLocController::is_gps_enabled() const
+LocationServiceController::is_gps_enabled() const
 {
   return impl->is_gps_enabled();
 }
 
 bool
-UbuntuAppLocController::is_location_service_enabled() const
+LocationServiceController::is_location_service_enabled() const
 {
   return impl->is_location_service_enabled();
 }
 void
-UbuntuAppLocController::set_gps_enabled(bool enabled)
+LocationServiceController::set_gps_enabled(bool enabled)
 {
   impl->set_gps_enabled(enabled);
 }
 
 void
-UbuntuAppLocController::set_location_service_enabled(bool enabled)
+LocationServiceController::set_location_service_enabled(bool enabled)
 {
   impl->set_location_service_enabled(enabled);
 }

@@ -17,7 +17,7 @@ add_library (${SERVICE_LIB} STATIC
   controller.cc
   phone.cc
   service.cc
-  controller-ualc.cc
+  location-service-controller.cc
   accounts-service-license-controller.cc
   license-controller.cc
 )

@@ -17,18 +17,18 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#ifndef __INDICATOR_LOCATION_CONTROLLER_UALC__H__
-#define __INDICATOR_LOCATION_CONTROLLER_UALC__H__
+#ifndef INDICATOR_LOCATION_CONTROLLER_LOCATION_SERVICE
+#define INDICATOR_LOCATION_CONTROLLER_LOCATION_SERVICE
 
 #include "controller.h"
 
 #include <memory> // std::unique_ptr
 
-class UbuntuAppLocController: public Controller
+class LocationServiceController: public Controller
 {
   public:
-    UbuntuAppLocController ();
-    virtual ~UbuntuAppLocController();
+    LocationServiceController();
+    virtual ~LocationServiceController();
 
     virtual const core::Property<bool>& is_valid() const override;
     bool is_gps_enabled () const override;
@@ -42,6 +42,5 @@ class UbuntuAppLocController: public Controller
     std::unique_ptr<Impl> impl;
 };
 
-#endif // __INDICATOR_LOCATION_CONTROLLER_UALC__H__
-
+#endif // INDICATOR_LOCATION_CONTROLLER_LOCATION_SERVICE
 
