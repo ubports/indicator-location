@@ -35,7 +35,6 @@ int
 main (int argc G_GNUC_UNUSED, char ** argv G_GNUC_UNUSED)
 {
   GMainLoop * loop;
-g_message("hello cruel world");
 
   /* boilerplate i18n */
   setlocale (LC_ALL, "");
