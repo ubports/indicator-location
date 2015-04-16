@@ -27,15 +27,6 @@
 ****
 ***/
 
-#define BUS_NAME "com.ubuntu.location.Service"
-#define OBJECT_PATH "/com/ubuntu/location/Service"
-
-#define LOC_IFACE_NAME "com.ubuntu.location.Service"
-
-#define PROP_IFACE_NAME "org.freedesktop.DBus.Properties"
-#define PROP_KEY_LOC_ENABLED "IsOnline"
-#define PROP_KEY_GPS_ENABLED "DoesSatelliteBasedPositioning"
-
 class UbuntuAppLocController::Impl
 {
 public:
@@ -48,17 +39,21 @@ public:
             g_object_unref(c);
         });
 
-        m_gps_enabled.changed().connect([this](bool b){m_owner.notify_gps_enabled(b);});
-        m_loc_enabled.changed().connect([this](bool b){m_owner.notify_location_service_enabled(b);});
+        m_gps_enabled.changed().connect([this](bool b){
+            m_owner.notify_gps_enabled(b);
+        });
 
-        g_bus_get(G_BUS_TYPE_SYSTEM, m_cancellable.get(), on_system_bus_ready, this);
+        m_loc_enabled.changed().connect([this](bool b){
+            m_owner.notify_location_service_enabled(b);
+        });
+
+        g_bus_get(G_BUS_TYPE_SYSTEM,
+                  m_cancellable.get(),
+                  on_system_bus_ready,
+                  this);
     }
 
-    ~Impl()
-    {
-        if (m_name_tag)
-            g_bus_unwatch_name(m_name_tag);
-    }
+    ~Impl() =default;
 
     const core::Property<bool>& is_valid() const
     {
@@ -87,11 +82,14 @@ public:
 
 private:
 
+    /***
+    ****  bus bootstrapping & name watching
+    ***/
+
     static void on_system_bus_ready(GObject*, GAsyncResult* res, gpointer gself)
     {
         GError* error;
         GDBusConnection* system_bus;
-g_message("%s", G_STRFUNC);
 
         error = nullptr;
         system_bus = g_bus_get_finish(res, &error);
@@ -101,84 +99,104 @@ g_message("%s", G_STRFUNC);
 
             self->m_system_bus.reset(system_bus, GObjectDeleter());
 
-            self->m_name_tag = g_bus_watch_name_on_connection(system_bus,
-                                                              BUS_NAME,
-                                                              G_BUS_NAME_WATCHER_FLAGS_AUTO_START,
-                                                              on_name_appeared,
-                                                              on_name_vanished,
-                                                              gself,
-                                                              nullptr);
+            auto name_tag = g_bus_watch_name_on_connection(
+                                system_bus,
+                                BUS_NAME,
+                                G_BUS_NAME_WATCHER_FLAGS_AUTO_START,
+                                on_name_appeared,
+                                on_name_vanished,
+                                gself,
+                                nullptr);
+
+            //  manage the name_tag's lifespan
+            self->m_name_tag.reset(new guint{name_tag}, [](guint* name_tag){
+                g_bus_unwatch_name(*name_tag);
+                delete name_tag;
+            });
         }
         else if (error != nullptr)
         {
             if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-                g_warning("Couldn't get AccountsService proxy: %s", error->message);
+                g_warning("Couldn't get system bus: %s", error->message);
             g_error_free(error);
         }
     }
 
     static void on_name_appeared(GDBusConnection * system_bus,
-                                 const gchar * bus_name,
-                                 const gchar * name_owner,
+                                 const gchar     * bus_name,
+                                 const gchar     * name_owner,
                                  gpointer gself)
     {
         auto self = static_cast<Impl*>(gself);
 
-g_message("name appeared, owner is %s", name_owner);
-        self->m_signal_tag = g_dbus_connection_signal_subscribe(system_bus,
-                                                                name_owner,
-                                                                PROP_IFACE_NAME,
-                                                                "PropertiesChanged",
-                                                                OBJECT_PATH,
-                                                                nullptr, // arg0
-                                                                G_DBUS_SIGNAL_FLAGS_NONE,
-                                                                on_properties_changed,
-                                                                gself,
-                                                                nullptr);
+        // Why do we use PropertiesChanged, Get, and Set by hand instead
+        // of letting gdbus-codegen or g_dbus_proxy_new() do the dirty work?
+        // ubuntu-location-service's GetAll method is broken; proxies aren't
+        // able to bootstrap themselves and cache the object properties. Ugh.
 
+        // subscribe to PropertiesChanged signals from the service
+        auto signal_tag = g_dbus_connection_signal_subscribe(
+                              system_bus,
+                              name_owner,
+                              PROP_IFACE_NAME,
+                              "PropertiesChanged",
+                              OBJECT_PATH,
+                              nullptr, // arg0
+                              G_DBUS_SIGNAL_FLAGS_NONE,
+                              on_properties_changed,
+                              gself,
+                              nullptr);
+
+        // manage the signal_tag lifespan
+        g_object_ref(system_bus);
+        self->m_signal_tag.reset(new guint{signal_tag},
+                                 [system_bus](guint* tag){
+            g_dbus_connection_signal_unsubscribe(system_bus, *tag);
+            g_object_unref(system_bus);
+            delete tag;
+        });
+
+        // GetAll is borked so call Get on each property we care about
         struct {
             const char * name;
             GAsyncReadyCallback callback;
-        } properties[] = {
+        } props[] = {
             { PROP_KEY_LOC_ENABLED, on_loc_enabled_reply },
             { PROP_KEY_GPS_ENABLED, on_gps_enabled_reply }
         };
-        for (const auto& prop : properties)
+        for (const auto& prop : props)
         { 
-g_message("calling Get %s", prop.name);
-            g_dbus_connection_call(system_bus,
-                                   BUS_NAME,
-                                   OBJECT_PATH,
-                                   PROP_IFACE_NAME,
-                                   "Get",
-                                   g_variant_new("(ss)", LOC_IFACE_NAME, prop.name), // args
-                                   G_VARIANT_TYPE("(v)"), // return type
-                                   G_DBUS_CALL_FLAGS_NONE,
-                                   -1, // use default timeout
-                                  self->m_cancellable.get(),
-                                  prop.callback,
-                                  gself);
+            g_dbus_connection_call(
+                system_bus,
+                BUS_NAME,
+                OBJECT_PATH,
+                PROP_IFACE_NAME,
+                "Get",
+                g_variant_new("(ss)", LOC_IFACE_NAME, prop.name), // args
+                G_VARIANT_TYPE("(v)"), // return type
+                G_DBUS_CALL_FLAGS_NONE,
+                -1, // use default timeout
+                self->m_cancellable.get(),
+                prop.callback,
+                gself);
         }
 
-g_message("setting m_is_valid to true because we have an owner");
+        g_debug("setting is_valid to true: location-service appeared");
         self->m_is_valid.set(true);
     }
 
-    static void on_name_vanished(GDBusConnection * system_bus,
-                                 const gchar*,
-                                 gpointer gself)
+    static void on_name_vanished(GDBusConnection*, const gchar*, gpointer gself)
     {
         auto self = static_cast<Impl*>(gself);
 
-        if (self->m_signal_tag)
-        {
-            g_dbus_connection_signal_unsubscribe(system_bus, self->m_signal_tag);
-            self->m_signal_tag = 0;
-        }
-
-g_message("setting m_is_valid to false because the owner disappeared");
+        g_debug("setting is_valid to false: location-service vanished");
         self->m_is_valid.set(false);
+        self->m_signal_tag.reset();
     }
+
+    /***
+    ****  org.freedesktop.dbus.properties.PropertiesChanged handling
+    ***/
 
     static void on_properties_changed(GDBusConnection * /*connection*/,
                                       const gchar     * /*sender_name*/,
@@ -193,8 +211,8 @@ g_message("setting m_is_valid to false because the owner disappeared");
         GVariant *changed_properties;
         const gchar **invalidated_properties;
         GVariantIter property_iter;
-        const gchar *property_name;
-        GVariant *property_value;
+        const gchar *key;
+        GVariant* val;
 
         g_variant_get(parameters,
                       "(&s@a{sv}^a&s)",
@@ -202,21 +220,24 @@ g_message("setting m_is_valid to false because the owner disappeared");
                       &changed_properties,
                       &invalidated_properties);
 
-g_message("got changed properties: %s", g_variant_print(parameters, true));
         g_variant_iter_init(&property_iter, changed_properties);
-        while (g_variant_iter_next(&property_iter, "{&sv}", &property_name, &property_value))
+        while (g_variant_iter_next(&property_iter, "{&sv}", &key, &val))
         {
-g_message("key{%s} value{%s}", property_name, g_variant_print(property_value, true));
-            if (!g_strcmp0(property_name, PROP_KEY_LOC_ENABLED))
-                self->m_loc_enabled.set(g_variant_get_boolean(property_value));
-            else if (!g_strcmp0(property_name, PROP_KEY_GPS_ENABLED))
-                self->m_gps_enabled.set(g_variant_get_boolean(property_value));
-            g_variant_unref(property_value);
+            if (!g_strcmp0(key, PROP_KEY_LOC_ENABLED))
+                self->m_loc_enabled.set(g_variant_get_boolean(val));
+            else if (!g_strcmp0(key, PROP_KEY_GPS_ENABLED))
+                self->m_gps_enabled.set(g_variant_get_boolean(val));
+
+            g_variant_unref(val);
         }
 
         g_variant_unref(changed_properties);
         g_free(invalidated_properties);
     }
+
+    /***
+    ****  org.freedesktop.dbus.properties.Get handling
+    ***/
 
     static std::tuple<bool,bool> get_bool_reply_from_call(GObject      * source,
                                                           GAsyncResult * res)
@@ -227,8 +248,16 @@ g_message("key{%s} value{%s}", property_name, g_variant_print(property_value, tr
         bool result;
 
         error = nullptr;
-        v = g_dbus_connection_call_finish(G_DBUS_CONNECTION(source), res, &error);
-        if (v != nullptr)
+        GDBusConnection * conn = G_DBUS_CONNECTION(source);
+        v = g_dbus_connection_call_finish(conn, res, &error);
+        if (error != nullptr)
+        {
+            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                g_warning("Error calling dbus method: %s", error->message);
+            g_error_free(error);
+            success = false;
+        }
+        else if (v != nullptr)
         {
             if (g_variant_is_of_type(v, G_VARIANT_TYPE("(v)")))
             {
@@ -236,18 +265,10 @@ g_message("key{%s} value{%s}", property_name, g_variant_print(property_value, tr
                 g_variant_get(v, "(v)", &inner);
                 success = true;
                 result = g_variant_get_boolean(inner);
-                g_message("result is %d",(int)result);
                 g_variant_unref(inner);
             }
 
             g_variant_unref(v);
-        }
-        else if (error != nullptr)
-        {
-            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-                g_warning("Error calling dbus method: %s", error->message);
-            g_error_free(error);
-            success = false;
         }
 
         return std::make_tuple(success, result);
@@ -257,34 +278,36 @@ g_message("key{%s} value{%s}", property_name, g_variant_print(property_value, tr
                                      GAsyncResult * res,
                                      gpointer       gself)
     {
-        bool success, result;
-        std::tie(success, result) = get_bool_reply_from_call(source_object, res);
-g_message("in %s, got success %d resultd %d", G_STRFUNC, (int)success, (int)result);
+        bool success, value;
+        std::tie(success, value) = get_bool_reply_from_call(source_object, res);
+        g_debug("service loc reply: success %d value %d", (int)success, (int)value);
         if (success)
-            static_cast<Impl*>(gself)->m_loc_enabled.set(result);;
+            static_cast<Impl*>(gself)->m_loc_enabled.set(value);
     }
 
     static void on_gps_enabled_reply(GObject      * source_object,
                                      GAsyncResult * res,
                                      gpointer       gself)
     {
-        bool success, result;
-        std::tie(success, result) = get_bool_reply_from_call(source_object, res);
-g_message("in %s, got success %d resultd %d", G_STRFUNC, (int)success, (int)result);
+        bool success, value;
+        std::tie(success, value) = get_bool_reply_from_call(source_object, res);
+        g_debug("service gps reply: success %d value %d", (int)success, (int)value);
         if (success)
-            static_cast<Impl*>(gself)->m_gps_enabled.set(result);;
+            static_cast<Impl*>(gself)->m_gps_enabled.set(value);
     }
 
     /***
-    ****
+    ****  org.freedesktop.dbus.properties.Set handling
     ***/
 
     void set_bool_property(const char* property_name, bool b)
     {
         g_return_if_fail(m_system_bus);
 
-        auto args = g_variant_new("(ssv)", LOC_IFACE_NAME, property_name, g_variant_new_boolean(b));
-g_message("calling Set with args: %s", g_variant_print(args, true));
+        auto args = g_variant_new("(ssv)",
+                                  LOC_IFACE_NAME,
+                                  property_name,
+                                  g_variant_new_boolean(b));
         g_dbus_connection_call(m_system_bus.get(),
                                BUS_NAME,
                                OBJECT_PATH,
@@ -299,7 +322,7 @@ g_message("calling Set with args: %s", g_variant_print(args, true));
                                this);
     }
 
-    static void check_method_call_reply(GObject      *connection,
+    static void check_method_call_reply(GObject      *oconnection,
                                         GAsyncResult *res,
                                         gpointer      gself)
     {
@@ -307,11 +330,12 @@ g_message("calling Set with args: %s", g_variant_print(args, true));
         GVariant * v;
 
         error = nullptr;
-        v = g_dbus_connection_call_finish(G_DBUS_CONNECTION(connection), res, &error);
+        auto connection = G_DBUS_CONNECTION(oconnection);
+        v = g_dbus_connection_call_finish(connection, res, &error);
         if (error != nullptr)
         {
             if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-                g_warning("DBus method call returned an error : %s", error->message);
+                g_warning("DBus method returned an error : %s", error->message);
 
             g_error_free(error);
         }
@@ -324,14 +348,26 @@ g_message("calling Set with args: %s", g_variant_print(args, true));
         }
     }
 
+    /***
+    ****
+    ***/
+
+    static constexpr const char* BUS_NAME {"com.ubuntu.location.Service"};
+    static constexpr const char* OBJECT_PATH {"/com/ubuntu/location/Service"};
+    static constexpr const char* LOC_IFACE_NAME {"com.ubuntu.location.Service"};
+    static constexpr const char* PROP_IFACE_NAME {"org.freedesktop.DBus.Properties"};
+    static constexpr const char* PROP_KEY_LOC_ENABLED {"IsOnline"};
+    static constexpr const char* PROP_KEY_GPS_ENABLED {"DoesSatelliteBasedPositioning"};
+
     UbuntuAppLocController& m_owner;
-    std::shared_ptr<GCancellable> m_cancellable {};
-    std::shared_ptr<GDBusConnection> m_system_bus {};
     core::Property<bool> m_gps_enabled {false};
     core::Property<bool> m_loc_enabled {false};
     core::Property<bool> m_is_valid {false};
-    guint m_name_tag {};
-    guint m_signal_tag {};
+
+    std::shared_ptr<GCancellable> m_cancellable {};
+    std::shared_ptr<GDBusConnection> m_system_bus {};
+    std::shared_ptr<guint> m_name_tag {};
+    std::shared_ptr<guint> m_signal_tag {};
 };
 
 /***
