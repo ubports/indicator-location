@@ -13,8 +13,8 @@ Build-Depends: cmake,
                libgtest-dev,
                libubuntu-app-launch2-dev,
                liburl-dispatcher1-dev,
-               libubuntu-application-api-dev,
                python,
+               libproperties-cpp-dev,
 Standards-Version: 3.9.4
 Homepage: http://launchpad.net/indicator-location/
 # If you aren't a member of ~indicator-applet-developers but need to upload 

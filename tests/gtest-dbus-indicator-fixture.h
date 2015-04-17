@@ -181,6 +181,13 @@ class GTestDBusIndicatorFixture: public GTestDBusFixture
       g_free (signal_name);
     }
 
+    void wait_for_action_enabled_change (const gchar * action_name)
+    {
+      gchar * signal_name = g_strdup_printf ("action-enabled-changed::%s", action_name);
+      wait_for_signal (action_group, signal_name);
+      g_free (signal_name);
+    }
+
   protected:
 
     bool find_menu_item_for_action (const char * action_key, GMenuModel ** setme, int * item_index)

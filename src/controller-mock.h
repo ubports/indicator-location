@@ -26,10 +26,11 @@ class MockController: public Controller
 {
   public:
 
-    MockController (): valid(true), gps(false), loc(false) { }
-    virtual ~MockController() { }
+    MockController() =default;
+    virtual ~MockController() =default;
 
-    bool is_valid () const { return valid; }
+    core::Property<bool>& is_valid() { return m_is_valid; }
+    const core::Property<bool>& is_valid() const override { return m_is_valid; }
     bool is_gps_enabled () const { return gps; }
     bool is_location_service_enabled () const { return loc; }
 
@@ -38,9 +39,9 @@ class MockController: public Controller
 
   private:
 
-    bool valid;
-    bool gps;
-    bool loc;
+    core::Property<bool> m_is_valid {true};
+    bool gps { false };
+    bool loc { false };
 };
 
 #endif // __INDICATOR_LOCATION_CONTROLLER_MOCK__H__
