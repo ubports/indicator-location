@@ -38,11 +38,11 @@ public:
             g_object_unref(c);
         });
 
-        m_gps_enabled.changed().connect([owner](bool b){
+        m_gps_enabled.changed().connect([&owner](bool b){
             owner.notify_gps_enabled(b);
         });
 
-        m_loc_enabled.changed().connect([owner](bool b){
+        m_loc_enabled.changed().connect([&owner](bool b){
             owner.notify_location_service_enabled(b);
         });
 
@@ -243,23 +243,19 @@ private:
     {
         GError * error;
         GVariant * v;
-        bool success;
-        bool result;
+        bool success {false};
+        bool result {false};
 
         error = nullptr;
         GDBusConnection * conn = G_DBUS_CONNECTION(source);
         v = g_dbus_connection_call_finish(conn, res, &error);
         if (v != nullptr)
         {
-            if (g_variant_is_of_type(v, G_VARIANT_TYPE("(v)")))
-            {
-                GVariant* inner {};
-                g_variant_get(v, "(v)", &inner);
-                success = true;
-                result = g_variant_get_boolean(inner);
-                g_variant_unref(inner);
-            }
-
+            GVariant* inner {};
+            g_variant_get(v, "(v)", &inner);
+            success = true;
+            result = g_variant_get_boolean(inner);
+            g_variant_unref(inner);
             g_variant_unref(v);
         }
         else if (error != nullptr)
