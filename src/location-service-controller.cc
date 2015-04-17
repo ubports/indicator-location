@@ -317,7 +317,7 @@ private:
                                this);
     }
 
-    static void check_method_call_reply(GObject      *oconnection,
+    static void check_method_call_reply(GObject      *connection,
                                         GAsyncResult *res,
                                         gpointer      gself)
     {
@@ -325,8 +325,7 @@ private:
         GVariant * v;
 
         error = nullptr;
-        auto connection = G_DBUS_CONNECTION(oconnection);
-        v = g_dbus_connection_call_finish(connection, res, &error);
+        v = g_dbus_connection_call_finish(G_DBUS_CONNECTION(connection), res, &error);
         if (v != nullptr)
         {
             auto vs = g_variant_print(v, true);
