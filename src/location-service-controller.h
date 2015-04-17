@@ -36,6 +36,9 @@ class LocationServiceController: public Controller
     void set_gps_enabled (bool enabled) override;
     void set_location_service_enabled (bool enabled) override;
 
+    LocationServiceController(const LocationServiceController&) =delete;
+    LocationServiceController& operator=(const LocationServiceController&) =delete;
+
   private:
     friend class Impl;
     class Impl;
