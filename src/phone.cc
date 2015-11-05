@@ -327,8 +327,7 @@ Phone :: create_menu ()
   /* populate the submenu */
   rebuild_submenu();
 
-  // disabled for 13.04 -- the location settings panel isn't complete
-  // g_menu_append (submenu, _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::location");
+  g_menu_append (submenu.get(), _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::security-privacy");
 
   /* add the submenu to a new header */
   header = g_menu_item_new (nullptr, "indicator." HEADER_ACTION_KEY);
@@ -358,10 +357,4 @@ Phone::rebuild_submenu()
     g_menu_append(submenu.get(), _("View HERE terms and conditions"),
                   "indicator." LICENCE_ACTION_KEY);
   }
-
-  GMenuItem * gps = g_menu_item_new(_("GPS"), "indicator." GPS_ACTION_KEY);
-  g_menu_item_set_attribute(gps, "x-canonical-type", "s",
-                            "com.canonical.indicator.switch");
-  g_menu_append_item(submenu.get(), gps);
-  g_object_unref(gps);
 }

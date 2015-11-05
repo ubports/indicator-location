@@ -97,8 +97,8 @@ TEST_F (PhoneTest, ActionsExit)
 TEST_F (PhoneTest, MenuitemsExist)
 {
   ASSERT_TRUE (action_menuitem_exists ("indicator.location-detection-enabled"));
-  ASSERT_TRUE (action_menuitem_exists ("indicator.gps-detection-enabled"));
-  //ASSERT_TRUE (action_menuitem_exists ("indicator.settings"));
+  ASSERT_FALSE (action_menuitem_exists ("indicator.gps-detection-enabled"));
+  ASSERT_TRUE (action_menuitem_exists ("indicator.settings"));
 }
 
 TEST_F (PhoneTest, IsValidEnabled)
