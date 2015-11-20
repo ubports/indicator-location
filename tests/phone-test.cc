@@ -125,9 +125,9 @@ TEST_F (PhoneTest, IsValidEnabled)
 TEST_F (PhoneTest, IsValidVisible)
 {
   // make sure something's enabled so that the indicator should be visible
-  if (!myController->is_gps_enabled()) {
-    myController->set_gps_enabled(true);
-    wait_for_action_state_change("gps-detection-enabled");
+  if (!myController->is_location_service_enabled()) {
+    myController->set_location_service_enabled(true);
+    wait_for_action_state_change("location-detection-enabled");
   }
 
   // test the header's 'invisible' entry tracks the controller's is_valid() state
@@ -327,7 +327,7 @@ TEST_F (PhoneTest, Header)
     bool expected_visible;
   } visibility_tests[] = {
     { false, false, false },
-    { true,  false, true },
+    { true,  false, false },
     { false, true,  true },
     { true,  true,  true }
   };

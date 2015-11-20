@@ -77,9 +77,8 @@ Phone :: should_be_visible () const
     return false;
 
   // as per "Indicators - RTM Usability Fix" document:
-  // visible iff location and/or GPS is enabled
-  return controller->is_location_service_enabled()
-      || controller->is_gps_enabled();
+  // visible iff location is enabled
+  return controller->is_location_service_enabled();
 }
 
 GVariant *
@@ -176,7 +175,7 @@ Phone :: on_detection_location_activated (GSimpleAction * action,
 {
   GVariant * state = g_action_get_state (G_ACTION (action));
   static_cast<Phone*>(gself)->controller->set_location_service_enabled (!g_variant_get_boolean (state));
-  if (!g_variant_get_boolean (state) == false) {
+  if (g_variant_get_boolean (state)) {
   	static_cast<Phone*>(gself)->controller->set_gps_enabled (!g_variant_get_boolean (state));
   }
   g_variant_unref (state);
