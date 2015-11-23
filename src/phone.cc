@@ -176,7 +176,7 @@ Phone :: on_detection_location_activated (GSimpleAction * action,
   GVariant * state = g_action_get_state (G_ACTION (action));
   static_cast<Phone*>(gself)->controller->set_location_service_enabled (!g_variant_get_boolean (state));
   if (g_variant_get_boolean (state)) {
-  	static_cast<Phone*>(gself)->controller->set_gps_enabled (!g_variant_get_boolean (state));
+      static_cast<Phone*>(gself)->controller->set_gps_enabled (!g_variant_get_boolean (state));
   }
   g_variant_unref (state);
 }
@@ -329,8 +329,6 @@ Phone :: create_menu ()
   /* populate the submenu */
   rebuild_submenu();
 
-  g_menu_append (submenu.get(), _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::security-privacy");
-
   /* add the submenu to a new header */
   header = g_menu_item_new (nullptr, "indicator." HEADER_ACTION_KEY);
   g_menu_item_set_attribute (header, "x-canonical-type", "s", "com.canonical.indicator.root");
@@ -359,4 +357,6 @@ Phone::rebuild_submenu()
     g_menu_append(submenu.get(), _("View HERE terms and conditions"),
                   "indicator." LICENCE_ACTION_KEY);
   }
+
+  g_menu_append (submenu.get(), _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::security-privacy");
 }
