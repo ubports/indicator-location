@@ -77,9 +77,8 @@ Phone :: should_be_visible () const
     return false;
 
   // as per "Indicators - RTM Usability Fix" document:
-  // visible iff location and/or GPS is enabled
-  return controller->is_location_service_enabled()
-      || controller->is_gps_enabled();
+  // visible iff location is enabled
+  return controller->is_location_service_enabled();
 }
 
 GVariant *
@@ -327,9 +326,6 @@ Phone :: create_menu ()
   /* populate the submenu */
   rebuild_submenu();
 
-  // disabled for 13.04 -- the location settings panel isn't complete
-  // g_menu_append (submenu, _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::location");
-
   /* add the submenu to a new header */
   header = g_menu_item_new (nullptr, "indicator." HEADER_ACTION_KEY);
   g_menu_item_set_attribute (header, "x-canonical-type", "s", "com.canonical.indicator.root");
@@ -359,9 +355,5 @@ Phone::rebuild_submenu()
                   "indicator." LICENCE_ACTION_KEY);
   }
 
-  GMenuItem * gps = g_menu_item_new(_("GPS"), "indicator." GPS_ACTION_KEY);
-  g_menu_item_set_attribute(gps, "x-canonical-type", "s",
-                            "com.canonical.indicator.switch");
-  g_menu_append_item(submenu.get(), gps);
-  g_object_unref(gps);
+  g_menu_append (submenu.get(), _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::security-privacy");
 }
