@@ -17,7 +17,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifndef __INDICATOR_LOCATION_UTILS_H__
+#define __INDICATOR_LOCATION_UTILS_H__
 
 #include <glib.h>
 #include <gio/gio.h>
@@ -31,4 +32,6 @@ struct GObjectDeleter
   void operator()(GDBusConnection    * o) { operator()(G_OBJECT(o)); }
   void operator()(GSimpleActionGroup * o) { operator()(G_OBJECT(o)); }
 };
+
+#endif /* __INDICATOR_LOCATION_UTILS_H__ */
 

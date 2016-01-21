@@ -17,7 +17,8 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#pragma once
+#ifndef __INDICATOR_LOCATION_CONTROLLER_H__
+#define __INDICATOR_LOCATION_CONTROLLER_H__
 
 #include <core/property.h>
 
@@ -37,3 +38,4 @@ public:
     virtual void set_location_service_enabled (bool enabled) =0;
 };
 
+#endif // __INDICATOR_LOCATION_CONTROLLER_H__

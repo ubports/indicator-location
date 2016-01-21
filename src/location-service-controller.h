@@ -17,7 +17,8 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#pragma once
+#ifndef INDICATOR_LOCATION_CONTROLLER_LOCATION_SERVICE
+#define INDICATOR_LOCATION_CONTROLLER_LOCATION_SERVICE
 
 #include "controller.h" // parent class
 
@@ -43,4 +44,6 @@ private:
     class Impl;
     std::unique_ptr<Impl> impl;
 };
+
+#endif // INDICATOR_LOCATION_CONTROLLER_LOCATION_SERVICE
 

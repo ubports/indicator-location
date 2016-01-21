@@ -17,7 +17,8 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#pragma once
+#ifndef __INDICATOR_LOCATION_PHONE_H__
+#define __INDICATOR_LOCATION_PHONE_H__
 
 #include <memory>
 #include <vector>
@@ -75,3 +76,4 @@ class Phone
     GSimpleAction * create_licence_action ();
 };
 
+#endif /* __INDICATOR_LOCATION_PHONE_H__ */

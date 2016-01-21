@@ -17,7 +17,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifndef __INDICATOR_LOCATION_SERVICE_H__
+#define __INDICATOR_LOCATION_SERVICE_H__
 
 #include <memory>
 #include <set>
@@ -58,4 +59,6 @@ class Service
     static void on_name_lost (GDBusConnection*, const char*, gpointer);
     static void on_bus_acquired (GDBusConnection*, const char*, gpointer);
 };
+
+#endif /* __INDICATOR_LOCATION_SERVICE_H__ */
 
