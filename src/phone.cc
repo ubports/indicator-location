@@ -40,7 +40,6 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
   create_menu ();
 
   auto on_gps = [this](bool enabled){
-    g_message("gps enabled: %d", int(enabled));
     update_gps_enabled_action();
     update_header();
   };
@@ -49,7 +48,6 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
   );
 
   auto on_loc = [this](bool enabled){
-    g_message("loc enabled: %d", int(enabled));
     update_detection_enabled_action();
     update_header();
   };
@@ -58,7 +56,6 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
   );
 
   auto on_valid = [this](bool valid){
-    g_message("is_valid: %d", int(valid));
     update_actions_enabled();
   };
   controller_connections.push_back(
