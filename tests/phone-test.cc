@@ -21,12 +21,11 @@
 #define INDICATOR_PROFILE "phone"
 #include "gtest-dbus-indicator-fixture.h"
 
+#include "controller-mock.h"
 #include "src/dbus-shared.h"
-#include "src/controller-mock.h"
 #include "src/service.h"
 
-class PhoneTest: public GTestDBusIndicatorFixture,
-                 public ControllerListener
+class PhoneTest: public GTestDBusIndicatorFixture
 {
   protected:
 
@@ -37,6 +36,7 @@ class PhoneTest: public GTestDBusIndicatorFixture,
 
     std::shared_ptr<MockController> myController;
     std::shared_ptr<Service> myService;
+    std::vector<core::ScopedConnection> myConnections;
 
   public:
 
@@ -72,14 +72,27 @@ class PhoneTest: public GTestDBusIndicatorFixture,
     virtual void setup_service ()
     {
       myController.reset (new MockController ());
-      myController->add_listener (this);
       myService.reset (new Service (myController));
+
+      myConnections.push_back(
+        myController->gps_enabled().changed().connect([this](bool enabled){
+          gps_enabled_changed = true;
+          gps_enabled = enabled;
+        })
+      );
+
+      myConnections.push_back(
+        myController->location_service_enabled().changed().connect([this](bool enabled){
+          loc_enabled_changed = true;
+          loc_enabled = enabled;
+        })
+      );
     }
 
     virtual void teardown_service ()
     {
       myService.reset ();
-      myController->remove_listener (this);
+      myConnections.clear ();
       myController.reset ();
     }
 };
@@ -123,7 +136,7 @@ TEST_F (PhoneTest, IsValidEnabled)
 TEST_F (PhoneTest, IsValidVisible)
 {
   // make sure something's enabled so that the indicator should be visible
-  if (!myController->is_location_service_enabled()) {
+  if (!myController->location_service_enabled().get()) {
     myController->set_location_service_enabled(true);
     wait_for_action_state_change("location-detection-enabled");
   }
