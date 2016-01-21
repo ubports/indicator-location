@@ -38,14 +38,6 @@ public:
             g_object_unref(c);
         });
 
-        m_gps_enabled.changed().connect([&owner](bool b){
-            owner.notify_gps_enabled(b);
-        });
-
-        m_loc_enabled.changed().connect([&owner](bool b){
-            owner.notify_location_service_enabled(b);
-        });
-
         g_bus_get(G_BUS_TYPE_SYSTEM,
                   m_cancellable.get(),
                   on_system_bus_ready,
@@ -59,14 +51,14 @@ public:
         return m_is_valid;
     }
 
-    bool is_gps_enabled() const
+    const core::Property<bool>& gps_enabled() const
     {
-        return m_gps_enabled.get();
+        return m_gps_enabled;
     }
 
-    bool is_location_service_enabled() const
+    const core::Property<bool>& location_service_enabled() const
     {
-        return m_loc_enabled.get();
+        return m_loc_enabled;
     }
 
     void set_gps_enabled(bool enabled)
@@ -382,17 +374,18 @@ LocationServiceController::is_valid() const
   return impl->is_valid();
 }
 
-bool
-LocationServiceController::is_gps_enabled() const
+const core::Property<bool>&
+LocationServiceController::gps_enabled() const
 {
-  return impl->is_gps_enabled();
+  return impl->gps_enabled();
 }
 
-bool
-LocationServiceController::is_location_service_enabled() const
+const core::Property<bool>&
+LocationServiceController::location_service_enabled() const
 {
-  return impl->is_location_service_enabled();
+  return impl->location_service_enabled();
 }
+
 void
 LocationServiceController::set_gps_enabled(bool enabled)
 {

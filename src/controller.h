@@ -19,47 +19,21 @@
 
 #pragma once
 
-#include <set>
-
 #include <core/property.h>
-
-class ControllerListener
-{
-  public:
-    ControllerListener() {}
-    virtual ~ControllerListener() {}
-
-  public:
-    virtual void on_gps_enabled_changed (bool is_enabled) = 0;
-    virtual void on_location_service_enabled_changed (bool is_enabled) = 0;
-};
 
 class Controller
 {
-  public:
-
-    Controller () {}
-    virtual ~Controller() {}
-
-    void add_listener (ControllerListener *);
-    void remove_listener (ControllerListener *);
+public:
+    Controller() =default;
+    virtual ~Controller() =default;
 
     /// True iff we've gotten status info from the location service
     virtual const core::Property<bool>& is_valid() const =0;
 
-    virtual bool is_gps_enabled () const = 0;
-    virtual bool is_location_service_enabled () const = 0;
+    virtual const core::Property<bool>& gps_enabled() const =0;
+    virtual const core::Property<bool>& location_service_enabled() const =0;
 
-    virtual void set_gps_enabled (bool enabled) = 0;
-    virtual void set_location_service_enabled (bool enabled) = 0;
-
-  private:
-
-    std::set<ControllerListener*> listeners;
-
-  protected:
-
-    void notify_gps_enabled (bool);
-    void notify_location_service_enabled (bool);
+    virtual void set_gps_enabled (bool enabled) =0;
+    virtual void set_location_service_enabled (bool enabled) =0;
 };
 
