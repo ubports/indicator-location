@@ -18,8 +18,6 @@ add_library (${SERVICE_LIB} STATIC
   phone.cc
   service.cc
   location-service-controller.cc
-  accounts-service-license-controller.cc
-  license-controller.cc
 )
 include_directories (${CMAKE_SOURCE_DIR})
 link_directories (${SERVICE_DEPS_LIBRARY_DIRS})

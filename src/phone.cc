@@ -33,22 +33,18 @@
 #define GPS_ACTION_KEY "gps-detection-enabled"
 
 Phone :: Phone (const std::shared_ptr<Controller>& controller_,
-                const std::shared_ptr<LicenseController>& license_controller_,
                 const std::shared_ptr<GSimpleActionGroup>& action_group_):
   controller (controller_),
-  license_controller (license_controller_),
   action_group (action_group_)
 {
   create_menu ();
   controller->add_listener (this);
-  license_controller->add_listener (this);
 
   /* create the actions & add them to the group */
-  std::array<GSimpleAction*, 5> actions = { create_root_action(),
+  std::array<GSimpleAction*, 4> actions = { create_root_action(),
                                             create_detection_enabled_action(),
                                             create_gps_enabled_action(),
-                                            create_settings_action(),
-                                            create_licence_action() };
+                                            create_settings_action() };
   for (auto a : actions)
     {
       g_action_map_add_action (G_ACTION_MAP(action_group.get()), G_ACTION(a));
@@ -63,7 +59,6 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
 Phone :: ~Phone ()
 {
   controller->remove_listener (this);
-  license_controller->remove_listener (this);
 }
 
 /***
@@ -158,17 +153,6 @@ Phone :: on_location_service_enabled_changed (bool is_enabled G_GNUC_UNUSED)
 }
 
 void
-Phone::on_license_accepted_changed(bool license_accepted)
-{
-  rebuild_submenu();
-}
-
-void
-Phone::on_license_path_changed(const std::string & license_path)
-{
-}
-
-void
 Phone :: on_detection_location_activated (GSimpleAction * action,
                                           GVariant      * parameter G_GNUC_UNUSED,
                                           gpointer        gself)
@@ -232,39 +216,6 @@ Phone :: create_gps_enabled_action ()
 
   g_signal_connect (action, "activate",
                     G_CALLBACK(on_detection_gps_activated), this);
-
-  return action;
-}
-
-/***
-****
-***/
-
-#define LICENCE_ACTION_KEY "licence"
-
-namespace
-{
-  void
-  on_licence_activated (GSimpleAction * simple      G_GNUC_UNUSED,
-                         GVariant      * parameter,
-                         gpointer        user_data   G_GNUC_UNUSED)
-  {
-    LicenseController * license_controller = static_cast<LicenseController *>(user_data);
-    std::string path = license_controller->license_path();
-    const gchar * urls[2] = {path.c_str(), nullptr};
-    ubuntu_app_launch_start_application("webbrowser-app", urls);
-  }
-}
-
-GSimpleAction *
-Phone :: create_licence_action ()
-{
-  GSimpleAction * action;
-
-  action = g_simple_action_new (LICENCE_ACTION_KEY, nullptr);
-
-  g_signal_connect(action, "activate", G_CALLBACK(on_licence_activated),
-                   static_cast<void *>(license_controller.get()));
 
   return action;
 }
@@ -348,12 +299,6 @@ Phone::rebuild_submenu()
                             "com.canonical.indicator.switch");
   g_menu_append_item(submenu.get(), location);
   g_object_unref(location);
-
-  if (license_controller->license_accepted())
-  {
-    g_menu_append(submenu.get(), _("View HERE terms and conditions"),
-                  "indicator." LICENCE_ACTION_KEY);
-  }
 
   g_menu_append (submenu.get(), _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::security-privacy");
 }
