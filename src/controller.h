@@ -17,8 +17,7 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#ifndef __INDICATOR_LOCATION_CONTROLLER_H__
-#define __INDICATOR_LOCATION_CONTROLLER_H__
+#pragma once
 
 #include <set>
 
@@ -64,4 +63,3 @@ class Controller
     void notify_location_service_enabled (bool);
 };
 
-#endif // __INDICATOR_LOCATION_CONTROLLER_H__

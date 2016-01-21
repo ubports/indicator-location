@@ -17,8 +17,7 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#ifndef __INDICATOR_LOCATION_CONTROLLER_MOCK__H__
-#define __INDICATOR_LOCATION_CONTROLLER_MOCK__H__
+#pragma once
 
 #include "controller.h"
 
@@ -43,7 +42,4 @@ class MockController: public Controller
     bool gps { false };
     bool loc { false };
 };
-
-#endif // __INDICATOR_LOCATION_CONTROLLER_MOCK__H__
-
 
