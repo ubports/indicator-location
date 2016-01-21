@@ -14,7 +14,6 @@ SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g ${CXX_WARNING_ARGS} ${GCO
 ###
 
 add_library (${SERVICE_LIB} STATIC
-  controller.cc
   phone.cc
   service.cc
   location-service-controller.cc

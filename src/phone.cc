@@ -38,7 +38,32 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
   action_group (action_group_)
 {
   create_menu ();
-  controller->add_listener (this);
+
+  auto on_gps = [this](bool enabled){
+    g_message("gps enabled: %d", (int)enabled);
+    update_gps_enabled_action();
+    update_header();
+  };
+  controller_connections.push_back(
+    controller->gps_enabled().changed().connect(on_gps)
+  );
+
+  auto on_loc = [this](bool enabled){
+    g_message("loc enabled: %d", (int)enabled);
+    update_detection_enabled_action();
+    update_header();
+  };
+  controller_connections.push_back(
+    controller->location_service_enabled().changed().connect(on_loc)
+  );
+
+  auto on_valid = [this](bool valid){
+    g_message("is_valid: %d", int(valid));
+    update_actions_enabled();
+  };
+  controller_connections.push_back(
+    controller->is_valid().changed().connect(on_valid)
+  ); 
 
   /* create the actions & add them to the group */
   std::array<GSimpleAction*, 4> actions = { create_root_action(),
@@ -51,14 +76,11 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
       g_object_unref (a);
     }
 
-  // the profile should track whether the controller is valid or not
-  controller->is_valid().changed().connect([this](bool){on_is_valid_changed();});
-  on_is_valid_changed();
+  update_actions_enabled();
 }
 
 Phone :: ~Phone ()
 {
-  controller->remove_listener (this);
 }
 
 /***
@@ -73,7 +95,7 @@ Phone :: should_be_visible () const
 
   // as per "Indicators - RTM Usability Fix" document:
   // visible iff location is enabled
-  return controller->is_location_service_enabled();
+  return controller->location_service_enabled().get();
 }
 
 GVariant *
@@ -123,7 +145,7 @@ Phone::update_header()
 }
 
 void
-Phone :: on_is_valid_changed()
+Phone :: update_actions_enabled()
 {
   const auto map = G_ACTION_MAP(action_group.get());
   const bool is_valid = controller->is_valid().get();
@@ -141,15 +163,7 @@ Phone :: on_is_valid_changed()
 GVariant *
 Phone :: action_state_for_location_detection ()
 {
-  return g_variant_new_boolean (controller->is_location_service_enabled());
-}
-
-void
-Phone :: on_location_service_enabled_changed (bool is_enabled G_GNUC_UNUSED)
-{
-  GAction * action = g_action_map_lookup_action (G_ACTION_MAP(action_group.get()), LOCATION_ACTION_KEY);
-  g_simple_action_set_state (G_SIMPLE_ACTION(action), action_state_for_location_detection());
-  update_header();
+  return g_variant_new_boolean (controller->location_service_enabled().get());
 }
 
 void
@@ -177,6 +191,13 @@ Phone :: create_detection_enabled_action ()
   return action;
 }
 
+void
+Phone::update_detection_enabled_action()
+{
+  GAction * action = g_action_map_lookup_action (G_ACTION_MAP(action_group.get()), LOCATION_ACTION_KEY);
+  g_simple_action_set_state (G_SIMPLE_ACTION(action), action_state_for_location_detection());
+}
+
 /***
 ****
 ***/
@@ -184,15 +205,7 @@ Phone :: create_detection_enabled_action ()
 GVariant *
 Phone :: action_state_for_gps_detection ()
 {
-  return g_variant_new_boolean (controller->is_gps_enabled());
-}
-
-void
-Phone :: on_gps_enabled_changed (bool is_enabled G_GNUC_UNUSED)
-{
-  GAction * action = g_action_map_lookup_action (G_ACTION_MAP(action_group.get()), GPS_ACTION_KEY);
-  g_simple_action_set_state (G_SIMPLE_ACTION(action), action_state_for_gps_detection());
-  update_header();
+  return g_variant_new_boolean (controller->gps_enabled().get());
 }
 
 void
@@ -206,7 +219,7 @@ Phone :: on_detection_gps_activated (GSimpleAction * action,
 }
 
 GSimpleAction *
-Phone :: create_gps_enabled_action ()
+Phone :: create_gps_enabled_action()
 {
   GSimpleAction * action;
 
@@ -218,6 +231,13 @@ Phone :: create_gps_enabled_action ()
                     G_CALLBACK(on_detection_gps_activated), this);
 
   return action;
+}
+
+void
+Phone::update_gps_enabled_action()
+{
+  GAction * action = g_action_map_lookup_action (G_ACTION_MAP(action_group.get()), GPS_ACTION_KEY);
+  g_simple_action_set_state (G_SIMPLE_ACTION(action), action_state_for_gps_detection());
 }
 
 /***

@@ -20,13 +20,14 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <glib.h>
 #include <gio/gio.h>
 
 #include "controller.h"
 
-class Phone: public ControllerListener
+class Phone
 {
   public:
     Phone (const std::shared_ptr<Controller>& controller,
@@ -36,9 +37,7 @@ class Phone: public ControllerListener
 
   protected:
     std::shared_ptr<Controller> controller;
-    virtual void on_is_valid_changed();
-    virtual void on_gps_enabled_changed (bool is_enabled);
-    virtual void on_location_service_enabled_changed (bool is_enabled);
+    std::vector<core::ScopedConnection> controller_connections;
 
   private:
     std::shared_ptr<GMenu> menu;
@@ -54,15 +53,19 @@ class Phone: public ControllerListener
     GVariant * action_state_for_root () const;
     GSimpleAction * create_root_action ();
     void update_header();
+    void update_actions_enabled();
 
   private:
     GVariant * action_state_for_location_detection ();
     GSimpleAction * create_detection_enabled_action ();
+    void update_detection_enabled_action();
     static void on_detection_location_activated (GSimpleAction*, GVariant*, gpointer);
+
 
   private:
     GVariant * action_state_for_gps_detection ();
     GSimpleAction * create_gps_enabled_action ();
+    void update_gps_enabled_action();
     static void on_detection_gps_activated (GSimpleAction*, GVariant*, gpointer);
 
   private:
