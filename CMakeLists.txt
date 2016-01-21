@@ -35,7 +35,8 @@ pkg_check_modules (SERVICE_DEPS REQUIRED
                    ubuntu-app-launch-2
                    url-dispatcher-1
                    gio-unix-2.0>=2.36
-                   glib-2.0>=2.36)
+                   glib-2.0>=2.36
+                   properties-cpp>=0.0.1)
 include_directories (SYSTEM ${SERVICE_DEPS_INCLUDE_DIRS})
 
 ##
