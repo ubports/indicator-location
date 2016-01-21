@@ -40,7 +40,7 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
   create_menu ();
 
   auto on_gps = [this](bool enabled){
-    g_message("gps enabled: %d", (int)enabled);
+    g_message("gps enabled: %d", int(enabled));
     update_gps_enabled_action();
     update_header();
   };
@@ -49,7 +49,7 @@ Phone :: Phone (const std::shared_ptr<Controller>& controller_,
   );
 
   auto on_loc = [this](bool enabled){
-    g_message("loc enabled: %d", (int)enabled);
+    g_message("loc enabled: %d", int(enabled));
     update_detection_enabled_action();
     update_header();
   };
@@ -250,7 +250,7 @@ namespace
 {
   void
   on_uri_dispatched (const gchar * uri,
-                     gboolean      success     G_GNUC_UNUSED,
+                     gboolean      success,
                      gpointer      user_data   G_GNUC_UNUSED)
   {
     if (!success)

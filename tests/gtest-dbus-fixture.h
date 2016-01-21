@@ -57,7 +57,7 @@ class GTestDBusFixture : public ::testing::Test
     static gboolean
     wait_for_signal__timeout (gpointer name)
     {
-      g_error ("%s: timed out waiting for signal '%s'", G_STRLOC, (char*)name);
+      g_error ("%s: timed out waiting for signal '%s'", G_STRLOC, name);
       return G_SOURCE_REMOVE;
     }
 
@@ -113,7 +113,7 @@ class GTestDBusFixture : public ::testing::Test
   protected:
 
     /* convenience func to loop while waiting for a GObject's signal */
-    void wait_for_signal(gpointer o, const gchar * signal, const int timeout_seconds=5)
+    void wait_for_signal(gpointer o, const gchar * signal, const guint timeout_seconds=5)
     {
       // wait for the signal or for timeout, whichever comes first
       const auto handler_id = g_signal_connect_swapped(o, signal,
@@ -128,7 +128,7 @@ class GTestDBusFixture : public ::testing::Test
     }
 
     /* convenience func to loop for N msec */
-    void wait_msec(int msec=50)
+    void wait_msec(guint msec=50)
     {
       const auto id = g_timeout_add(msec, wait_msec__timeout, loop);
       g_main_loop_run(loop);

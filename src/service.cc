@@ -84,44 +84,44 @@ Service :: unexport ()
 ***/
 
 void
-Service :: on_name_lost (GDBusConnection * connection,
+Service :: on_name_lost (GDBusConnection * conn,
                          const char      * name,
                          gpointer          gself)
 {
-  g_debug ("%s::%s: %s %p", G_STRLOC, G_STRFUNC, name, connection);
+  g_debug ("%s::%s: %s %p", G_STRLOC, G_STRFUNC, name, conn);
 
-  static_cast<Service*>(gself)->on_name_lost (connection, name);
+  static_cast<Service*>(gself)->on_name_lost (conn, name);
 }
 void
-Service :: on_name_lost (GDBusConnection * connection,
+Service :: on_name_lost (GDBusConnection * conn,
                          const char      * name)
 {
-  g_debug ("%s::%s: %s %p", G_STRLOC, G_STRFUNC, name, connection);
+  g_debug ("%s::%s: %s %p", G_STRLOC, G_STRFUNC, name, conn);
 
   if (name_lost_callback != nullptr)
     (name_lost_callback)(this, name_lost_user_data);
 }
 
 void
-Service :: on_bus_acquired (GDBusConnection * connection,
+Service :: on_bus_acquired (GDBusConnection * conn,
                             const char      * name,
                             gpointer          gself)
 {
-  static_cast<Service*>(gself)->on_bus_acquired (connection, name);
+  static_cast<Service*>(gself)->on_bus_acquired (conn, name);
 }
 void
-Service :: on_bus_acquired (GDBusConnection * connection,
+Service :: on_bus_acquired (GDBusConnection * conn,
                             const char * name)
 {
-  g_debug ("%s::%s: %s %p", G_STRLOC, G_STRFUNC, name, connection);
+  g_debug ("%s::%s: %s %p", G_STRLOC, G_STRFUNC, name, conn);
 
-  this->connection.reset (G_DBUS_CONNECTION (g_object_ref(connection)));
+  this->connection.reset (G_DBUS_CONNECTION (g_object_ref(conn)));
 
   GError * error = nullptr;
 
   /* export the action group */
 
-  unsigned int export_id = g_dbus_connection_export_action_group (connection,
+  unsigned int export_id = g_dbus_connection_export_action_group (conn,
                                                                   INDICATOR_OBJECT_PATH,
                                                                   G_ACTION_GROUP (action_group.get()),
                                                                   &error);
@@ -146,7 +146,7 @@ Service :: on_bus_acquired (GDBusConnection * connection,
 
   for (unsigned int i=0, n=G_N_ELEMENTS(menus); i<n; i++)
     { 
-      export_id = g_dbus_connection_export_menu_model (connection,
+      export_id = g_dbus_connection_export_menu_model (conn,
                                                        menus[i].path,
                                                        G_MENU_MODEL (menus[i].menu.get()),
                                                        &error);

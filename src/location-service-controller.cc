@@ -31,7 +31,7 @@ class LocationServiceController::Impl
 {
 public:
 
-    Impl(LocationServiceController& owner)
+    Impl()
     {
         m_cancellable.reset(g_cancellable_new(), [](GCancellable* c) {
             g_cancellable_cancel(c);
@@ -100,9 +100,9 @@ private:
                                 nullptr);
 
             //  manage the name_tag's lifespan
-            self->m_name_tag.reset(new guint{name_tag}, [](guint* name_tag){
-                g_bus_unwatch_name(*name_tag);
-                delete name_tag;
+            self->m_name_tag.reset(new guint{name_tag}, [](guint* tag){
+                g_bus_unwatch_name(*tag);
+                delete tag;
             });
         }
         else if (error != nullptr)
@@ -114,9 +114,9 @@ private:
     }
 
     static void on_name_appeared(GDBusConnection * system_bus,
-                                 const gchar     * bus_name,
+                                 const gchar     * /*bus_name*/,
                                  const gchar     * name_owner,
-                                 gpointer gself)
+                                 gpointer          gself)
     {
         auto self = static_cast<Impl*>(gself);
 
@@ -267,7 +267,7 @@ private:
     {
         bool success, value;
         std::tie(success, value) = get_bool_reply_from_call(source_object, res);
-        g_debug("service loc reply: success %d value %d", (int)success, (int)value);
+        g_debug("service loc reply: success %d value %d", int(success), int(value));
         if (success)
             static_cast<Impl*>(gself)->m_loc_enabled.set(value);
     }
@@ -278,7 +278,7 @@ private:
     {
         bool success, value;
         std::tie(success, value) = get_bool_reply_from_call(source_object, res);
-        g_debug("service gps reply: success %d value %d", (int)success, (int)value);
+        g_debug("service gps reply: success %d value %d", int(success), int(value));
         if (success)
             static_cast<Impl*>(gself)->m_gps_enabled.set(value);
     }
@@ -311,7 +311,7 @@ private:
 
     static void check_method_call_reply(GObject      *connection,
                                         GAsyncResult *res,
-                                        gpointer      gself)
+                                        gpointer      /*gself*/)
     {
         GError * error;
         GVariant * v;
@@ -360,7 +360,7 @@ private:
 ***/
 
 LocationServiceController::LocationServiceController():
-  impl{new Impl{*this}}
+  impl{new Impl{}}
 {
 }
 

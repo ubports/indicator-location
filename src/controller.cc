@@ -17,23 +17,12 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#pragma once
+#include "controller.h"
 
-#include <core/property.h>
-
-class Controller
+Controller::Controller()
 {
-public:
-    Controller();
-    virtual ~Controller();
+}
 
-    /// True iff we've gotten status info from the location service
-    virtual const core::Property<bool>& is_valid() const =0;
-
-    virtual const core::Property<bool>& gps_enabled() const =0;
-    virtual const core::Property<bool>& location_service_enabled() const =0;
-
-    virtual void set_gps_enabled (bool enabled) =0;
-    virtual void set_location_service_enabled (bool enabled) =0;
-};
-
+Controller::~Controller()
+{
+}

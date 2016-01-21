@@ -33,8 +33,8 @@ class MockController: public Controller
     const core::Property<bool>& gps_enabled() const override { return m_gps_enabled; }
     const core::Property<bool>& location_service_enabled() const override { return m_location_service_enabled; }
 
-    void set_gps_enabled (bool enabled) { m_gps_enabled=enabled; }
-    void set_location_service_enabled (bool enabled) { m_location_service_enabled=enabled; }
+    void set_gps_enabled (bool enabled) override { m_gps_enabled=enabled; }
+    void set_location_service_enabled (bool enabled) override { m_location_service_enabled=enabled; }
 
   private:
 
