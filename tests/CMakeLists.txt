@@ -19,6 +19,9 @@ include_directories (${CMAKE_SOURCE_DIR})
 set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -g ${CC_WARNING_ARGS}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${CC_WARNING_ARGS} -std=c++11")
 
+add_test(NAME formatcode 
+         COMMAND "${CMAKE_SOURCE_DIR}/tools/format-test.sh" "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/tools/formatcode")
+
 ###
 ###  phone-test
 ###
