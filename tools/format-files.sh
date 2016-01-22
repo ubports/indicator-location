@@ -36,7 +36,7 @@ dir="$1"
 astyle="$2"
 format="$3"
 
-files=`find "$dir" -name '*.h' -o -name '*.cpp' -o -name '*.c' \
+files=`find "$dir" -name '*.h' -o -name '*.cpp' -o -name '*.c'  -o -name '*.cc' \
     | grep -v UnityScopesApi_tp.h`
 
 "$astyle" --options="$dir"/astyle-config -n $files

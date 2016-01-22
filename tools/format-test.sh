@@ -30,11 +30,13 @@ formatcode="$2"
 exitval=0
 for file in $(find "$dir" -name '*.h' -o -name '*.cpp' -o -name '*.c' -o -name '*.cc' -print0 | xargs -0);
 do
-    results=$(cat $file | $formatcode | diff -q $file -)
-    if [ -n "foo" ];
+    results=$(cat $file | $formatcode | diff -u $file -)
+    linecount=$(echo "$var" | wc -l)
+    if test $linecount -gt 1
     then
         basecmd=$(basename $0)
         echo "$basecmd FAIL $file"
+        echo "${results}"
         exitval=1
     fi
 done
