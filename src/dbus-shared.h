@@ -21,4 +21,3 @@
 
 #define INDICATOR_BUS_NAME "com.canonical.indicator.location"
 #define INDICATOR_OBJECT_PATH "/com/canonical/indicator/location"
-

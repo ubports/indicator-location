@@ -24,38 +24,36 @@
 
 #include "controller.h"
 #include "phone.h"
-#include "utils.h" // GObjectDeleter
+#include "utils.h"  // GObjectDeleter
 
 class Service
 {
-  public:
-    explicit Service (const std::shared_ptr<Controller>& controller);
-    virtual ~Service ();
+public:
+    explicit Service(const std::shared_ptr<Controller>& controller);
+    virtual ~Service();
 
-  private:
+private:
     std::shared_ptr<GSimpleActionGroup> action_group;
-    std::unique_ptr<GDBusConnection,GObjectDeleter> connection;
+    std::unique_ptr<GDBusConnection, GObjectDeleter> connection;
     Phone phone_profile;
 
-  public:
+public:
     typedef void (*name_lost_callback_func)(Service*, void* user_data);
-    void set_name_lost_callback (name_lost_callback_func callback, void* user_data);
-  private:
+    void set_name_lost_callback(name_lost_callback_func callback, void* user_data);
+
+private:
     name_lost_callback_func name_lost_callback;
-    void * name_lost_user_data;
+    void* name_lost_user_data;
 
-
-  private:
+private:
     unsigned int action_group_export_id;
     std::set<unsigned int> exported_menus;
-    void unexport ();
+    void unexport();
 
-
-  private: // DBus callbacks
+private:  // DBus callbacks
     unsigned int bus_own_id;
-    void on_name_lost (GDBusConnection*, const char*);
-    void on_bus_acquired (GDBusConnection*, const char*);
-    static void on_name_lost (GDBusConnection*, const char*, gpointer);
-    static void on_bus_acquired (GDBusConnection*, const char*, gpointer);
+    void on_name_lost(GDBusConnection*, const char*);
+    void on_bus_acquired(GDBusConnection*, const char*);
+    static void on_name_lost(GDBusConnection*, const char*, gpointer);
+    static void on_bus_acquired(GDBusConnection*, const char*, gpointer);
 };
-

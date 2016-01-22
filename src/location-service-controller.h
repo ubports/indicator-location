@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include "controller.h" // parent class
+#include "controller.h"  // parent class
 
-#include <memory> // std::unique_ptr
+#include <memory>  // std::unique_ptr
 
-class LocationServiceController: public Controller
+class LocationServiceController : public Controller
 {
 public:
     LocationServiceController();
@@ -32,15 +32,14 @@ public:
     const core::Property<bool>& is_valid() const override;
     const core::Property<bool>& gps_enabled() const override;
     const core::Property<bool>& location_service_enabled() const override;
-    void set_gps_enabled (bool enabled) override;
-    void set_location_service_enabled (bool enabled) override;
+    void set_gps_enabled(bool enabled) override;
+    void set_location_service_enabled(bool enabled) override;
 
-    LocationServiceController(const LocationServiceController&) =delete;
-    LocationServiceController& operator=(const LocationServiceController&) =delete;
+    LocationServiceController(const LocationServiceController&) = delete;
+    LocationServiceController& operator=(const LocationServiceController&) = delete;
 
 private:
     friend class Impl;
     class Impl;
     std::unique_ptr<Impl> impl;
 };
-

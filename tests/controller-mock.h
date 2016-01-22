@@ -21,25 +21,40 @@
 
 #include <src/controller.h>
 
-class MockController: public Controller
+class MockController : public Controller
 {
-  public:
+public:
+    MockController() = default;
+    virtual ~MockController() = default;
 
-    MockController() =default;
-    virtual ~MockController() =default;
+    core::Property<bool>& is_valid()
+    {
+        return m_is_valid;
+    }
+    const core::Property<bool>& is_valid() const override
+    {
+        return m_is_valid;
+    }
+    const core::Property<bool>& gps_enabled() const override
+    {
+        return m_gps_enabled;
+    }
+    const core::Property<bool>& location_service_enabled() const override
+    {
+        return m_location_service_enabled;
+    }
 
-    core::Property<bool>& is_valid() { return m_is_valid; }
-    const core::Property<bool>& is_valid() const override { return m_is_valid; }
-    const core::Property<bool>& gps_enabled() const override { return m_gps_enabled; }
-    const core::Property<bool>& location_service_enabled() const override { return m_location_service_enabled; }
+    void set_gps_enabled(bool enabled) override
+    {
+        m_gps_enabled = enabled;
+    }
+    void set_location_service_enabled(bool enabled) override
+    {
+        m_location_service_enabled = enabled;
+    }
 
-    void set_gps_enabled (bool enabled) override { m_gps_enabled=enabled; }
-    void set_location_service_enabled (bool enabled) override { m_location_service_enabled=enabled; }
-
-  private:
-
-    core::Property<bool> m_is_valid {true};
-    core::Property<bool> m_gps_enabled {false};
-    core::Property<bool> m_location_service_enabled {false};
+private:
+    core::Property<bool> m_is_valid{true};
+    core::Property<bool> m_gps_enabled{false};
+    core::Property<bool> m_location_service_enabled{false};
 };
-

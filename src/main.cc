@@ -24,30 +24,28 @@
 #include "location-service-controller.h"
 #include "service.h"
 
-static void
-on_name_lost (Service * service G_GNUC_UNUSED, gpointer loop)
+static void on_name_lost(Service* service G_GNUC_UNUSED, gpointer loop)
 {
-  g_main_loop_quit (static_cast<GMainLoop*>(loop));
+    g_main_loop_quit(static_cast<GMainLoop*>(loop));
 }
 
-int
-main (int argc G_GNUC_UNUSED, char ** argv G_GNUC_UNUSED)
+int main(int argc G_GNUC_UNUSED, char** argv G_GNUC_UNUSED)
 {
-  GMainLoop * loop;
+    GMainLoop* loop;
 
-  /* boilerplate i18n */
-  setlocale (LC_ALL, "");
-  bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
-  textdomain (GETTEXT_PACKAGE);
- 
-  /* set up the service */
-  loop = g_main_loop_new (nullptr, false);
-  auto controller = std::make_shared<LocationServiceController>();
-  Service service (controller);
-  service.set_name_lost_callback (on_name_lost, loop);
-  g_main_loop_run (loop);
+    /* boilerplate i18n */
+    setlocale(LC_ALL, "");
+    bindtextdomain(GETTEXT_PACKAGE, GNOMELOCALEDIR);
+    textdomain(GETTEXT_PACKAGE);
 
-  /* cleanup */
-  g_main_loop_unref (loop);
-  return 0;
+    /* set up the service */
+    loop = g_main_loop_new(nullptr, false);
+    auto controller = std::make_shared<LocationServiceController>();
+    Service service(controller);
+    service.set_name_lost_callback(on_name_lost, loop);
+    g_main_loop_run(loop);
+
+    /* cleanup */
+    g_main_loop_unref(loop);
+    return 0;
 }
