@@ -17,6 +17,8 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
+#pragma once
+
 #include "src/dbus-shared.h"
 #include "gtest-dbus-fixture.h"
 

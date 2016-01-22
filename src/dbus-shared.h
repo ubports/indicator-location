@@ -17,10 +17,8 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#ifndef DBUS_SHARED_H
-#define DBUS_SHARED_H
+#pragma once
 
 #define INDICATOR_BUS_NAME "com.canonical.indicator.location"
 #define INDICATOR_OBJECT_PATH "/com/canonical/indicator/location"
 
-#endif /* DBUS_SHARED_H */
