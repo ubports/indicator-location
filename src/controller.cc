@@ -19,10 +19,6 @@
 
 #include "controller.h"
 
-Controller::Controller()
-{
-}
+Controller::Controller() =default;
 
-Controller::~Controller()
-{
-}
+Controller::~Controller() =default;
