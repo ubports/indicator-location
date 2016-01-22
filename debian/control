@@ -15,7 +15,7 @@ Build-Depends: cmake,
                libproperties-cpp-dev,
 # for code formatting
                astyle,
-               clang-format-3.6
+               clang-format-3.6,
                dos2unix,
 Standards-Version: 3.9.4
 Homepage: http://launchpad.net/indicator-location/
