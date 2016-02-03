@@ -227,7 +227,8 @@ void on_uri_dispatched(const gchar* uri, gboolean success, gpointer user_data G_
 void on_settings_activated(GSimpleAction* simple G_GNUC_UNUSED, GVariant* parameter, gpointer user_data G_GNUC_UNUSED)
 {
     const char* key = g_variant_get_string(parameter, nullptr);
-    gchar* uri = g_strdup_printf("settings:///system/%s", key);
+    gchar* uri = g_strdup_printf("settings:///%s", key);
+    g_debug("%s calling url_dispatch_send '%s'", G_STRLOC, uri);
     url_dispatch_send(uri, on_uri_dispatched, nullptr);
     g_free(uri);
 }
@@ -278,5 +279,5 @@ void Phone::rebuild_submenu()
     g_menu_append_item(submenu.get(), location);
     g_object_unref(location);
 
-    g_menu_append(submenu.get(), _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::security-privacy");
+    g_menu_append(submenu.get(), _("Location settings…"), "indicator." SETTINGS_ACTION_KEY "::location");
 }
