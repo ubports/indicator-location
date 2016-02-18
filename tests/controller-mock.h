@@ -17,10 +17,9 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#ifndef __INDICATOR_LOCATION_CONTROLLER_MOCK__H__
-#define __INDICATOR_LOCATION_CONTROLLER_MOCK__H__
+#pragma once
 
-#include "controller.h"
+#include <src/controller.h>
 
 class MockController: public Controller
 {
@@ -31,19 +30,16 @@ class MockController: public Controller
 
     core::Property<bool>& is_valid() { return m_is_valid; }
     const core::Property<bool>& is_valid() const override { return m_is_valid; }
-    bool is_gps_enabled () const { return gps; }
-    bool is_location_service_enabled () const { return loc; }
+    const core::Property<bool>& gps_enabled() const override { return m_gps_enabled; }
+    const core::Property<bool>& location_service_enabled() const override { return m_location_service_enabled; }
 
-    void set_gps_enabled (bool enabled) { notify_gps_enabled (gps=enabled); }
-    void set_location_service_enabled (bool enabled) { notify_location_service_enabled (loc=enabled); }
+    void set_gps_enabled (bool enabled) override { m_gps_enabled=enabled; }
+    void set_location_service_enabled (bool enabled) override { m_location_service_enabled=enabled; }
 
   private:
 
     core::Property<bool> m_is_valid {true};
-    bool gps { false };
-    bool loc { false };
+    core::Property<bool> m_gps_enabled {false};
+    core::Property<bool> m_location_service_enabled {false};
 };
-
-#endif // __INDICATOR_LOCATION_CONTROLLER_MOCK__H__
-
 

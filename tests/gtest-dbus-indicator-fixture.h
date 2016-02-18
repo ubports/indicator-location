@@ -44,9 +44,9 @@ class GTestDBusIndicatorFixture: public GTestDBusFixture
                                   gint          position   G_GNUC_UNUSED,
                                   gint          removed    G_GNUC_UNUSED,
                                   gint          added      G_GNUC_UNUSED,
-                                  gpointer      any_item_changed)
+                                  gpointer      gany_item_changed)
     {
-      *((gboolean*)any_item_changed) = true;
+      *static_cast<gboolean*>(gany_item_changed) = true;
     }
 
   protected:
@@ -83,7 +83,7 @@ class GTestDBusIndicatorFixture: public GTestDBusFixture
 
     void sync_menu (void)
     {
-      g_slist_free_full (menu_references, (GDestroyNotify)g_object_unref);
+      g_slist_free_full (menu_references, GDestroyNotify(g_object_unref));
       menu_references = nullptr;
       activate_subtree (G_MENU_MODEL (menu_model));
     }
@@ -111,7 +111,7 @@ class GTestDBusIndicatorFixture: public GTestDBusFixture
                                                              G_BUS_NAME_WATCHER_FLAGS_NONE,
                                                              on_name_appeared, // quits the loop
                                                              nullptr, this, nullptr);
-      const guint timer_id = g_timeout_add_seconds (TIME_LIMIT_SEC, (GSourceFunc)g_main_loop_quit, loop);
+      const guint timer_id = g_timeout_add_seconds (TIME_LIMIT_SEC, GSourceFunc(g_main_loop_quit), loop);
       g_main_loop_run (loop);
       g_source_remove (timer_id);
       g_bus_unwatch_name (watch_id);
@@ -136,7 +136,7 @@ class GTestDBusIndicatorFixture: public GTestDBusFixture
     {
       g_clear_pointer (&timer, g_timer_destroy);
 
-      g_slist_free_full (menu_references, (GDestroyNotify)g_object_unref);
+      g_slist_free_full (menu_references, GDestroyNotify(g_object_unref));
       menu_references = nullptr;
       g_clear_object (&menu_model);
 

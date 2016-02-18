@@ -30,7 +30,7 @@
 class Service
 {
   public:
-    Service (const std::shared_ptr<Controller>& controller);
+    explicit Service (const std::shared_ptr<Controller>& controller);
     virtual ~Service ();
 
   private:

@@ -19,28 +19,10 @@
 
 #include "controller.h"
 
-void
-Controller :: add_listener (ControllerListener * l)
+Controller::Controller()
 {
-  listeners.insert (l);
 }
 
-void
-Controller :: remove_listener (ControllerListener * l)
+Controller::~Controller()
 {
-  listeners.erase (l);
-}
-
-void
-Controller :: notify_gps_enabled (bool enabled)
-{
-  for (auto it : listeners)
-    it->on_gps_enabled_changed (enabled);
-}
-
-void
-Controller :: notify_location_service_enabled (bool enabled)
-{
-  for (auto it : listeners)
-    it->on_location_service_enabled_changed (enabled);
 }
