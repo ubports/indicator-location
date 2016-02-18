@@ -1,3 +1,15 @@
+indicator-location (13.10.0+16.04.20160218-0ubuntu1) xenial; urgency=medium
+
+  * Remove the "View HERE terms and conditions" menuitem (LP: #1507793,
+    #1535353)
+  * Style guide code cleanup. No functional changes.
+  * Use core::Property<X> fields to notify the indicator when location
+    settings change
+  * When 'Location settings…' is clicked, invoke the uri
+    'settings:///location' (LP: #1533835)
+
+ -- Charles Kerr <charles.kerr@canonical.com>  Thu, 18 Feb 2016 17:05:40 +0000
+
 indicator-location (13.10.0+16.04.20151127-0ubuntu1) xenial; urgency=medium
 
   [ xavigarcia ]
