@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Canonical Ltd.
+ * Copyright 2013-2016 Canonical Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#ifndef __INDICATOR_LOCATION_PHONE_H__
-#define __INDICATOR_LOCATION_PHONE_H__
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -30,50 +29,49 @@
 
 class Phone
 {
-  public:
-    Phone (const std::shared_ptr<Controller>& controller,
-           const std::shared_ptr<GSimpleActionGroup>& action_group);
-    virtual ~Phone ();
-    std::shared_ptr<GMenu> get_menu () { return menu; }
+public:
+    Phone(const std::shared_ptr<Controller>& controller, const std::shared_ptr<GSimpleActionGroup>& action_group);
+    virtual ~Phone();
+    std::shared_ptr<GMenu> get_menu()
+    {
+        return menu;
+    }
 
-  protected:
+protected:
     std::shared_ptr<Controller> controller;
     std::vector<core::ScopedConnection> controller_connections;
 
-  private:
+private:
     std::shared_ptr<GMenu> menu;
     std::shared_ptr<GMenu> submenu;
     std::shared_ptr<GSimpleActionGroup> action_group;
 
-  private:
-    void create_menu ();
+private:
+    void create_menu();
     void rebuild_submenu();
 
-  private:
-    bool should_be_visible () const;
-    GVariant * action_state_for_root () const;
-    GSimpleAction * create_root_action ();
+private:
+    bool should_be_visible() const;
+    GVariant* action_state_for_root() const;
+    GSimpleAction* create_root_action();
     void update_header();
     void update_actions_enabled();
 
-  private:
-    GVariant * action_state_for_location_detection ();
-    GSimpleAction * create_detection_enabled_action ();
+private:
+    GVariant* action_state_for_location_detection();
+    GSimpleAction* create_detection_enabled_action();
     void update_detection_enabled_action();
-    static void on_detection_location_activated (GSimpleAction*, GVariant*, gpointer);
+    static void on_detection_location_activated(GSimpleAction*, GVariant*, gpointer);
 
-
-  private:
-    GVariant * action_state_for_gps_detection ();
-    GSimpleAction * create_gps_enabled_action ();
+private:
+    GVariant* action_state_for_gps_detection();
+    GSimpleAction* create_gps_enabled_action();
     void update_gps_enabled_action();
-    static void on_detection_gps_activated (GSimpleAction*, GVariant*, gpointer);
+    static void on_detection_gps_activated(GSimpleAction*, GVariant*, gpointer);
 
-  private:
-    GSimpleAction * create_settings_action ();
+private:
+    GSimpleAction* create_settings_action();
 
-  private:
-    GSimpleAction * create_licence_action ();
+private:
+    GSimpleAction* create_licence_action();
 };
-
-#endif /* __INDICATOR_LOCATION_PHONE_H__ */

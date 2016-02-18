@@ -40,6 +40,39 @@ pkg_check_modules (SERVICE_DEPS REQUIRED
 include_directories (SYSTEM ${SERVICE_DEPS_INCLUDE_DIRS})
 
 ##
+##  Code Style
+##
+
+# Code style fixer from unity-scopes-api.
+#
+# We put the code through astyle first because it makes some fixes that clang-format
+# won't do (such as "char *p" -> "char* p"). But astyle messes up other things
+# (particularly lambdas and assembly-style comments), which clang-format does right.
+# So, we run clang-format after running astyle, which undoes the damage done by astyle
+# without reverting desirable astyle fixes.
+
+find_program(ASTYLE_COMMAND NAMES astyle)
+if (NOT ASTYLE_COMMAND)
+    message(WARNING "Cannot find astyle: formatcode target will not be available")
+else()
+    # astyle 2.03 creates DOS line endings, so we need to fix its output
+    find_program(DOS2UNIX_COMMAND NAMES dos2unix)
+    if (NOT DOS2UNIX_COMMAND)
+        message(WARNING "Cannot find dos2unix: formatcode target will not be available")
+    else()
+        find_program(CLANG_FORMAT_COMMAND NAMES clang-format-3.6 clang-format-3.5)
+        if (NOT CLANG_FORMAT_COMMAND)
+            message(WARNING "Cannot find clang-format >= clang-format-3.5: formatcode target will not be available")
+        endif()
+    endif()
+endif()
+
+if (ASTYLE_COMMAND AND DOS2UNIX_COMMAND AND CLANG_FORMAT_COMMAND)
+    add_custom_target(formatcode
+                      ${PROJECT_SOURCE_DIR}/tools/format-files.sh ${PROJECT_SOURCE_DIR} ${ASTYLE_COMMAND} ${CLANG_FORMAT_COMMAND})
+endif()
+
+##
 ##
 ##
 
@@ -60,6 +93,7 @@ endif ()
 add_subdirectory (src)
 add_subdirectory (data)
 add_subdirectory (po)
+add_subdirectory (tools)
 if (${enable_tests})
   add_subdirectory (tests)
 endif ()

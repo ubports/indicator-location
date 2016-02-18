@@ -1,64 +1,59 @@
 /*
- * Copyright 2013 Canonical Ltd.
+ * Copyright 2013-2016 Canonical Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authors:
  *   Charles Kerr <charles.kerr@canonical.com>
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 3, as published
- * by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranties of
- * MERCHANTABILITY, SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR
- * PURPOSE.  See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __INDICATOR_LOCATION_SERVICE_H__
-#define __INDICATOR_LOCATION_SERVICE_H__
+#pragma once
 
 #include <memory>
 #include <set>
 
 #include "controller.h"
 #include "phone.h"
-#include "utils.h" // GObjectDeleter
+#include "utils.h"  // GObjectDeleter
 
 class Service
 {
-  public:
-    explicit Service (const std::shared_ptr<Controller>& controller);
-    virtual ~Service ();
+public:
+    explicit Service(const std::shared_ptr<Controller>& controller);
+    virtual ~Service();
 
-  private:
+private:
     std::shared_ptr<GSimpleActionGroup> action_group;
-    std::unique_ptr<GDBusConnection,GObjectDeleter> connection;
+    std::unique_ptr<GDBusConnection, GObjectDeleter> connection;
     Phone phone_profile;
 
-  public:
+public:
     typedef void (*name_lost_callback_func)(Service*, void* user_data);
-    void set_name_lost_callback (name_lost_callback_func callback, void* user_data);
-  private:
+    void set_name_lost_callback(name_lost_callback_func callback, void* user_data);
+
+private:
     name_lost_callback_func name_lost_callback;
-    void * name_lost_user_data;
+    void* name_lost_user_data;
 
-
-  private:
+private:
     unsigned int action_group_export_id;
     std::set<unsigned int> exported_menus;
-    void unexport ();
+    void unexport();
 
-
-  private: // DBus callbacks
+private:  // DBus callbacks
     unsigned int bus_own_id;
-    void on_name_lost (GDBusConnection*, const char*);
-    void on_bus_acquired (GDBusConnection*, const char*);
-    static void on_name_lost (GDBusConnection*, const char*, gpointer);
-    static void on_bus_acquired (GDBusConnection*, const char*, gpointer);
+    void on_name_lost(GDBusConnection*, const char*);
+    void on_bus_acquired(GDBusConnection*, const char*);
+    static void on_name_lost(GDBusConnection*, const char*, gpointer);
+    static void on_bus_acquired(GDBusConnection*, const char*, gpointer);
 };
-
-#endif /* __INDICATOR_LOCATION_SERVICE_H__ */
-

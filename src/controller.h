@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Canonical Ltd.
+ * Copyright 2013-2016 Canonical Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
  *   Charles Kerr <charles.kerr@canonical.com>
  */
 
-#ifndef __INDICATOR_LOCATION_CONTROLLER_H__
-#define __INDICATOR_LOCATION_CONTROLLER_H__
+#pragma once
 
 #include <core/property.h>
 
@@ -29,13 +28,11 @@ public:
     virtual ~Controller();
 
     /// True iff we've gotten status info from the location service
-    virtual const core::Property<bool>& is_valid() const =0;
+    virtual const core::Property<bool>& is_valid() const = 0;
 
-    virtual const core::Property<bool>& gps_enabled() const =0;
-    virtual const core::Property<bool>& location_service_enabled() const =0;
+    virtual const core::Property<bool>& gps_enabled() const = 0;
+    virtual const core::Property<bool>& location_service_enabled() const = 0;
 
-    virtual void set_gps_enabled (bool enabled) =0;
-    virtual void set_location_service_enabled (bool enabled) =0;
+    virtual void set_gps_enabled(bool enabled) = 0;
+    virtual void set_location_service_enabled(bool enabled) = 0;
 };
-
-#endif // __INDICATOR_LOCATION_CONTROLLER_H__

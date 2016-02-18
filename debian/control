@@ -13,6 +13,10 @@ Build-Depends: cmake,
                liburl-dispatcher1-dev,
                python,
                libproperties-cpp-dev,
+# for code formatting
+               astyle,
+               clang-format-3.6,
+               dos2unix,
 Standards-Version: 3.9.4
 Homepage: http://launchpad.net/indicator-location/
 # If you aren't a member of ~indicator-applet-developers but need to upload 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Canonical Ltd.
+ * Copyright 2013-2016 Canonical Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,6 @@
 
 #include "controller.h"
 
-Controller::Controller()
-{
-}
+Controller::Controller() = default;
 
-Controller::~Controller()
-{
-}
+Controller::~Controller() = default;
