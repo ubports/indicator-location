@@ -21,7 +21,6 @@
 #include <glib/gi18n.h>
 #include <glib.h>
 
-#include "accounts-service-license-controller.h"
 #include "location-service-controller.h"
 #include "service.h"
 
@@ -44,8 +43,7 @@ main (int argc G_GNUC_UNUSED, char ** argv G_GNUC_UNUSED)
   /* set up the service */
   loop = g_main_loop_new (nullptr, false);
   auto controller = std::make_shared<LocationServiceController>();
-  auto license_controller = std::make_shared<AccountsServiceLicenseController>();
-  Service service (controller, license_controller);
+  Service service (controller);
   service.set_name_lost_callback (on_name_lost, loop);
   g_main_loop_run (loop);
 

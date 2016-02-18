@@ -27,9 +27,9 @@
 ***
 **/
 
-Service :: Service (const std::shared_ptr<Controller>& controller, const std::shared_ptr<LicenseController>& license_controller):
+Service :: Service (const std::shared_ptr<Controller>& controller):
   action_group (g_simple_action_group_new(), GObjectDeleter()),
-  phone_profile (controller, license_controller, action_group),
+  phone_profile (controller, action_group),
   name_lost_callback (nullptr),
   name_lost_user_data (0),
   action_group_export_id (0),

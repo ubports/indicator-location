@@ -22,7 +22,6 @@
 #include "gtest-dbus-indicator-fixture.h"
 
 #include "src/dbus-shared.h"
-#include "src/mock-license-controller.h"
 #include "src/controller-mock.h"
 #include "src/service.h"
 
@@ -74,7 +73,7 @@ class PhoneTest: public GTestDBusIndicatorFixture,
     {
       myController.reset (new MockController ());
       myController->add_listener (this);
-      myService.reset (new Service (myController, std::make_shared<MockLicenseController>()));
+      myService.reset (new Service (myController));
     }
 
     virtual void teardown_service ()
@@ -91,7 +90,6 @@ TEST_F (PhoneTest, ActionsExit)
   ASSERT_TRUE (action_exists ("location-detection-enabled"));
   ASSERT_TRUE (action_exists ("phone-header"));
   ASSERT_TRUE (action_exists ("settings"));
-  ASSERT_TRUE (action_exists ("licence"));
 }
 
 TEST_F (PhoneTest, MenuitemsExist)
