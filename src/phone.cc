@@ -96,6 +96,16 @@ bool Phone::should_be_visible() const
     return controller->location_service_enabled().get();
 }
 
+bool Phone::location_service_active() const
+{
+    if (!controller->is_valid())
+    {
+        return false;
+    }
+
+    return controller->location_service_active().get();
+}
+
 GVariant* Phone::action_state_for_root() const
 {
     GVariantBuilder builder;
@@ -110,7 +120,7 @@ GVariant* Phone::action_state_for_root() const
     gboolean visible = should_be_visible();
     g_variant_builder_add(&builder, "{sv}", "visible", g_variant_new_boolean(visible));
 
-    const char* icon_name = "gps";
+    const char* icon_name = location_service_active() ? "gps-enabled-connected" : "gps-enabled-not-connected";
     GIcon* icon = g_themed_icon_new_with_default_fallbacks(icon_name);
     GVariant* serialized_icon = g_icon_serialize(icon);
     if (serialized_icon != NULL)

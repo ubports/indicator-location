@@ -52,6 +52,7 @@ private:
 
 private:
     bool should_be_visible() const;
+    bool location_service_active() const;
     GVariant* action_state_for_root() const;
     GSimpleAction* create_root_action();
     void update_header();
