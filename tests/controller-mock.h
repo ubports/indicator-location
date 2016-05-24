@@ -43,6 +43,10 @@ public:
     {
         return m_location_service_enabled;
     }
+    const core::Property<bool>& location_service_active() const override
+    {
+        return m_location_service_active;
+    }
 
     void set_gps_enabled(bool enabled) override
     {
@@ -57,4 +61,5 @@ private:
     core::Property<bool> m_is_valid{true};
     core::Property<bool> m_gps_enabled{false};
     core::Property<bool> m_location_service_enabled{false};
+    core::Property<bool> m_location_service_active{false};
 };

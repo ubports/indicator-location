@@ -33,6 +33,7 @@ find_package (PkgConfig REQUIRED)
 include (FindPkgConfig)
 pkg_check_modules (SERVICE_DEPS REQUIRED
                    ubuntu-app-launch-2
+                   ubuntu-location-service
                    url-dispatcher-1
                    gio-unix-2.0>=2.36
                    glib-2.0>=2.36

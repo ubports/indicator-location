@@ -83,6 +83,14 @@ protected:
                                                                                                    true;
                                                                                                loc_enabled = enabled;
                                                                                            }));
+
+///!
+//        myConnections.push_back(myController->location_service_active().changed().connect([this](bool active)
+//                                                                                          {
+//                                                                                              loc_active_changed =
+//                                                                                                  true;
+//                                                                                              loc_active = active;
+//                                                                                          }));
     }
 
     virtual void teardown_service()

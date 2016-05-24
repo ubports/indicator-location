@@ -32,6 +32,7 @@ public:
 
     virtual const core::Property<bool>& gps_enabled() const = 0;
     virtual const core::Property<bool>& location_service_enabled() const = 0;
+    virtual const core::Property<bool>& location_service_active() const = 0;
 
     virtual void set_gps_enabled(bool enabled) = 0;
     virtual void set_location_service_enabled(bool enabled) = 0;

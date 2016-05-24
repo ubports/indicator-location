@@ -32,6 +32,7 @@ public:
     const core::Property<bool>& is_valid() const override;
     const core::Property<bool>& gps_enabled() const override;
     const core::Property<bool>& location_service_enabled() const override;
+    const core::Property<bool>& location_service_active() const override;
     void set_gps_enabled(bool enabled) override;
     void set_location_service_enabled(bool enabled) override;
 

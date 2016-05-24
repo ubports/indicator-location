@@ -52,6 +52,12 @@ Phone::Phone(const std::shared_ptr<Controller>& controller_, const std::shared_p
     };
     controller_connections.push_back(controller->location_service_enabled().changed().connect(on_loc));
 
+    auto on_loc_active = [this](bool active)
+    {
+        update_header();
+    };
+    controller_connections.push_back(controller->location_service_active().changed().connect(on_loc_active));
+
     auto on_valid = [this](bool valid)
     {
         update_actions_enabled();

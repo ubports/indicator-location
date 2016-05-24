@@ -57,6 +57,11 @@ public:
         return m_loc_enabled;
     }
 
+    const core::Property<bool>& location_service_active() const
+    {
+        return m_loc_active;
+    }
+
     void set_gps_enabled(bool enabled)
     {
         set_bool_property(PROP_KEY_GPS_ENABLED, enabled);
@@ -137,7 +142,8 @@ private:
         {
             const char* name;
             GAsyncReadyCallback callback;
-        } props[] = {{PROP_KEY_LOC_ENABLED, on_loc_enabled_reply}, {PROP_KEY_GPS_ENABLED, on_gps_enabled_reply}};
+        } props[] = {{PROP_KEY_LOC_ENABLED, on_loc_enabled_reply}, {PROP_KEY_GPS_ENABLED, on_gps_enabled_reply},
+                     {PROP_KEY_LOC_STATE, on_loc_state_reply}};
         for (const auto& prop : props)
         {
             g_dbus_connection_call(system_bus, BUS_NAME, OBJECT_PATH, PROP_IFACE_NAME, "Get",
@@ -193,6 +199,10 @@ private:
             else if (!g_strcmp0(key, PROP_KEY_GPS_ENABLED))
             {
                 self->m_gps_enabled.set(g_variant_get_boolean(val));
+            }
+            else if (!g_strcmp0(key, PROP_KEY_LOC_STATE))
+            {
+                self->m_loc_active.set(g_variant_get_boolean(val));///!
             }
 
             g_variant_unref(val);
@@ -260,6 +270,17 @@ private:
         }
     }
 
+    static void on_loc_state_reply(GObject* source_object, GAsyncResult* res, gpointer gself)
+    {
+        bool success, value;
+        std::tie(success, value) = get_bool_reply_from_call(source_object, res);
+        g_debug("service loc reply: success %d value %d", int(success), int(value));
+        if (success)
+        {
+            static_cast<Impl*>(gself)->m_loc_active.set(value);///!
+        }
+    }
+
     /***
     ****  org.freedesktop.dbus.properties.Set handling
     ***/
@@ -313,9 +334,11 @@ private:
     static constexpr const char* PROP_IFACE_NAME{"org.freedesktop.DBus.Properties"};
     static constexpr const char* PROP_KEY_LOC_ENABLED{"IsOnline"};
     static constexpr const char* PROP_KEY_GPS_ENABLED{"DoesSatelliteBasedPositioning"};
+    static constexpr const char* PROP_KEY_LOC_STATE{"State"};
 
     core::Property<bool> m_gps_enabled{false};
     core::Property<bool> m_loc_enabled{false};
+    core::Property<bool> m_loc_active{false};
     core::Property<bool> m_is_valid{false};
 
     std::shared_ptr<GCancellable> m_cancellable{};
@@ -350,6 +373,11 @@ const core::Property<bool>& LocationServiceController::gps_enabled() const
 const core::Property<bool>& LocationServiceController::location_service_enabled() const
 {
     return impl->location_service_enabled();
+}
+
+const core::Property<bool>& LocationServiceController::location_service_active() const
+{
+    return impl->location_service_active();
 }
 
 void LocationServiceController::set_gps_enabled(bool enabled)
