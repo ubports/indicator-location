@@ -120,8 +120,19 @@ GVariant* Phone::action_state_for_root() const
     gboolean visible = should_be_visible();
     g_variant_builder_add(&builder, "{sv}", "visible", g_variant_new_boolean(visible));
 
-    const char* icon_name = location_service_active() ? "location-active" : "location-idle";
-    GIcon* icon = g_themed_icon_new_with_default_fallbacks(icon_name);
+    GIcon* icon;
+    if (!visible)
+    {
+        icon = g_themed_icon_new_with_default_fallbacks("location-disabled");
+    }
+    else if (location_service_active())
+    {
+        icon = g_themed_icon_new_with_default_fallbacks("location-active");
+    }
+    else
+    {
+        icon = g_themed_icon_new_with_default_fallbacks("location-idle");
+    }
     GVariant* serialized_icon = g_icon_serialize(icon);
     if (serialized_icon != NULL)
     {
