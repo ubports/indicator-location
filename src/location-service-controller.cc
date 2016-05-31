@@ -202,8 +202,8 @@ private:
             }
             else if (!g_strcmp0(key, PROP_KEY_LOC_STATE))
             {
-                bool active = g_variant_get_string(val, nullptr) == "active";
-                self->m_loc_active.set(active);
+                auto state_str = std::string(g_variant_get_string(val, nullptr));
+                self->m_loc_active.set(state_str == "active");
             }
 
             g_variant_unref(val);
@@ -306,13 +306,12 @@ private:
     static void on_loc_state_reply(GObject* source_object, GAsyncResult* res, gpointer gself)
     {
         bool success;
-        std::string value;
-        std::tie(success, value) = get_string_reply_from_call(source_object, res);
-        g_debug("service loc reply: success %d value %s", int(success), value);
+        std::string state_str;
+        std::tie(success, state_str) = get_string_reply_from_call(source_object, res);
+        g_debug("service loc reply: success %d value %s", int(success), state_str);
         if (success)
         {
-            bool active = value == "active";
-            static_cast<Impl*>(gself)->m_loc_active.set(active);
+            static_cast<Impl*>(gself)->m_loc_active.set(state_str == "active");
         }
     }
 
