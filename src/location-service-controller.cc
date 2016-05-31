@@ -70,7 +70,6 @@ public:
     void set_location_service_enabled(bool enabled)
     {
         set_bool_property(PROP_KEY_LOC_ENABLED, enabled);
-        set_string_property(PROP_KEY_LOC_STATE, enabled ? "enabled" : "disabled");
     }
 
 private:
@@ -327,20 +326,6 @@ private:
         g_return_if_fail(m_system_bus);
 
         auto args = g_variant_new("(ssv)", LOC_IFACE_NAME, property_name, g_variant_new_boolean(b));
-        g_dbus_connection_call(m_system_bus.get(), BUS_NAME, OBJECT_PATH, PROP_IFACE_NAME,
-                               "Set",  // method name,
-                               args,
-                               nullptr,  // reply type
-                               G_DBUS_CALL_FLAGS_NONE,
-                               -1,  // timeout msec
-                               m_cancellable.get(), check_method_call_reply, this);
-    }
-
-    void set_string_property(const char* property_name, std::string s)
-    {
-        g_return_if_fail(m_system_bus);
-
-        auto args = g_variant_new("(ssv)", LOC_IFACE_NAME, property_name, g_variant_new_string(s.c_str()));
         g_dbus_connection_call(m_system_bus.get(), BUS_NAME, OBJECT_PATH, PROP_IFACE_NAME,
                                "Set",  // method name,
                                args,
