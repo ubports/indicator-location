@@ -308,7 +308,7 @@ private:
         bool success;
         std::string state_str;
         std::tie(success, state_str) = get_string_reply_from_call(source_object, res);
-        g_debug("service loc reply: success %d value %s", int(success), state_str);
+        g_debug("service loc reply: success %d value '%s'", int(success), state_str.c_str());
         if (success)
         {
             static_cast<Impl*>(gself)->m_loc_active.set(state_str == "active");
