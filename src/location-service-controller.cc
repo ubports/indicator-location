@@ -202,7 +202,8 @@ private:
             }
             else if (!g_strcmp0(key, PROP_KEY_LOC_STATE))
             {
-                self->m_loc_active.set(g_variant_get_boolean(val));///!
+                bool active = g_variant_get_string(val, nullptr) == "active";
+                self->m_loc_active.set(active);
             }
 
             g_variant_unref(val);
@@ -248,6 +249,38 @@ private:
         return std::make_tuple(success, result);
     }
 
+    static std::tuple<bool, std::string> get_string_reply_from_call(GObject* source, GAsyncResult* res)
+    {
+        GError* error;
+        GVariant* v;
+        bool success{false};
+        std::string result{""};
+
+        error = nullptr;
+        GDBusConnection* conn = G_DBUS_CONNECTION(source);
+        v = g_dbus_connection_call_finish(conn, res, &error);
+        if (v != nullptr)
+        {
+            GVariant* inner{};
+            g_variant_get(v, "(v)", &inner);
+            success = true;
+            result = g_variant_get_string(inner, nullptr);
+            g_variant_unref(inner);
+            g_variant_unref(v);
+        }
+        else if (error != nullptr)
+        {
+            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+            {
+                g_warning("Error calling dbus method: %s", error->message);
+            }
+            g_error_free(error);
+            success = false;
+        }
+
+        return std::make_tuple(success, result);
+    }
+
     static void on_loc_enabled_reply(GObject* source_object, GAsyncResult* res, gpointer gself)
     {
         bool success, value;
@@ -272,12 +305,14 @@ private:
 
     static void on_loc_state_reply(GObject* source_object, GAsyncResult* res, gpointer gself)
     {
-        bool success, value;
-        std::tie(success, value) = get_bool_reply_from_call(source_object, res);
-        g_debug("service loc reply: success %d value %d", int(success), int(value));
+        bool success;
+        std::string value;
+        std::tie(success, value) = get_string_reply_from_call(source_object, res);
+        g_debug("service loc reply: success %d value %s", int(success), value);
         if (success)
         {
-            static_cast<Impl*>(gself)->m_loc_active.set(value);///!
+            bool active = value == "active";
+            static_cast<Impl*>(gself)->m_loc_active.set(active);
         }
     }
 
