@@ -203,7 +203,6 @@ private:
             else if (!g_strcmp0(key, PROP_KEY_LOC_STATE))
             {
                 auto state_str = std::string(g_variant_get_string(val, nullptr));
-                std::cerr << "DEBUG: on_properties_changed(): state_str = " << state_str << std::endl;
                 self->m_loc_active.set(state_str == "active");
             }
 
@@ -312,7 +311,6 @@ private:
         g_debug("service state reply: success %d value '%s'", int(success), state_str.c_str());
         if (success)
         {
-            std::cerr << "DEBUG: on_loc_state_reply(): state_str = " << state_str << std::endl;
             static_cast<Impl*>(gself)->m_loc_active.set(state_str == "active");
         }
     }
