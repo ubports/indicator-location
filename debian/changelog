@@ -1,3 +1,11 @@
+indicator-location (13.10.0+16.10.20160613-0ubuntu1) yakkety; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Give indicator feedback when location-service is being used by
+    apps/scopes (LP: #1407921)
+
+ -- marcus.tomlinson@canonical.com <marcus.tomlinson@canonical.com>  Mon, 13 Jun 2016 05:24:53 +0000
+
 indicator-location (13.10.0+16.04.20160218-0ubuntu1) xenial; urgency=medium
 
   * Remove the "View HERE terms and conditions" menuitem (LP: #1507793,
