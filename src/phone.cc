@@ -52,6 +52,12 @@ Phone::Phone(const std::shared_ptr<Controller>& controller_, const std::shared_p
     };
     controller_connections.push_back(controller->location_service_enabled().changed().connect(on_loc));
 
+    auto on_loc_active = [this](bool active)
+    {
+        update_header();
+    };
+    controller_connections.push_back(controller->location_service_active().changed().connect(on_loc_active));
+
     auto on_valid = [this](bool valid)
     {
         update_actions_enabled();
@@ -90,6 +96,16 @@ bool Phone::should_be_visible() const
     return controller->location_service_enabled().get();
 }
 
+bool Phone::location_service_active() const
+{
+    if (!controller->is_valid())
+    {
+        return false;
+    }
+
+    return controller->location_service_active().get();
+}
+
 GVariant* Phone::action_state_for_root() const
 {
     GVariantBuilder builder;
@@ -104,8 +120,19 @@ GVariant* Phone::action_state_for_root() const
     gboolean visible = should_be_visible();
     g_variant_builder_add(&builder, "{sv}", "visible", g_variant_new_boolean(visible));
 
-    const char* icon_name = "gps";
-    GIcon* icon = g_themed_icon_new_with_default_fallbacks(icon_name);
+    GIcon* icon;
+    if (!visible)
+    {
+        icon = g_themed_icon_new_with_default_fallbacks("location-disabled");
+    }
+    else if (location_service_active())
+    {
+        icon = g_themed_icon_new_with_default_fallbacks("location-active");
+    }
+    else
+    {
+        icon = g_themed_icon_new_with_default_fallbacks("location-idle");
+    }
     GVariant* serialized_icon = g_icon_serialize(icon);
     if (serialized_icon != NULL)
     {

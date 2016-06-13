@@ -57,6 +57,11 @@ public:
         return m_loc_enabled;
     }
 
+    const core::Property<bool>& location_service_active() const
+    {
+        return m_loc_active;
+    }
+
     void set_gps_enabled(bool enabled)
     {
         set_bool_property(PROP_KEY_GPS_ENABLED, enabled);
@@ -137,7 +142,8 @@ private:
         {
             const char* name;
             GAsyncReadyCallback callback;
-        } props[] = {{PROP_KEY_LOC_ENABLED, on_loc_enabled_reply}, {PROP_KEY_GPS_ENABLED, on_gps_enabled_reply}};
+        } props[] = {{PROP_KEY_LOC_ENABLED, on_loc_enabled_reply}, {PROP_KEY_GPS_ENABLED, on_gps_enabled_reply},
+                     {PROP_KEY_LOC_STATE, on_loc_state_reply}};
         for (const auto& prop : props)
         {
             g_dbus_connection_call(system_bus, BUS_NAME, OBJECT_PATH, PROP_IFACE_NAME, "Get",
@@ -194,6 +200,11 @@ private:
             {
                 self->m_gps_enabled.set(g_variant_get_boolean(val));
             }
+            else if (!g_strcmp0(key, PROP_KEY_LOC_STATE))
+            {
+                auto state_str = std::string(g_variant_get_string(val, nullptr));
+                self->m_loc_active.set(state_str == "active");
+            }
 
             g_variant_unref(val);
         }
@@ -238,6 +249,38 @@ private:
         return std::make_tuple(success, result);
     }
 
+    static std::tuple<bool, std::string> get_string_reply_from_call(GObject* source, GAsyncResult* res)
+    {
+        GError* error;
+        GVariant* v;
+        bool success{false};
+        std::string result{""};
+
+        error = nullptr;
+        GDBusConnection* conn = G_DBUS_CONNECTION(source);
+        v = g_dbus_connection_call_finish(conn, res, &error);
+        if (v != nullptr)
+        {
+            GVariant* inner{};
+            g_variant_get(v, "(v)", &inner);
+            success = true;
+            result = g_variant_get_string(inner, nullptr);
+            g_variant_unref(inner);
+            g_variant_unref(v);
+        }
+        else if (error != nullptr)
+        {
+            if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+            {
+                g_warning("Error calling dbus method: %s", error->message);
+            }
+            g_error_free(error);
+            success = false;
+        }
+
+        return std::make_tuple(success, result);
+    }
+
     static void on_loc_enabled_reply(GObject* source_object, GAsyncResult* res, gpointer gself)
     {
         bool success, value;
@@ -257,6 +300,18 @@ private:
         if (success)
         {
             static_cast<Impl*>(gself)->m_gps_enabled.set(value);
+        }
+    }
+
+    static void on_loc_state_reply(GObject* source_object, GAsyncResult* res, gpointer gself)
+    {
+        bool success;
+        std::string state_str;
+        std::tie(success, state_str) = get_string_reply_from_call(source_object, res);
+        g_debug("service state reply: success %d value '%s'", int(success), state_str.c_str());
+        if (success)
+        {
+            static_cast<Impl*>(gself)->m_loc_active.set(state_str == "active");
         }
     }
 
@@ -313,9 +368,11 @@ private:
     static constexpr const char* PROP_IFACE_NAME{"org.freedesktop.DBus.Properties"};
     static constexpr const char* PROP_KEY_LOC_ENABLED{"IsOnline"};
     static constexpr const char* PROP_KEY_GPS_ENABLED{"DoesSatelliteBasedPositioning"};
+    static constexpr const char* PROP_KEY_LOC_STATE{"State"};
 
     core::Property<bool> m_gps_enabled{false};
     core::Property<bool> m_loc_enabled{false};
+    core::Property<bool> m_loc_active{false};
     core::Property<bool> m_is_valid{false};
 
     std::shared_ptr<GCancellable> m_cancellable{};
@@ -350,6 +407,11 @@ const core::Property<bool>& LocationServiceController::gps_enabled() const
 const core::Property<bool>& LocationServiceController::location_service_enabled() const
 {
     return impl->location_service_enabled();
+}
+
+const core::Property<bool>& LocationServiceController::location_service_active() const
+{
+    return impl->location_service_active();
 }
 
 void LocationServiceController::set_gps_enabled(bool enabled)
