@@ -1,7 +1,7 @@
 Source: indicator-location
 Section: misc
 Priority: optional
-Maintainer: Charles Kerr <charles.kerr@canonical.com>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: cmake,
                dbus,
                debhelper (>= 9),
@@ -17,6 +17,8 @@ Build-Depends: cmake,
                astyle,
                clang-format-3.6,
                dos2unix,
+# for systemd unit
+               systemd,
 Standards-Version: 3.9.4
 Homepage: http://launchpad.net/indicator-location/
 # If you aren't a member of ~indicator-applet-developers but need to upload 
@@ -29,6 +31,7 @@ Package: indicator-location
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
+         indicator-common,
 Description: Indicator to show when the system is using your
  physical location data and allow the user to toggle
  permissions on its use.
