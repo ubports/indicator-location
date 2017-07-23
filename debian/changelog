@@ -1,3 +1,9 @@
+indicator-location (13.10.1+ubports) zesty; urgency=medium
+
+  * Imported to UBports
+
+ -- UBports auto importer <infra@ubports.com>  Sun, 23 Jul 2017 17:38:07 +0200
+
 indicator-location (13.10.0+17.04.20161021-0ubuntu1) zesty; urgency=medium
 
   [ Ted Gould ]
