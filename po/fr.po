@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2014-09-02 19:21+0100\n"
-"PO-Revision-Date: 2018-08-19 18:28+0000\n"
+"PO-Revision-Date: 2018-08-19 18:30+0000\n"
 "Last-Translator: Anne Onyme <anneonyme017@openmailbox.org>\n"
 "Language-Team: French <https://translate.ubports.com/projects/ubports/"
 "indicator-location/fr/>\n"
@@ -22,7 +22,7 @@ msgstr ""
 
 #: ../src/phone.cc:81 ../src/phone.cc:84
 msgid "Location"
-msgstr "Emplacement"
+msgstr "Lieu"
 
 #: ../src/phone.cc:335
 msgid "Location detection"
