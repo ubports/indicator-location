@@ -22,7 +22,7 @@ msgstr ""
 
 #: ../src/phone.cc:81 ../src/phone.cc:84
 msgid "Location"
-msgstr "Lieu"
+msgstr "Position"
 
 #: ../src/phone.cc:335
 msgid "Location detection"
