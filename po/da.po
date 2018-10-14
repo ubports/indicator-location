@@ -8,14 +8,17 @@ msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2014-09-02 19:21+0100\n"
-"PO-Revision-Date: 2014-07-23 10:11+0000\n"
-"Last-Translator: Ask Hjorth Larsen <asklarsen@gmail.com>\n"
-"Language-Team: Danish <da@li.org>\n"
+"PO-Revision-Date: 2018-09-15 17:44+0000\n"
+"Last-Translator: Tom Rausner <tomrausner@gmail.com>\n"
+"Language-Team: Danish <https://translate.ubports.com/projects/ubports/"
+"indicator-location/da/>\n"
+"Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 2.20\n"
 "X-Launchpad-Export-Date: 2014-10-15 20:19+0000\n"
-"X-Generator: Launchpad (build 17196)\n"
 
 #: ../src/phone.cc:81 ../src/phone.cc:84
 msgid "Location"
@@ -27,7 +30,7 @@ msgstr "Positionsbestemmelse"
 
 #: ../src/phone.cc:344
 msgid "View HERE terms and conditions"
-msgstr ""
+msgstr "Se HERE's betingelser og krav"
 
 #: ../src/phone.cc:348
 msgid "GPS"

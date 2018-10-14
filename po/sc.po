@@ -1,0 +1,36 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Canonical Ltd.
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: indicator-location\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-09-02 19:21+0100\n"
+"PO-Revision-Date: 2018-09-30 11:06+0000\n"
+"Last-Translator: Adrià <adriamartinmor@gmail.com>\n"
+"Language-Team: Sardinian <https://translate.ubports.com/projects/ubports/"
+"indicator-location/sc/>\n"
+"Language: sc\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 2.20\n"
+
+#: src/phone.cc:83 src/phone.cc:86
+msgid "Location"
+msgstr "Positzione"
+
+#: src/phone.cc:327
+msgid "Location detection"
+msgstr "Rilevamentu de sa positzione"
+
+#: src/phone.cc:336
+msgid "View HERE terms and conditions"
+msgstr "Ammustra is cunditziones de su servìtziu HERE"
+
+#: src/phone.cc:340
+msgid "GPS"
+msgstr "GPS"
