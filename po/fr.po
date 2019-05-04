@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: indicator-location\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-02 19:21+0100\n"
 "PO-Revision-Date: 2019-04-25 19:14+0000\n"
 "Last-Translator: Anne Onyme <anneonyme017@netcourrier.com>\n"
@@ -20,18 +20,18 @@ msgstr ""
 "X-Generator: Weblate 3.2.2\n"
 "X-Launchpad-Export-Date: 2014-10-15 20:19+0000\n"
 
-#: ../src/phone.cc:81 ../src/phone.cc:84
+#: src/phone.cc:83 src/phone.cc:86
 msgid "Location"
 msgstr "Position"
 
-#: ../src/phone.cc:335
+#: src/phone.cc:327
 msgid "Location detection"
 msgstr "Détection de la position"
 
-#: ../src/phone.cc:344
+#: src/phone.cc:336
 msgid "View HERE terms and conditions"
 msgstr "Voir les conditions d'utilisation de HERE"
 
-#: ../src/phone.cc:348
+#: src/phone.cc:340
 msgid "GPS"
 msgstr "GPS"

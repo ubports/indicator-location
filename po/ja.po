@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: indicator-location\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-02 19:21+0100\n"
 "PO-Revision-Date: 2018-10-21 00:00+0000\n"
 "Last-Translator: M.Sugahara <equaaqua@hotmail.com>\n"
@@ -20,18 +20,18 @@ msgstr ""
 "X-Generator: Weblate 3.0.1\n"
 "X-Launchpad-Export-Date: 2014-10-15 20:19+0000\n"
 
-#: ../src/phone.cc:81 ../src/phone.cc:84
+#: src/phone.cc:83 src/phone.cc:86
 msgid "Location"
 msgstr "場所"
 
-#: ../src/phone.cc:335
+#: src/phone.cc:327
 msgid "Location detection"
 msgstr "位置情報の検知"
 
-#: ../src/phone.cc:344
+#: src/phone.cc:336
 msgid "View HERE terms and conditions"
 msgstr "利用規約を確認する"
 
-#: ../src/phone.cc:348
+#: src/phone.cc:340
 msgid "GPS"
 msgstr "GPS"
