@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-02 19:21+0100\n"
-"PO-Revision-Date: 2018-11-25 00:01+0000\n"
-"Last-Translator: Louies <louies0623@gmail.com>\n"
+"PO-Revision-Date: 2019-05-08 18:52+0000\n"
+"Last-Translator: louies0623 <louies0623@gmail.com>\n"
 "Language-Team: Chinese (Hong Kong) <https://translate.ubports.com/projects/"
 "ubports/indicator-location/zh_Hant_HK/>\n"
 "Language: zh_Hant_HK\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 3.1.1\n"
+"X-Generator: Weblate 3.6.1\n"
 
 #: src/phone.cc:83 src/phone.cc:86
 msgid "Location"
@@ -25,12 +25,12 @@ msgstr "位置"
 
 #: src/phone.cc:327
 msgid "Location detection"
-msgstr ""
+msgstr "位置偵測"
 
 #: src/phone.cc:336
 msgid "View HERE terms and conditions"
-msgstr ""
+msgstr "確認服務條款"
 
 #: src/phone.cc:340
 msgid "GPS"
-msgstr ""
+msgstr "GPS"
