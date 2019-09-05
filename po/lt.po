@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-02 19:21+0100\n"
-"PO-Revision-Date: 2019-08-01 21:49+0000\n"
+"PO-Revision-Date: 2019-09-06 19:50+0000\n"
 "Last-Translator: Moo <moose@mail.ru>\n"
 "Language-Team: Lithuanian <https://translate.ubports.com/projects/ubports/"
 "indicator-location/lt/>\n"
@@ -28,11 +28,11 @@ msgstr "Vieta"
 
 #: src/phone.cc:327
 msgid "Location detection"
-msgstr ""
+msgstr "Buvimo vietos aptikimas"
 
 #: src/phone.cc:336
 msgid "View HERE terms and conditions"
-msgstr ""
+msgstr "Rodyti HERE nuostatas ir sąlygas"
 
 #: src/phone.cc:340
 msgid "GPS"
