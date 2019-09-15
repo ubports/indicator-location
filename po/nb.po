@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-02 19:21+0100\n"
-"PO-Revision-Date: 2018-09-01 19:36+0000\n"
+"PO-Revision-Date: 2019-06-03 11:03+0000\n"
 "Last-Translator: Ari Börde Kröyer <ari.kroyer@online.no>\n"
 "Language-Team: Norwegian Bokmål <https://translate.ubports.com/projects/"
 "ubports/indicator-location/nb/>\n"
@@ -17,12 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2.20\n"
+"X-Generator: Weblate 3.6.1\n"
 "X-Launchpad-Export-Date: 2014-10-15 20:20+0000\n"
 
 #: src/phone.cc:83 src/phone.cc:86
 msgid "Location"
-msgstr "Plassering"
+msgstr "Sted"
 
 #: src/phone.cc:327
 msgid "Location detection"
