@@ -3,9 +3,18 @@ cmake_minimum_required (VERSION 2.8.9)
 
 list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-set (PROJECT_VERSION "13.10.0")
+##
+##  GNU standard paths
+## 
+include (GNUInstallDirs)
+
+set (PROJECT_VERSION "16.10.0")
 set (PACKAGE ${CMAKE_PROJECT_NAME})
 set (GETTEXT_PACKAGE indicator-location)
+add_definitions (
+    -DGETTEXT_PACKAGE="${GETTEXT_PACKAGE}"
+    -DGNOMELOCALEDIR="${CMAKE_INSTALL_FULL_LOCALEDIR}"
+)
 
 set (SERVICE_LIB ${PACKAGE})
 set (SERVICE_EXEC "${PACKAGE}-service")
@@ -13,10 +22,7 @@ set (SERVICE_EXEC "${PACKAGE}-service")
 option (enable_tests "Build the package's automatic tests." ON)
 option (enable_lcov "Generate lcov code coverage reports." ON)
 
-##
-##  GNU standard paths
-## 
-include (GNUInstallDirs)
+
 if (EXISTS "/etc/debian_version") # Workaround for libexecdir on debian
   set (CMAKE_INSTALL_LIBEXECDIR "${CMAKE_INSTALL_LIBDIR}")
   set (CMAKE_INSTALL_FULL_LIBEXECDIR "${CMAKE_INSTALL_FULL_LIBDIR}")
