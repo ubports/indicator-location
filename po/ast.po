@@ -8,28 +8,30 @@ msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-02 19:21+0100\n"
-"PO-Revision-Date: 2014-10-19 16:19+0000\n"
-"Last-Translator: ivarela <ivarela@ubuntu.com>\n"
-"Language-Team: Asturian <ast@li.org>\n"
+"PO-Revision-Date: 2019-10-30 00:36+0000\n"
+"Last-Translator: enolp <enolp@softastur.org>\n"
+"Language-Team: Asturian <https://translate.ubports.com/projects/ubports/"
+"indicator-location/ast/>\n"
 "Language: ast\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 3.8\n"
 "X-Launchpad-Export-Date: 2014-10-20 07:18+0000\n"
-"X-Generator: Launchpad (build 17196)\n"
 
 #: src/phone.cc:83 src/phone.cc:86
 msgid "Location"
-msgstr "Allugamientu"
+msgstr ""
 
 #: src/phone.cc:327
 msgid "Location detection"
-msgstr "Deteición d'allugamientu"
+msgstr ""
 
 #: src/phone.cc:336
 msgid "View HERE terms and conditions"
-msgstr "Ver los términos y condiciones del serviciu HERE"
+msgstr ""
 
 #: src/phone.cc:340
 msgid "GPS"
-msgstr "GPS"
+msgstr ""
