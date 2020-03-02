@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-02 19:21+0100\n"
-"PO-Revision-Date: 2020-03-01 10:22+0000\n"
+"PO-Revision-Date: 2020-03-03 14:22+0000\n"
 "Last-Translator: Pavel Borecki <pavel.borecki@gmail.com>\n"
 "Language-Team: Czech <https://translate.ubports.com/projects/ubports/"
 "indicator-location/cs/>\n"
@@ -22,7 +22,7 @@ msgstr ""
 
 #: src/phone.cc:83 src/phone.cc:86
 msgid "Location"
-msgstr "Umístění"
+msgstr "Poloha"
 
 #: src/phone.cc:327
 msgid "Location detection"
@@ -30,7 +30,7 @@ msgstr "Určení polohy"
 
 #: src/phone.cc:336
 msgid "View HERE terms and conditions"
-msgstr "Zobrazit všeobecné smluvní podmínky ZDE"
+msgstr "Všeobecné smluvní podmínky jsou ZDE"
 
 #: src/phone.cc:340
 msgid "GPS"
