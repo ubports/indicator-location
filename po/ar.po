@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: indicator-location\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-02 19:21+0100\n"
-"PO-Revision-Date: 2020-11-20 20:15+0000\n"
+"PO-Revision-Date: 2020-12-07 18:28+0000\n"
 "Last-Translator: abidin <abidin24@tutanota.com>\n"
 "Language-Team: Arabic <https://translate.ubports.com/projects/ubports/"
 "indicator-location/ar/>\n"
@@ -30,7 +30,6 @@ msgid "Location detection"
 msgstr "تحديد الموقع"
 
 #: src/phone.cc:336
-#, fuzzy
 msgid "View HERE terms and conditions"
 msgstr "اعرض شروط استخدام HERE"
 
